@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -170,6 +171,9 @@ input[type="file"] { display: none; }
 .selected-item .item-actions, .item-row .item-actions { display: flex; align-items: center; gap: 8px; }
 .selected-item .btn-remove { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 50%; font-size: 16px; line-height: 1; transition: all 0.15s; padding: 0; flex-shrink: 0; }
 .selected-item .btn-remove:hover { background: var(--danger-light); color: var(--danger); }
+.qty-inline-input { width: 54px; padding: 3px 6px; font-size: 0.8125rem; text-align: center; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color 0.15s; -moz-appearance: textfield; flex-shrink: 0; }
+.qty-inline-input:focus { border-color: var(--border-focus); }
+.qty-inline-input::-webkit-inner-spin-button, .qty-inline-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .selected-item-header { display: flex; justify-content: space-between; margin-bottom: 5px; cursor: pointer; color: var(--text-primary); font-weight: 500; font-size: 0.8125rem; }
 .selected-item-qty { display: flex; align-items: center; gap: 5px; }
 .selected-item-qty input, .quantity-input { width: 80px; padding: 6px 8px; text-align: center; border-radius: 6px; }
@@ -10591,17 +10595,23 @@ hr { margin: 16px 0; border: none; border-top: 1px solid var(--border); }
                         <span class="item-name">${item.name}</span>
                     </div>
                     <div class="item-actions">
-                        <span style="color:var(--text-muted);font-size:0.8125rem;">x${item.quantity}</span>
+                        <input class="qty-inline-input" type="number" min="1" value="${item.quantity}" title="数量"
+                            oninput="updateItemQuantity('${item.id}', this.value)"
+                            onchange="updateItemQuantityCommit('${item.id}', this.value)"
+                            onclick="this.select()"
+                        />
                         <button class="btn-remove" onclick="removeSelectedItem('${item.id}')" title="移除">×</button>
                     </div>
                 </div>
             `).join('');
         }
         function updateItemQuantity(itemId, quantity) {
-            const item = selectedItems.find(item => item.id === itemId);
-            if (item) {
-                item.quantity = parseInt(quantity) || 1;
-            }
+            const item = selectedItems.find(i => i.id === itemId);
+            if (item && quantity !== '') item.quantity = Math.max(1, parseInt(quantity) || 1);
+        }
+        function updateItemQuantityCommit(itemId, quantity) {
+            const item = selectedItems.find(i => i.id === itemId);
+            if (item) { item.quantity = Math.max(1, parseInt(quantity) || 1); renderSelectedItems(); }
         }
         function removeSelectedItem(itemId) {
             selectedItems = selectedItems.filter(item => item.id !== itemId);
