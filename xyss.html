@@ -169,6 +169,9 @@ input[type="file"] { display: none; }
 .selected-item .item-actions, .item-row .item-actions { display: flex; align-items: center; gap: 8px; }
 .selected-item .btn-remove { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 50%; font-size: 16px; line-height: 1; transition: all 0.15s; padding: 0; flex-shrink: 0; }
 .selected-item .btn-remove:hover { background: var(--danger-light); color: var(--danger); }
+.qty-inline-input { width: 54px; padding: 3px 6px; font-size: 0.8125rem; text-align: center; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color 0.15s; -moz-appearance: textfield; flex-shrink: 0; }
+.qty-inline-input:focus { border-color: var(--border-focus); }
+.qty-inline-input::-webkit-inner-spin-button, .qty-inline-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .selected-item-header { display: flex; justify-content: space-between; margin-bottom: 5px; cursor: pointer; color: var(--text-primary); font-weight: 500; font-size: 0.8125rem; }
 .selected-item-qty { display: flex; align-items: center; gap: 5px; }
 .selected-item-qty input, .quantity-input { width: 80px; padding: 6px 8px; text-align: center; border-radius: 6px; }
@@ -1932,13 +1935,18 @@ function renderSelectedItems() {
                 <span class="item-name">${item.name}</span>
             </div>
             <div class="item-actions">
-                <span style="color:var(--text-muted);font-size:0.8125rem;">x${item.quantity}</span>
+                <input class="qty-inline-input" type="number" min="1" value="${item.quantity}" title="数量"
+                    oninput="updateQuantityLive('${item.id}', this.value)"
+                    onchange="updateQuantity('${item.id}', this.value)"
+                    onclick="this.select()"
+                />
                 <button class="btn-remove" onclick="removeItem('${item.id}')" title="移除">×</button>
             </div>
         </div>
     `).join('');
 }
 function updateQuantity(id, val) { let it = selectedItems.find(i=>i.id===id); if(it) it.quantity = Math.max(1, parseInt(val)||1); renderSelectedItems(); }
+function updateQuantityLive(id, val) { let it = selectedItems.find(i=>i.id===id); if(it && val !== '') it.quantity = Math.max(1, parseInt(val)||1); }
 function removeItem(id) { selectedItems = selectedItems.filter(i=>i.id!==id); renderSelectedItems(); }
 function applyBulkQuantity() { let qty=parseInt(document.getElementById('bulkQuantity').value); if(isNaN(qty)||qty<1) return; selectedItems.forEach(i=>i.quantity=qty); renderSelectedItems(); showToast(`批量数量=${qty}`); }
 function clearItems() { if(confirm('清空所有道具？')){ selectedItems=[]; renderSelectedItems(); } }
