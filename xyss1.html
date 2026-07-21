@@ -24,7 +24,6 @@
       margin: 0 auto;
     }
 
-    /* 两栏布局：左侧更宽，右侧较窄 */
     .two-columns {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -204,7 +203,6 @@
       font-size: 0.8rem;
     }
 
-    /* 可选道具区域滚动优化 */
     .items-scroll-area {
       max-height: 520px;
       overflow-y: auto;
@@ -733,7 +731,9 @@
         { threshold: 10000, rate: 2 },
         { threshold: 20000, rate: 2.5 },
         { threshold: 30000, rate: 3 },
-        { threshold: 50000, rate: 3.5 }
+        { threshold: 50000, rate: 3.5 },
+        { threshold: 70000, rate: 4 },
+        { threshold: 100000, rate: 4.5 }
       ];
       let applicableRate = 0;
       for (let i = 0; i < thresholds.length; i++) {
@@ -749,18 +749,15 @@
     function getTotalRechargeExtraRate(totalRecharge) {
       const thresholds = [
         { threshold: 2000, rate: 0.4 },
-        { threshold: 5000, rate: 0.6 },
-        { threshold: 10000, rate: 0.8 },
-        { threshold: 20000, rate: 1 },
-        { threshold: 30000, rate: 1.2 },
-        { threshold: 40000, rate: 1.4 },
-        { threshold: 50000, rate: 1.6 },
-        { threshold: 70000, rate: 1.8 },
-        { threshold: 100000, rate: 2 },
-        { threshold: 130000, rate: 2.2 },
-        { threshold: 160000, rate: 2.4 },
-        { threshold: 190000, rate: 2.6 },
-        { threshold: 220000, rate: 2.8 }
+        { threshold: 5000, rate: 0.8 },
+        { threshold: 10000, rate: 1.2 },
+        { threshold: 20000, rate: 1.6 },
+        { threshold: 30000, rate: 2 },
+        { threshold: 40000, rate: 2.4 },
+        { threshold: 50000, rate: 2.8 },
+        { threshold: 70000, rate: 3.2 },
+        { threshold: 100000, rate: 3.6 },
+        { threshold: 130000, rate: 4 }
       ];
       let applicableRate = 0;
       for (let i = 0; i < thresholds.length; i++) {
