@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨服信息总览</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+/* ==================== Base ==================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #f0f2f5;
+    --card-bg: #ffffff;
+    --primary: #4a6cf7;
+    --primary-light: #e8edfe;
+    --text: #1a1a2e;
+    --text-secondary: #6c7a89;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e0;
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+    --radius: 10px;
+    --radius-sm: 6px;
+    --green-bg: #e8f5e9;
+    --green-border: #81c784;
+    --green-text: #2e7d32;
+    --green-badge: #4caf50;
+    --gray-bg: #f5f6f7;
+    --gray-text: #adb5bd;
+    --tooltip-bg: #1a1a2e;
+    --tooltip-text: #ffffff;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+#app { max-width: 1400px; margin: 0 auto; padding: 24px 20px 60px; }
+
+/* ==================== Header ==================== */
+header { text-align: center; margin-bottom: 28px; }
+header h1 { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+header p { color: var(--text-secondary); font-size: 15px; }
+
+/* ==================== Upload Section ==================== */
+#upload-section { display: flex; gap: 20px; margin-bottom: 24px; }
+
+.upload-card {
+    flex: 1; display: flex; align-items: center; gap: 16px;
+    padding: 22px 24px; background: var(--card-bg);
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    cursor: pointer; transition: all 0.2s ease; position: relative;
+}
+.upload-card:hover, .upload-card.dragover { border-color: var(--primary); background: var(--primary-light); }
+.upload-card.loaded { border-style: solid; border-color: var(--green-border); background: var(--green-bg); }
+.upload-icon { font-size: 36px; line-height: 1; }
+.upload-text { flex: 1; }
+.upload-title { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.upload-hint { font-size: 13px; color: var(--text-secondary); }
+.upload-card.loaded .upload-hint { color: var(--green-text); font-weight: 500; word-break: break-all; }
+
+/* ==================== Scrape Button ==================== */
+.scrape-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+#scrape-btn {
+    padding: 10px 20px; border: 1px solid var(--primary); border-radius: var(--radius-sm);
+    background: var(--primary); color: #fff; font-size: 14px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+}
+#scrape-btn:hover { background: #3a5ce0; border-color: #3a5ce0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74, 108, 247, 0.3); }
+#scrape-btn:active { transform: translateY(0); }
+.scrape-hint { font-size: 13px; color: var(--text-secondary); }
+
+/* ==================== Toolbar ==================== */
+#toolbar { margin-bottom: 20px; }
+.stats-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; align-items: center; padding: 10px 24px; background: var(--card-bg); border-radius: var(--radius-sm); box-shadow: var(--shadow); min-width: 110px; }
+.stat-value { font-size: 22px; font-weight: 700; color: var(--primary); }
+.stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.controls input[type="text"] { flex: 1; min-width: 200px; padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; outline: none; transition: border-color 0.2s; }
+.controls input[type="text"]:focus { border-color: var(--primary); }
+.controls select { padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--card-bg); cursor: pointer; outline: none; }
+.controls label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.controls label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+
+#reset-btn { padding: 8px 18px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); font-size: 14px; cursor: pointer; color: var(--text); transition: all 0.2s; }
+#reset-btn:hover { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
+#undo-btn { padding: 8px 18px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); font-size: 14px; cursor: pointer; color: var(--text); transition: all 0.2s; }
+#undo-btn:not(:disabled):hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+#undo-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.merge-hint { margin-top: 10px; font-size: 13px; color: var(--text-secondary); background: var(--primary-light); padding: 6px 14px; border-radius: var(--radius-sm); }
+
+/* ==================== Results ==================== */
+#results { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+
+.server-card {
+    background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 16px 18px; border-left: 4px solid var(--primary);
+    transition: box-shadow 0.2s, transform 0.2s, opacity 0.2s;
+}
+.server-card:hover { box-shadow: var(--shadow-hover); }
+.server-card.dragging { opacity: 0.4; transform: scale(0.95); }
+.server-card.drag-over-valid { box-shadow: 0 0 0 3px #4caf50, var(--shadow-hover); transform: scale(1.03); }
+.server-card.drag-over-invalid { box-shadow: 0 0 0 3px #f44336, var(--shadow-hover); }
+
+.card-drag-icon { margin-left: auto; font-size: 18px; color: var(--gray-text); cursor: grab; line-height: 1; }
+.card-drag-icon:active { cursor: grabbing; }
+
+.card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.main-server-badge { font-size: 15px; font-weight: 700; color: #fff; background: var(--primary); padding: 3px 12px; border-radius: 20px; }
+.card-tag { font-size: 12px; color: var(--text-secondary); background: var(--gray-bg); padding: 2px 8px; border-radius: 4px; }
+.card-merged-row { font-size: 13px; color: #e65100; background: #fff3e0; padding: 4px 10px; border-radius: var(--radius-sm); margin-bottom: 10px; font-weight: 600; display: inline-block; }
+
+/* ==================== Server Table (replaces chips) ==================== */
+.server-table-wrap {
+    margin-bottom: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+.server-table-wrap::-webkit-scrollbar { width: 5px; }
+.server-table-wrap::-webkit-scrollbar-track { background: transparent; }
+.server-table-wrap::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
+
+.server-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.server-table thead th {
+    font-size: 11px; color: var(--text-secondary); font-weight: 500; text-align: left;
+    padding: 5px 8px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--card-bg); z-index: 1;
+}
+.server-table thead th.srv-power { text-align: right; }
+
+.server-table .server-row {
+    cursor: pointer; transition: background 0.12s;
+    border-bottom: 1px solid #f0f0f0;
+}
+.server-table .server-row:last-child { border-bottom: none; }
+
+.server-table .server-row.has-chars { color: var(--green-text); }
+.server-table .server-row.has-chars:hover { background: #d4edd4; }
+.server-table .server-row.no-chars { color: var(--gray-text); }
+.server-table .server-row.no-chars:hover { background: var(--gray-bg); }
+
+.server-table .server-row.is-main { background: #f0f4ff; }
+.server-table .server-row.is-main:hover { background: #e0e8ff; }
+
+.server-table td { padding: 5px 8px; vertical-align: middle; }
+
+.server-table .srv-id {
+    width: 52px; font-weight: 600; position: relative; white-space: nowrap;
+}
+.server-table .is-main .srv-id::before {
+    content: '\2605'; font-size: 11px; color: var(--primary); margin-right: 2px;
+}
+
+.server-table .srv-player { font-weight: 500; }
+.server-table .has-chars .srv-player { color: var(--text); }
+
+.server-table .srv-power {
+    text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums;
+    width: 80px; font-weight: 600;
+}
+.server-table .has-chars .srv-power { color: var(--green-text); }
+
+/* ==================== Card Footer ==================== */
+.card-footer {
+    display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary);
+    padding-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.card-footer span { white-space: nowrap; }
+.card-footer .footer-highlight { color: var(--green-text); font-weight: 600; }
+
+/* ==================== Unmatched ==================== */
+#unmatched-section { margin-top: 24px; }
+#unmatched-section h2 { font-size: 16px; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+.unmatched-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.server-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: var(--radius-sm); font-size: 13px;
+    cursor: pointer; transition: all 0.15s ease;
+    border: 1px solid var(--border); background: var(--gray-bg); color: var(--text);
+    user-select: none;
+}
+.server-chip.has-chars { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); font-weight: 600; }
+.server-chip.has-chars:hover { background: #c8e6c9; border-color: #66bb6a; transform: translateY(-2px); box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3); }
+.server-chip.no-chars { color: var(--gray-text); }
+.server-chip.no-chars:hover { background: #e9ecef; transform: translateY(-1px); }
+.chip-id { font-weight: 600; }
+.chip-count { font-size: 11px; background: var(--green-badge); color: #fff; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; line-height: 1.4; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ==================== Tooltip ==================== */
+#tooltip {
+    position: fixed; visibility: hidden; opacity: 0;
+    background: var(--tooltip-bg); color: var(--tooltip-text);
+    border-radius: var(--radius); padding: 14px 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    max-width: 360px; max-height: 450px; overflow-y: auto;
+    z-index: 10000; font-size: 13px;
+    transition: opacity 0.15s ease, visibility 0.15s ease; pointer-events: none;
+}
+#tooltip.visible { visibility: visible; opacity: 1; }
+#tooltip::-webkit-scrollbar { width: 6px; }
+#tooltip::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+#tooltip::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+
+.tooltip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
+.tooltip-server-id { font-size: 15px; font-weight: 700; }
+.tooltip-count { font-size: 12px; color: #aaa; background: rgba(255, 255, 255, 0.1); padding: 2px 8px; border-radius: 10px; }
+.tooltip-table { width: 100%; border-collapse: collapse; }
+.tooltip-table tr { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.tooltip-table tr:last-child { border-bottom: none; }
+.tooltip-table td { padding: 5px 4px; vertical-align: middle; }
+.tooltip-table .name { color: #fff; }
+.tooltip-table .power { color: #80cbc4; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tooltip-empty { color: #777; text-align: center; padding: 12px 0; font-style: italic; }
+
+/* ==================== Empty State ==================== */
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 6px; }
+
+/* ==================== Toast ==================== */
+.toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1a1a2e; color: #fff; padding: 12px 28px; border-radius: 8px;
+    font-size: 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    z-index: 99999; opacity: 0; transition: all 0.3s ease; pointer-events: none; white-space: nowrap;
+}
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ==================== View Toggle ==================== */
+#view-toggle-btn {
+    padding: 8px 16px; border: 1px solid var(--primary); border-radius: var(--radius-sm);
+    background: var(--card-bg); color: var(--primary); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+#view-toggle-btn:hover { background: var(--primary); color: #fff; }
+#view-toggle-btn.active { background: var(--primary); color: #fff; }
+
+.card-view-toggle {
+    padding: 3px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--card-bg); color: var(--text-secondary); font-size: 12px;
+    cursor: pointer; transition: all 0.15s; line-height: 1.4; white-space: nowrap;
+}
+.card-view-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.card-view-toggle.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+
+/* ==================== Top10 Table ==================== */
+.top10-wrap {
+    margin-bottom: 12px; max-height: 320px; overflow-y: auto;
+    border-radius: var(--radius-sm); border: 1px solid var(--border);
+}
+.top10-wrap::-webkit-scrollbar { width: 5px; }
+.top10-wrap::-webkit-scrollbar-track { background: transparent; }
+.top10-wrap::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
+
+.top10-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.top10-table thead th {
+    font-size: 11px; color: var(--text-secondary); font-weight: 500; text-align: left;
+    padding: 5px 8px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--card-bg); z-index: 1;
+}
+.top10-table thead th.t10-power { text-align: right; }
+.top10-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
+.top10-table tbody tr:last-child { border-bottom: none; }
+.top10-table tbody tr:hover { background: var(--primary-light); }
+.top10-table td { padding: 5px 8px; vertical-align: middle; }
+.top10-table .t10-rank { width: 32px; font-weight: 700; color: var(--text-secondary); }
+.top10-table .t10-rank.top3 { color: #e65100; }
+.top10-table .t10-name { font-weight: 500; color: var(--text); }
+.top10-table .t10-server { width: 50px; color: var(--text-secondary); font-size: 12px; }
+.top10-table .t10-power {
+    text-align: right; white-space: nowrap; font-weight: 600;
+    color: var(--green-text); font-variant-numeric: tabular-nums;
+}
+.top10-table .t10-id { color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+.top10-table .t10-recharge {
+    text-align: right; white-space: nowrap; font-weight: 600;
+    color: #e65100; font-variant-numeric: tabular-nums;
+}
+.top10-table thead th.t10-recharge { text-align: right; }
+.top10-table .t10-active { text-align: center; font-weight: 600; font-size: 12px; white-space: nowrap; }
+.top10-table .t10-active.active { color: var(--green-badge); }
+.top10-table .t10-active.inactive { color: var(--gray-text); }
+.top10-empty { text-align: center; padding: 20px 0; color: var(--gray-text); font-style: italic; }
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+    #upload-section { flex-direction: column; }
+    #results { grid-template-columns: 1fr; }
+    .controls { flex-direction: column; align-items: stretch; }
+    .controls input[type="text"] { min-width: auto; }
+}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>逍遥蜀山·跨服信息总览</h1>
+            <p></p>
+        </header>
+
+        <section id="upload-section">
+            <div class="upload-card" id="upload-merge" data-type="merge">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">
+                    <div class="upload-title">合服列表</div>
+                    <div class="upload-hint">点击或拖拽 .xlsx / .csv / .tsv 文件到此处</div>
+                </div>
+                <input type="file" accept=".xlsx,.xls,.csv,.tsv,.txt" hidden>
+            </div>
+            <div class="upload-card" id="upload-rank" data-type="rank">
+                <div class="upload-icon">📊</div>
+                <div class="upload-text">
+                    <div class="upload-title">角色列表</div>
+                    <div class="upload-hint">点击或拖拽 .xlsx / .csv / .tsv 文件到此处</div>
+                </div>
+                <input type="file" accept=".xlsx,.xls,.csv,.tsv,.txt" hidden>
+            </div>
+        </section>
+
+        <div class="scrape-bar">
+            <button id="scrape-btn">抓取角色数据</button>
+            <span class="scrape-hint">点击复制脚本，粘贴到角色列表页浏览器控制台即可自动抓取并下载 xlsx</span>
+        </div>
+
+        <script type="text/plain" id="scrape-script">(async function() {
+    const WAIT_TIME = 1500;
+    const FILE_NAME = '角色数据.xlsx';
+
+    function loadXLSX() {
+        return new Promise((resolve, reject) => {
+            if (typeof XLSX !== 'undefined') { resolve(); return; }
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('加载 xlsx 库失败，请检查网络。'));
+            document.head.appendChild(script);
+        });
+    }
+
+    function getPaginationInfo() {
+        const totalEl = document.querySelector('.el-pagination__total');
+        if (!totalEl) { alert('未找到分页信息，请确认在角色列表页面。'); return null; }
+        const total = parseInt(totalEl.textContent.match(/\d+/)[0], 10);
+        const sizeSelect = document.querySelector('.el-select .el-input__inner');
+        let pageSize = 20;
+        if (sizeSelect && sizeSelect.value) { pageSize = parseInt(sizeSelect.value, 10) || 20; }
+        const totalPages = Math.ceil(total / pageSize);
+        console.log(`📊 总记录: ${total}, 每页: ${pageSize}, 总页数: ${totalPages}`);
+        return { total, pageSize, totalPages };
+    }
+
+    function getPageData() {
+        const rows = document.querySelectorAll('table.el-table__body tbody tr');
+        const data = [];
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const rowData = [];
+            const maxCol = Math.min(cells.length, 15);
+            for (let i = 0; i < maxCol; i++) {
+                let text = cells[i].textContent.trim().replace(/\s+/g, ' ');
+                rowData.push(text);
+            }
+            while (rowData.length < 15) rowData.push('');
+            data.push(rowData);
+        });
+        return data;
+    }
+
+    function goToNextPage() {
+        const nextBtn = document.querySelector('.btn-next');
+        if (!nextBtn) return false;
+        const isDisabled = nextBtn.getAttribute('aria-disabled') === 'true' || nextBtn.classList.contains('disabled');
+        if (isDisabled) return false;
+        nextBtn.click();
+        return true;
+    }
+
+    function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    async function startScraping() {
+        const info = getPaginationInfo();
+        if (!info) return;
+        const { total, pageSize, totalPages } = info;
+        if (pageSize <= 20) {
+            const mins = Math.round(totalPages * WAIT_TIME / 1000 / 60);
+            if (!confirm(`每页 ${pageSize} 条，共 ${totalPages} 页，预计耗时约 ${mins} 分钟。\n建议手动调整每页显示条数为更大值（如100）以减少时间。\n是否继续？`)) { return; }
+        }
+        let allData = []; let currentPage = 1; let hasNext = true;
+        console.log('开始抓取...');
+        while (hasNext) {
+            console.log(`📄 正在抓取第 ${currentPage} 页...`);
+            const pageData = getPageData();
+            allData = allData.concat(pageData);
+            console.log(`✅ 已累计 ${allData.length} 条记录`);
+            hasNext = goToNextPage();
+            if (hasNext) { await wait(WAIT_TIME); currentPage++; }
+            else { console.log('🏁 已到达最后一页'); }
+        }
+        if (allData.length === 0) { alert('未抓取到任何数据，请检查页面。'); return; }
+        try {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(allData);
+            XLSX.utils.book_append_sheet(wb, ws, '角色数据');
+            XLSX.writeFile(wb, FILE_NAME);
+            console.log(`🎉 导出成功！共导出 ${allData.length} 条记录，文件已开始下载。`);
+        } catch (e) { console.error('导出失败:', e); alert('导出失败，请检查控制台错误信息。'); }
+    }
+
+    try { await loadXLSX(); await startScraping(); }
+    catch (err) { alert(err.message); }
+})();</script>
+
+        <section id="toolbar" style="display:none;">
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-value" id="stat-groups">0</span>
+                    <span class="stat-label">合服组</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="stat-servers">0</span>
+                    <span class="stat-label">区服总数</span>
+                </div>
+            </div>
+            <div class="controls">
+                <input type="text" id="search" placeholder="搜索区服号或角色名...">
+                <select id="sort">
+                    <option value="mainServer">按主服排序</option>
+                    <option value="characterCount">按角色数量排序</option>
+                    <option value="topPower">按最强战力排序</option>
+                    <option value="openDays">按开服天数排序</option>
+                </select>
+                <label><input type="checkbox" id="filter-empty"> 仅显示有角色的合服组</label>
+                <button id="view-toggle-btn">切换Top10视图</button>
+                <button id="undo-btn" disabled>撤回合并</button>
+                <button id="reset-btn">重新上传</button>
+            </div>
+            <div class="merge-hint">💡 拖拽卡片到另一个卡片上可合并跨服组（仅限区服数量相同的组）</div>
+        </section>
+
+        <section id="results">
+            <div class="empty-state">
+                <div class="empty-icon">⬆️</div>
+                <h3>先上传文件</h3>
+                <p>同时上传合服列表和排行榜EXCEL文档</p>
+            </div>
+        </section>
+
+        <section id="unmatched-section" style="display:none;">
+            <h2>未匹配到合服组的角色（区服未出现在合服列表中）</h2>
+            <div class="unmatched-list" id="unmatched-list"></div>
+        </section>
+
+        <div id="tooltip"></div>
+    </div>
+
+    <script>
+'use strict';
+
+// ==================== State ====================
+const state = {
+    mergeRows: null, rankRows: null, rankFormat: 'v1',
+    mergeGroups: [], rankData: {}, matchedData: [], unmatchedServers: [],
+    searchQuery: '', sortBy: 'mainServer', filterEmpty: false,
+    files: { merge: null, rank: null }, mergeHistory: [],
+    displayMode: 'servers', cardOverrides: {},
+};
+
+// ==================== Color Palette ====================
+const PALETTE = [
+    { border: '#4a6cf7', chip: '#e8edfe' }, { border: '#2e7d32', chip: '#e8f5e9' },
+    { border: '#e65100', chip: '#fff3e0' }, { border: '#7b1fa2', chip: '#f3e5f5' },
+    { border: '#c2185b', chip: '#fce4ec' }, { border: '#00695c', chip: '#e0f7fa' },
+    { border: '#f9a825', chip: '#fff9c4' }, { border: '#4527a0', chip: '#ede7f6' },
+    { border: '#0277bd', chip: '#e1f5fe' }, { border: '#bf360c', chip: '#fbe9e7' },
+];
+function getColorForGroup(bigCross) { return PALETTE[(parseInt(bigCross) || 0) % PALETTE.length]; }
+
+// ==================== File Parsing ====================
+function decodeUtf8(bytes) {
+    var start = 0;
+    if (bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) start = 3;
+    return new TextDecoder('utf-8', { fatal: false }).decode(bytes.subarray ? bytes.subarray(start) : bytes.slice(start));
+}
+
+async function parseFile(file) {
+    var buf = await file.arrayBuffer();
+    var bytes = new Uint8Array(buf);
+    var isZip = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4B;
+    var isOle = bytes.length >= 8 && bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0;
+    if ((isZip || isOle) && typeof XLSX !== 'undefined') {
+        try {
+            var wb = XLSX.read(buf, { type: 'array' });
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            if (rows && rows.length > 0) return rows;
+        } catch (e) { console.error('XLSX parse error, falling back to text:', e.message); }
+    }
+    return parseText(decodeUtf8(bytes));
+}
+
+function parseText(text) {
+    return text.trim().split(/\r?\n/).map(function(line) {
+        if (line.includes('\t')) return line.split('\t');
+        if (line.includes(',')) return line.split(',');
+        return [line];
+    });
+}
+
+function detectFileType(rows) {
+    if (!rows || !rows[0]) return 'unknown';
+    const headerStr = rows[0].map(c => String(c)).join(' ');
+    if (headerStr.includes('合服范围') || headerStr.includes('主服')) return 'merge';
+    if (headerStr.includes('战力排名') || headerStr.includes('角色名称')) return 'rank';
+    var firstRow = rows[0];
+    var colO = firstRow[14];
+    var colOIsDate = !isNaN(Number(colO)) || (typeof colO === 'string' && /\d{4}[-\/]\d{1,2}[-\/]\d{1,2}/.test(colO));
+    if (typeof firstRow[1] === 'string' && firstRow[1].length > 0
+        && !isNaN(Number(firstRow[5])) && Number(firstRow[5]) > 0
+        && !isNaN(Number(firstRow[9])) && colOIsDate) return 'rank_v2';
+    return 'unknown';
+}
+
+// ==================== Excel Date Helpers ====================
+function excelSerialToMs(serial) {
+    if (!serial || serial <= 0) return 0;
+    var daysSinceEpoch = serial > 60 ? serial - 25569 : serial - 25568;
+    return Math.round(daysSinceEpoch * 86400000);
+}
+function parseLastLogin(val) {
+    if (val === null || val === undefined || val === '') return 0;
+    var num = Number(val);
+    if (!isNaN(num) && num > 0) return excelSerialToMs(num);
+    var str = String(val).trim().replace(/\//g, '-').replace(' ', 'T');
+    var ms = Date.parse(str);
+    if (!isNaN(ms)) return ms;
+    ms = Date.parse(String(val).trim().replace(/\//g, '-'));
+    if (!isNaN(ms)) return ms;
+    return 0;
+}
+
+// ==================== Data Processing ====================
+function processMergeData(rows) {
+    const groups = [];
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row[4]) continue;
+        const mainServer = String(row[4]).trim();
+        const rangeStr = String(row[5] || '').trim();
+        let servers = [];
+        if (rangeStr === '-' || rangeStr === '' || rangeStr === '—') {
+            servers = [mainServer];
+        } else {
+            servers = rangeStr.split(/[,，\s]+/).map(s => s.trim()).filter(s => s && s !== '-' && s !== '—');
+            if (servers.length === 0) servers = [mainServer];
+        }
+        groups.push({
+            mainServer, servers,
+            bigCross: String(row[2] || '').trim(), smallCross: String(row[3] || '').trim(),
+            mergeTime: String(row[6] || '').trim(), openDays: row[7],
+            avgPower: Number(row[8]) || 0, dau: row[9],
+        });
+    }
+    return groups;
+}
+
+function processRankData(rows) {
+    const data = {};
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row[2]) continue;
+        const server = String(row[2]).trim();
+        const name = String(row[5] || '').trim();
+        const power = Number(row[6]) || 0;
+        const rank = Number(row[0]) || 0;
+        if (!data[server]) data[server] = [];
+        data[server].push({ rank, name, power });
+    }
+    Object.values(data).forEach(chars => chars.sort((a, b) => b.power - a.power));
+    return data;
+}
+
+function processRankDataV2(rows) {
+    const data = {};
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row[5]) continue;
+        const server = String(row[5]).trim();
+        const name = String(row[1] || '').trim();
+        const power = Number(row[9]) || 0;
+        const lastLoginMs = parseLastLogin(row[14]);
+        const id = String(row[0] || '').trim();
+        const recharge = Number(row[10]) || 0;
+        if (!data[server]) data[server] = [];
+        data[server].push({ name, power, lastLoginMs, id, recharge });
+    }
+    Object.values(data).forEach(chars => chars.sort((a, b) => b.power - a.power));
+    return data;
+}
+
+function buildServer(sid) {
+    const characters = state.rankData[sid] || [];
+    const topPlayer = characters.length > 0 ? { name: characters[0].name, power: characters[0].power } : null;
+    var activeCount = 0;
+    if (state.rankFormat === 'v2') {
+        var now = Date.now();
+        activeCount = characters.filter(function(c) {
+            return c.lastLoginMs && (now - c.lastLoginMs) <= 86400000;
+        }).length;
+    }
+    return { id: sid, characters, topPlayer, characterCount: characters.length, activeCount: activeCount };
+}
+
+function recalcGroup(group) {
+    const totalCharacters = group.servers.reduce((s, srv) => s + srv.characterCount, 0);
+    var activeCount = group.servers.reduce(function(s, srv) { return s + (srv.activeCount || 0); }, 0);
+    let topPlayer = null, topServer = null;
+    group.servers.forEach(srv => {
+        if (srv.topPlayer && (!topPlayer || srv.topPlayer.power > topPlayer.power)) {
+            topPlayer = srv.topPlayer; topServer = srv.id;
+        }
+    });
+    group.totalCharacters = totalCharacters;
+    group.activeCount = activeCount;
+    group.topPlayer = topPlayer ? { ...topPlayer, server: topServer } : null;
+    return group;
+}
+
+function matchData(mergeGroups, rankData) {
+    const serverToGroup = {};
+    mergeGroups.forEach((group, idx) => { group.servers.forEach(sid => { serverToGroup[sid] = idx; }); });
+    const unmatchedServers = Object.keys(rankData).filter(sid => serverToGroup[sid] === undefined);
+    const matched = mergeGroups.map(group => {
+        const servers = group.servers.map(sid => buildServer(sid));
+        return recalcGroup({ ...group, servers });
+    });
+    return { matched, unmatchedServers };
+}
+
+// ==================== Formatting ====================
+function formatPower(power) {
+    if (!power || power === 0) return '0';
+    if (power >= 1e12) return (power / 1e12).toFixed(2) + '万亿';
+    if (power >= 1e8) return (power / 1e8).toFixed(2) + '亿';
+    if (power >= 1e4) return (power / 1e4).toFixed(2) + '万';
+    return String(power);
+}
+
+function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+// ==================== Rendering ====================
+function applyFiltersAndSort() {
+    let data = [...state.matchedData];
+    if (state.filterEmpty) data = data.filter(g => g.totalCharacters > 0);
+    if (state.searchQuery) {
+        const q = state.searchQuery.toLowerCase().trim();
+        data = data.filter(g => {
+            if (g.mainServer.toLowerCase().includes(q)) return true;
+            if (g.servers.some(s => s.id.toLowerCase().includes(q))) return true;
+            if (g.servers.some(s => s.characters.some(c => c.name.toLowerCase().includes(q)))) return true;
+            return false;
+        });
+    }
+    switch (state.sortBy) {
+        case 'characterCount': data.sort((a, b) => b.totalCharacters - a.totalCharacters); break;
+        case 'topPower': data.sort((a, b) => { const ap = a.topPlayer ? a.topPlayer.power : 0; const bp = b.topPlayer ? b.topPlayer.power : 0; return bp - ap; }); break;
+        case 'openDays': data.sort((a, b) => (Number(b.openDays) || 0) - (Number(a.openDays) || 0)); break;
+        default: data.sort((a, b) => Number(a.mainServer) - Number(b.mainServer));
+    }
+    return data;
+}
+
+function renderStats() {
+    const totalServers = state.matchedData.reduce((s, g) => s + g.servers.length, 0);
+    document.getElementById('stat-groups').textContent = state.matchedData.length;
+    document.getElementById('stat-servers').textContent = totalServers;
+}
+
+function getCardDisplayMode(mainServer) {
+    if (state.cardOverrides[mainServer]) return state.cardOverrides[mainServer];
+    return state.displayMode;
+}
+
+function renderServerTableView(group) {
+    var sortedServers = group.servers.slice().sort(function(a, b) {
+        if (a.characterCount > 0 && b.characterCount === 0) return -1;
+        if (a.characterCount === 0 && b.characterCount > 0) return 1;
+        if (a.characterCount > 0 && b.characterCount > 0) {
+            return (b.topPlayer ? b.topPlayer.power : 0) - (a.topPlayer ? a.topPlayer.power : 0);
+        }
+        return 0;
+    });
+    var tableWrap = document.createElement('div');
+    tableWrap.className = 'server-table-wrap';
+    var table = document.createElement('table');
+    table.className = 'server-table';
+    var thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th>区服</th><th>最强玩家</th><th class="srv-power">战力</th></tr>';
+    table.appendChild(thead);
+    var tbody = document.createElement('tbody');
+    sortedServers.forEach(function(srv) {
+        var tr = document.createElement('tr');
+        tr.className = 'server-row ' + (srv.characterCount > 0 ? 'has-chars' : 'no-chars');
+        if (srv.id === group.mainServer) tr.classList.add('is-main');
+        var tdId = document.createElement('td');
+        tdId.className = 'srv-id';
+        tdId.textContent = srv.id;
+        tr.appendChild(tdId);
+        var tdPlayer = document.createElement('td');
+        tdPlayer.className = 'srv-player';
+        tdPlayer.textContent = srv.topPlayer ? srv.topPlayer.name : '\u2014';
+        tr.appendChild(tdPlayer);
+        var tdPower = document.createElement('td');
+        tdPower.className = 'srv-power';
+        tdPower.textContent = srv.topPlayer ? formatPower(srv.topPlayer.power) : '\u2014';
+        tr.appendChild(tdPower);
+        tr.addEventListener('mouseenter', function() { showTooltip(tr, srv, group); });
+        tr.addEventListener('mouseleave', hideTooltip);
+        tr.addEventListener('click', function(e) { e.stopPropagation(); togglePinTooltip(tr, srv, group); });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tableWrap.appendChild(table);
+    return tableWrap;
+}
+
+function formatRecharge(val) {
+    if (!val || val === 0) return '¥0';
+    if (val >= 1e8) return '¥' + (val / 1e8).toFixed(2) + '亿';
+    if (val >= 1e4) return '¥' + (val / 1e4).toFixed(2) + '万';
+    return '¥' + Number(val).toFixed(2);
+}
+
+function renderTop10View(group) {
+    var allChars = [];
+    group.servers.forEach(function(srv) {
+        srv.characters.forEach(function(c) {
+            allChars.push({ name: c.name, power: c.power, server: srv.id, id: c.id || '', recharge: c.recharge || 0, lastLoginMs: c.lastLoginMs || 0 });
+        });
+    });
+    allChars.sort(function(a, b) { return b.power - a.power; });
+    var top10 = allChars.slice(0, 10);
+    var wrap = document.createElement('div');
+    wrap.className = 'top10-wrap';
+    var table = document.createElement('table');
+    table.className = 'top10-table';
+    var thead = document.createElement('thead');
+    var isV2 = state.rankFormat === 'v2';
+    if (isV2) {
+        thead.innerHTML = '<tr><th>#</th><th>角色名</th><th>区服</th><th class="t10-power">战力</th><th>ID</th><th class="t10-recharge">充值金额</th><th>活跃</th></tr>';
+    } else {
+        thead.innerHTML = '<tr><th>#</th><th>角色名</th><th>区服</th><th class="t10-power">战力</th></tr>';
+    }
+    table.appendChild(thead);
+    var tbody = document.createElement('tbody');
+    if (top10.length === 0) {
+        var tr = document.createElement('tr');
+        var colspan = isV2 ? 7 : 4;
+        tr.innerHTML = '<td colspan="' + colspan + '" class="top10-empty">该跨服暂无上榜角色</td>';
+        tbody.appendChild(tr);
+    } else {
+        top10.forEach(function(c, i) {
+            var tr = document.createElement('tr');
+            var rankClass = i < 3 ? 't10-rank top3' : 't10-rank';
+            var html = '<td class="' + rankClass + '">' + (i + 1) + '</td>'
+                + '<td class="t10-name">' + escapeHtml(c.name) + '</td>'
+                + '<td class="t10-server">' + c.server + '</td>'
+                + '<td class="t10-power">' + formatPower(c.power) + '</td>';
+            if (isV2) {
+                html += '<td class="t10-id">' + escapeHtml(c.id || '\u2014') + '</td>';
+                html += '<td class="t10-recharge">' + formatRecharge(c.recharge) + '</td>';
+                var isActive = c.lastLoginMs && (Date.now() - c.lastLoginMs) <= 86400000;
+                html += '<td class="t10-active' + (isActive ? ' active' : ' inactive') + '">' + (isActive ? '活跃' : 'X') + '</td>';
+            }
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    return wrap;
+}
+
+function renderCard(group, groupIndex) {
+    const color = getColorForGroup(group.bigCross);
+    const card = document.createElement('div');
+    card.className = 'server-card';
+    card.style.borderLeftColor = color.border;
+    card.draggable = true;
+    card.dataset.groupIndex = groupIndex;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    const badge = document.createElement('span');
+    badge.className = 'main-server-badge';
+    badge.style.background = color.border;
+    badge.textContent = '主服 ' + group.mainServer;
+    header.appendChild(badge);
+    if (group.bigCross) {
+        const tag = document.createElement('span');
+        tag.className = 'card-tag';
+        tag.textContent = '大跨' + group.bigCross + (group.smallCross ? '·小跨' + group.smallCross : '');
+        header.appendChild(tag);
+    }
+    if (group.openDays !== undefined && group.openDays !== '') {
+        const tag = document.createElement('span');
+        tag.className = 'card-tag';
+        tag.textContent = '开服' + group.openDays + '天';
+        header.appendChild(tag);
+    }
+    if (group.mergeTime && group.mergeTime !== '-' && group.mergeTime !== '—') {
+        const tag = document.createElement('span');
+        tag.className = 'card-tag';
+        tag.textContent = '合服 ' + group.mergeTime.substring(0, 10);
+        header.appendChild(tag);
+    }
+    var cardMode = getCardDisplayMode(group.mainServer);
+    var viewToggle = document.createElement('button');
+    viewToggle.className = 'card-view-toggle' + (cardMode === 'top10' ? ' active' : '');
+    viewToggle.textContent = cardMode === 'servers' ? 'Top10' : '区服';
+    viewToggle.title = cardMode === 'servers' ? '切换到Top10视图' : '切换到区服列表视图';
+    viewToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var cur = getCardDisplayMode(group.mainServer);
+        state.cardOverrides[group.mainServer] = cur === 'servers' ? 'top10' : 'servers';
+        renderResults();
+    });
+    header.appendChild(viewToggle);
+
+    const dragIcon = document.createElement('span');
+    dragIcon.className = 'card-drag-icon';
+    dragIcon.textContent = '⠿';
+    dragIcon.title = '拖拽合并';
+    header.appendChild(dragIcon);
+    card.appendChild(header);
+
+    // Merged main servers row
+    if (group.mergedMainServers && group.mergedMainServers.length > 0) {
+        const mergedRow = document.createElement('div');
+        mergedRow.className = 'card-merged-row';
+        mergedRow.textContent = '主服' + [group.mainServer, ...group.mergedMainServers].join('、');
+        card.appendChild(mergedRow);
+    }
+
+    // --- Body: server table or top10 based on display mode ---
+    if (cardMode === 'top10') {
+        card.appendChild(renderTop10View(group));
+    } else {
+        card.appendChild(renderServerTableView(group));
+    }
+
+    // Footer
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
+    const srvCount = document.createElement('span');
+    srvCount.textContent = '该跨服有 ' + group.servers.length + ' 个区服';
+    footer.appendChild(srvCount);
+    if (state.rankFormat === 'v2' && group.activeCount > 0) {
+        const activeInfo = document.createElement('span');
+        activeInfo.className = 'footer-highlight';
+        activeInfo.textContent = '活跃玩家 ' + group.activeCount + ' 人';
+        footer.appendChild(activeInfo);
+    }
+    if (group.topPlayer) {
+        const topInfo = document.createElement('span');
+        topInfo.className = 'footer-highlight';
+        topInfo.textContent = '最高战力 ' + group.topPlayer.name + ' ' + formatPower(group.topPlayer.power) + ' (区服' + group.topPlayer.server + ')';
+        footer.appendChild(topInfo);
+    }
+    card.appendChild(footer);
+
+    setupCardDragEvents(card, groupIndex);
+    return card;
+}
+
+function renderResults() {
+    const container = document.getElementById('results');
+    container.innerHTML = '';
+    const data = applyFiltersAndSort();
+    if (data.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.innerHTML = '<div class="empty-icon">🔍</div><h3>没有匹配的数据</h3><p>' + (state.searchQuery ? '未找到匹配"' + escapeHtml(state.searchQuery) + '"的结果' : '请检查文件是否正确') + '</p>';
+        container.appendChild(empty);
+        return;
+    }
+    data.forEach(group => {
+        const originalIndex = state.matchedData.indexOf(group);
+        container.appendChild(renderCard(group, originalIndex));
+    });
+}
+
+function renderUnmatched() {
+    const section = document.getElementById('unmatched-section');
+    const list = document.getElementById('unmatched-list');
+    list.innerHTML = '';
+    if (state.unmatchedServers.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    state.unmatchedServers.forEach(sid => {
+        const srv = buildServer(sid);
+        const chip = document.createElement('span');
+        chip.className = 'server-chip has-chars';
+        chip.innerHTML = '<span class="chip-id">' + sid + '</span>' + (srv.topPlayer ? '<span class="chip-count">' + escapeHtml(srv.topPlayer.name) + '</span>' : '');
+        const group = { mainServer: sid, bigCross: '0' };
+        chip.addEventListener('mouseenter', () => showTooltip(chip, srv, group));
+        chip.addEventListener('mouseleave', hideTooltip);
+        chip.addEventListener('click', (e) => { e.stopPropagation(); togglePinTooltip(chip, srv, group); });
+        list.appendChild(chip);
+    });
+}
+
+// ==================== Drag-to-Merge ====================
+let dragSourceIndex = null;
+let dragOverCard = null;
+
+function setupCardDragEvents(card, groupIndex) {
+    card.addEventListener('dragstart', (e) => {
+        dragSourceIndex = groupIndex;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(groupIndex));
+    });
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        if (dragOverCard) { dragOverCard.classList.remove('drag-over', 'drag-over-valid', 'drag-over-invalid'); dragOverCard = null; }
+        dragSourceIndex = null;
+    });
+    card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (dragSourceIndex === null || dragSourceIndex === groupIndex) return;
+        const sourceGroup = state.matchedData[dragSourceIndex];
+        const targetGroup = state.matchedData[groupIndex];
+        if (!sourceGroup || !targetGroup) return;
+        card.classList.remove('drag-over', 'drag-over-valid', 'drag-over-invalid');
+        if (sourceGroup.servers.length === targetGroup.servers.length) card.classList.add('drag-over-valid');
+        else card.classList.add('drag-over-invalid');
+        dragOverCard = card;
+    });
+    card.addEventListener('dragleave', (e) => {
+        if (!card.contains(e.relatedTarget)) card.classList.remove('drag-over', 'drag-over-valid', 'drag-over-invalid');
+    });
+    card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over', 'drag-over-valid', 'drag-over-invalid');
+        if (dragSourceIndex === null || dragSourceIndex === groupIndex) return;
+        const sourceGroup = state.matchedData[dragSourceIndex];
+        const targetGroup = state.matchedData[groupIndex];
+        if (!sourceGroup || !targetGroup) return;
+        if (sourceGroup.servers.length !== targetGroup.servers.length) {
+            showToast('区服数量不同，无法合并！源: ' + sourceGroup.servers.length + '个，目标: ' + targetGroup.servers.length + '个');
+            return;
+        }
+        mergeGroups(groupIndex, dragSourceIndex);
+    });
+}
+
+function mergeGroups(targetIndex, sourceIndex) {
+    state.mergeHistory.push(JSON.parse(JSON.stringify(state.matchedData)));
+    const target = state.matchedData[targetIndex];
+    const source = state.matchedData[sourceIndex];
+    if (!target.mergedMainServers) target.mergedMainServers = [];
+    target.mergedMainServers.push(source.mainServer);
+    if (source.mergedMainServers) target.mergedMainServers = target.mergedMainServers.concat(source.mergedMainServers);
+    target.servers = target.servers.concat(source.servers);
+    recalcGroup(target);
+    state.matchedData.splice(sourceIndex, 1);
+    updateUndoButton();
+    renderStats(); renderResults(); renderUnmatched();
+    showToast('已合并：从服 ' + source.mainServer + ' → 主服 ' + target.mainServer);
+}
+
+function undoLastMerge() {
+    if (state.mergeHistory.length === 0) return;
+    state.matchedData = state.mergeHistory.pop();
+    updateUndoButton();
+    renderStats(); renderResults(); renderUnmatched();
+    showToast('已撤回上一步合并操作');
+}
+
+function updateUndoButton() { document.getElementById('undo-btn').disabled = state.mergeHistory.length === 0; }
+
+// ==================== Toast ====================
+let toastTimer = null;
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) { toast = document.createElement('div'); toast.id = 'toast'; toast.className = 'toast'; document.body.appendChild(toast); }
+    toast.textContent = message;
+    toast.classList.add('visible');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('visible'), 3000);
+}
+
+// ==================== Tooltip ====================
+const tooltip = document.getElementById('tooltip');
+let pinnedChip = null;
+
+function buildTooltipContent(srv, group) {
+    var chars = srv.characters;
+    var displayChars = chars.slice(0, 5);
+    var html = '<div class="tooltip-header"><span class="tooltip-server-id">区服 ' + srv.id + '</span>';
+    if (group.mainServer && group.mainServer !== srv.id) html += '<span class="tooltip-count">主服 ' + group.mainServer + '</span>';
+    html += '</div>';
+    if (chars.length === 0) { html += '<div class="tooltip-empty">该区服暂无上榜角色</div>'; }
+    else {
+        html += '<table class="tooltip-table">';
+        for (var i = 0; i < displayChars.length; i++) {
+            var c = displayChars[i];
+            html += '<tr><td class="name">' + escapeHtml(c.name) + '</td><td class="power">' + formatPower(c.power) + '</td></tr>';
+        }
+        html += '</table>';
+    }
+    return html;
+}
+
+function showTooltip(chip, srv, group) {
+    if (pinnedChip && pinnedChip === chip) return;
+    tooltip.innerHTML = buildTooltipContent(srv, group);
+    tooltip.classList.add('visible');
+    positionTooltip(chip);
+}
+
+function positionTooltip(chip) {
+    const chipRect = chip.getBoundingClientRect();
+    const tipRect = tooltip.getBoundingClientRect();
+    let x = chipRect.right + 10;
+    let y = chipRect.top - 5;
+    if (x + tipRect.width > window.innerWidth - 10) x = chipRect.left - tipRect.width - 10;
+    if (x < 10) x = 10;
+    if (y + tipRect.height > window.innerHeight - 10) y = window.innerHeight - tipRect.height - 10;
+    if (y < 10) y = 10;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+}
+
+function hideTooltip() { if (pinnedChip) return; tooltip.classList.remove('visible'); }
+
+function togglePinTooltip(chip, srv, group) {
+    if (pinnedChip === chip) { pinnedChip = null; tooltip.classList.remove('visible'); }
+    else { pinnedChip = chip; tooltip.innerHTML = buildTooltipContent(srv, group); tooltip.classList.add('visible'); positionTooltip(chip); }
+}
+
+document.addEventListener('click', (e) => {
+    if (pinnedChip && !pinnedChip.contains(e.target) && !tooltip.contains(e.target)) {
+        pinnedChip = null;
+        tooltip.classList.remove('visible');
+    }
+});
+
+// ==================== Upload Handling ====================
+const uploadCards = document.querySelectorAll('.upload-card');
+uploadCards.forEach(card => {
+    const input = card.querySelector('input[type="file"]');
+    card.addEventListener('click', (e) => { if (e.target.tagName !== 'INPUT') input.click(); });
+    input.addEventListener('change', async (e) => { if (e.target.files.length > 0) await handleFile(e.target.files[0], card.dataset.type, card); });
+    card.addEventListener('dragover', (e) => { e.preventDefault(); card.classList.add('dragover'); });
+    card.addEventListener('dragleave', () => { card.classList.remove('dragover'); });
+    card.addEventListener('drop', async (e) => { e.preventDefault(); card.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) await handleFile(e.dataTransfer.files[0], card.dataset.type, card); });
+});
+
+async function handleFile(file, expectedType, card) {
+    try {
+        const rows = await parseFile(file);
+        let detectedType = detectFileType(rows);
+        if (detectedType === 'unknown') detectedType = expectedType;
+        let targetCard = card;
+        var typeForCard = detectedType === 'rank_v2' ? 'rank' : detectedType;
+        if (typeForCard !== expectedType && detectedType !== 'unknown') {
+            targetCard = document.querySelector('.upload-card[data-type="' + typeForCard + '"]') || card;
+        }
+        if (detectedType === 'merge') { state.mergeRows = rows; state.files.merge = file; }
+        else if (detectedType === 'rank') { state.rankRows = rows; state.files.rank = file; state.rankFormat = 'v1'; }
+        else if (detectedType === 'rank_v2') { state.rankRows = rows; state.files.rank = file; state.rankFormat = 'v2'; }
+        targetCard.classList.add('loaded');
+        targetCard.querySelector('.upload-hint').textContent = file.name;
+        tryProcess();
+    } catch (err) { alert('文件解析失败: ' + err.message); console.error(err); }
+}
+
+function tryProcess() {
+    if (!state.mergeRows || !state.rankRows) return;
+    state.mergeGroups = processMergeData(state.mergeRows);
+    if (state.rankFormat === 'v2') state.rankData = processRankDataV2(state.rankRows);
+    else state.rankData = processRankData(state.rankRows);
+    const { matched, unmatchedServers } = matchData(state.mergeGroups, state.rankData);
+    state.matchedData = matched;
+    state.unmatchedServers = unmatchedServers;
+    state.mergeHistory = [];
+    state.displayMode = 'servers'; state.cardOverrides = {};
+    var vtb = document.getElementById('view-toggle-btn');
+    vtb.textContent = '切换Top10视图'; vtb.classList.remove('active');
+    document.getElementById('toolbar').style.display = 'block';
+    updateUndoButton();
+    renderStats(); renderResults(); renderUnmatched();
+}
+
+// ==================== Controls ====================
+document.getElementById('search').addEventListener('input', (e) => { state.searchQuery = e.target.value; renderResults(); });
+document.getElementById('sort').addEventListener('change', (e) => { state.sortBy = e.target.value; renderResults(); });
+document.getElementById('filter-empty').addEventListener('change', (e) => { state.filterEmpty = e.target.checked; renderResults(); });
+document.getElementById('undo-btn').addEventListener('click', () => undoLastMerge());
+document.getElementById('view-toggle-btn').addEventListener('click', function() {
+    state.displayMode = state.displayMode === 'servers' ? 'top10' : 'servers';
+    state.cardOverrides = {};
+    var btn = document.getElementById('view-toggle-btn');
+    btn.textContent = state.displayMode === 'servers' ? '切换Top10视图' : '切换区服列表视图';
+    btn.classList.toggle('active', state.displayMode === 'top10');
+    renderResults();
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+    state.mergeRows = null; state.rankRows = null; state.rankFormat = 'v1';
+    state.mergeGroups = []; state.rankData = {}; state.matchedData = []; state.unmatchedServers = [];
+    state.searchQuery = ''; state.sortBy = 'mainServer'; state.filterEmpty = false;
+    state.files = { merge: null, rank: null }; state.mergeHistory = []; pinnedChip = null;
+    state.displayMode = 'servers'; state.cardOverrides = {};
+    var vtb = document.getElementById('view-toggle-btn');
+    vtb.textContent = '切换Top10视图'; vtb.classList.remove('active');
+    document.querySelectorAll('.upload-card').forEach(card => {
+        card.classList.remove('loaded');
+        card.querySelector('.upload-hint').textContent = '点击或拖拽 .xlsx / .csv / .tsv 文件到此处';
+        card.querySelector('input[type="file"]').value = '';
+    });
+    document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('search').value = '';
+    document.getElementById('sort').value = 'mainServer';
+    document.getElementById('filter-empty').checked = false;
+    tooltip.classList.remove('visible');
+    updateUndoButton();
+    document.getElementById('results').innerHTML = '<div class="empty-state"><div class="empty-icon">⬆️</div><h3>请上传文件</h3><p>同时上传合服列表和排行榜后，自动匹配显示</p></div>';
+    document.getElementById('unmatched-section').style.display = 'none';
+});
+
+window.addEventListener('scroll', () => {
+    if (pinnedChip && tooltip.classList.contains('visible')) positionTooltip(pinnedChip);
+    else tooltip.classList.remove('visible');
+});
+window.addEventListener('resize', () => { if (pinnedChip && tooltip.classList.contains('visible')) positionTooltip(pinnedChip); });
+
+// ==================== Scrape Script Copy ====================
+document.getElementById('scrape-btn').addEventListener('click', async () => {
+    const scriptText = document.getElementById('scrape-script').textContent.trim();
+    try {
+        await navigator.clipboard.writeText(scriptText);
+        showToast('脚本已复制');
+    } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = scriptText;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('抓取脚本已复制到剪贴板，粘贴到角色列表页控制台即可使用'); }
+        catch (err) { showToast('复制失败，请手动复制'); }
+        document.body.removeChild(ta);
+    }
+});
+    </script>
+</body>
+</html>
