@@ -91,9 +91,18 @@ header p { color: var(--text-secondary); font-size: 15px; }
 
 #reset-btn { padding: 8px 18px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); font-size: 14px; cursor: pointer; color: var(--text); transition: all 0.2s; }
 #reset-btn:hover { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
-#undo-btn { padding: 8px 18px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); font-size: 14px; cursor: pointer; color: var(--text); transition: all 0.2s; }
-#undo-btn:not(:disabled):hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-#undo-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+#undo-float {
+    position: fixed; bottom: 30px; right: 30px;
+    width: 52px; height: 52px; border-radius: 50%;
+    border: none; background: var(--primary); color: #fff;
+    font-size: 22px; cursor: pointer; z-index: 9000;
+    box-shadow: 0 4px 16px rgba(74, 108, 247, 0.4);
+    display: none; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+#undo-float.shown { display: flex; }
+#undo-float:not(:disabled):hover { background: #3a5ce0; transform: scale(1.1); }
+#undo-float:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
 
 .merge-hint { margin-top: 10px; font-size: 13px; color: var(--text-secondary); background: var(--primary-light); padding: 6px 14px; border-radius: var(--radius-sm); }
 
@@ -274,15 +283,18 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .top10-table tbody tr:last-child { border-bottom: none; }
 .top10-table tbody tr:hover { background: var(--primary-light); }
 .top10-table td { padding: 5px 8px; vertical-align: middle; }
-.top10-table .t10-rank { width: 32px; font-weight: 700; color: var(--text-secondary); }
+.top10-table .t10-rank { width: 32px; font-weight: 700; color: var(--text-secondary); text-align: center; }
+.top10-table thead th.t10-rank { text-align: center; }
 .top10-table .t10-rank.top3 { color: #e65100; }
 .top10-table .t10-name { font-weight: 500; color: var(--text); }
-.top10-table .t10-server { width: 50px; color: var(--text-secondary); font-size: 12px; }
+.top10-table .t10-server { width: 50px; color: var(--text-secondary); font-size: 12px; text-align: center; }
+.top10-table thead th.t10-server { text-align: center; }
 .top10-table .t10-power {
     text-align: right; white-space: nowrap; font-weight: 600;
     color: var(--green-text); font-variant-numeric: tabular-nums;
 }
-.top10-table .t10-id { color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+.top10-table .t10-id { color: var(--text-secondary); font-size: 12px; white-space: nowrap; cursor: pointer; transition: color 0.15s; }
+.top10-table .t10-id:hover { color: var(--primary); text-decoration: underline; }
 .top10-table .t10-recharge {
     text-align: right; white-space: nowrap; font-weight: 600;
     color: #e65100; font-variant-numeric: tabular-nums;
@@ -291,6 +303,7 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .top10-table .t10-active { text-align: center; font-weight: 600; font-size: 12px; white-space: nowrap; }
 .top10-table .t10-active.active { color: var(--green-badge); }
 .top10-table .t10-active.inactive { color: var(--gray-text); }
+.top10-table thead th.t10-active { text-align: center; }
 .top10-empty { text-align: center; padding: 20px 0; color: var(--gray-text); font-style: italic; }
 
 /* ==================== Responsive ==================== */
@@ -442,10 +455,9 @@ header p { color: var(--text-secondary); font-size: 15px; }
                 </select>
                 <label><input type="checkbox" id="filter-empty"> 仅显示有角色的合服组</label>
                 <button id="view-toggle-btn">切换Top10视图</button>
-                <button id="undo-btn" disabled>撤回合并</button>
                 <button id="reset-btn">重新上传</button>
             </div>
-            <div class="merge-hint">💡 拖拽卡片到另一个卡片上可合并跨服组（仅限区服数量相同的组）</div>
+            <div class="merge-hint">💡 拖拽卡片到另一个卡片上可合并跨服组</div>
         </section>
 
         <section id="results">
@@ -463,6 +475,7 @@ header p { color: var(--text-secondary); font-size: 15px; }
 
         <div id="tooltip"></div>
     </div>
+    <button id="undo-float" disabled title="撤回合并">↩</button>
 
     <script>
 'use strict';
@@ -484,7 +497,17 @@ const PALETTE = [
     { border: '#f9a825', chip: '#fff9c4' }, { border: '#4527a0', chip: '#ede7f6' },
     { border: '#0277bd', chip: '#e1f5fe' }, { border: '#bf360c', chip: '#fbe9e7' },
 ];
-function getColorForGroup(bigCross) { return PALETTE[(parseInt(bigCross) || 0) % PALETTE.length]; }
+var smallCrossColorMap = {};
+var smallCrossColorIdx = 0;
+function getColorForGroup(smallCross) {
+    var key = smallCross || '';
+    if (smallCrossColorMap[key] === undefined) {
+        smallCrossColorMap[key] = smallCrossColorIdx % PALETTE.length;
+        smallCrossColorIdx++;
+    }
+    return PALETTE[smallCrossColorMap[key]];
+}
+function resetColorMap() { smallCrossColorMap = {}; smallCrossColorIdx = 0; }
 
 // ==================== File Parsing ====================
 function decodeUtf8(bytes) {
@@ -658,6 +681,20 @@ function formatPower(power) {
 
 function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
+async function copyToClipboard(text, msg) {
+    try {
+        await navigator.clipboard.writeText(text);
+        showToast(msg || ('\u5df2\u590d\u5236: ' + text));
+    } catch (e) {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); showToast(msg || ('\u5df2\u590d\u5236: ' + text)); }
+        catch (err) { showToast('\u590d\u5236\u5931\u8d25'); }
+        document.body.removeChild(ta);
+    }
+}
+
 // ==================== Rendering ====================
 function applyFiltersAndSort() {
     let data = [...state.matchedData];
@@ -757,9 +794,9 @@ function renderTop10View(group) {
     var thead = document.createElement('thead');
     var isV2 = state.rankFormat === 'v2';
     if (isV2) {
-        thead.innerHTML = '<tr><th>#</th><th>角色名</th><th>区服</th><th class="t10-power">战力</th><th>ID</th><th class="t10-recharge">充值金额</th><th>活跃</th></tr>';
+        thead.innerHTML = '<tr><th class="t10-rank">#</th><th>角色名</th><th class="t10-server">区服</th><th class="t10-power">战力</th><th>ID</th><th class="t10-recharge">充值金额</th><th class="t10-active">活跃</th></tr>';
     } else {
-        thead.innerHTML = '<tr><th>#</th><th>角色名</th><th>区服</th><th class="t10-power">战力</th></tr>';
+        thead.innerHTML = '<tr><th class="t10-rank">#</th><th>角色名</th><th class="t10-server">区服</th><th class="t10-power">战力</th></tr>';
     }
     table.appendChild(thead);
     var tbody = document.createElement('tbody');
@@ -783,6 +820,18 @@ function renderTop10View(group) {
                 html += '<td class="t10-active' + (isActive ? ' active' : ' inactive') + '">' + (isActive ? '活跃' : 'X') + '</td>';
             }
             tr.innerHTML = html;
+            if (isV2 && c.id) {
+                var idCell = tr.querySelector('.t10-id');
+                if (idCell) {
+                    idCell.title = '点击复制ID';
+                    (function(idVal) {
+                        idCell.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            copyToClipboard(idVal);
+                        });
+                    })(c.id);
+                }
+            }
             tbody.appendChild(tr);
         });
     }
@@ -792,7 +841,7 @@ function renderTop10View(group) {
 }
 
 function renderCard(group, groupIndex) {
-    const color = getColorForGroup(group.bigCross);
+    const color = getColorForGroup(group.smallCross);
     const card = document.createElement('div');
     card.className = 'server-card';
     card.style.borderLeftColor = color.border;
@@ -944,8 +993,7 @@ function setupCardDragEvents(card, groupIndex) {
         const targetGroup = state.matchedData[groupIndex];
         if (!sourceGroup || !targetGroup) return;
         card.classList.remove('drag-over', 'drag-over-valid', 'drag-over-invalid');
-        if (sourceGroup.servers.length === targetGroup.servers.length) card.classList.add('drag-over-valid');
-        else card.classList.add('drag-over-invalid');
+        card.classList.add('drag-over-valid');
         dragOverCard = card;
     });
     card.addEventListener('dragleave', (e) => {
@@ -958,10 +1006,6 @@ function setupCardDragEvents(card, groupIndex) {
         const sourceGroup = state.matchedData[dragSourceIndex];
         const targetGroup = state.matchedData[groupIndex];
         if (!sourceGroup || !targetGroup) return;
-        if (sourceGroup.servers.length !== targetGroup.servers.length) {
-            showToast('区服数量不同，无法合并！源: ' + sourceGroup.servers.length + '个，目标: ' + targetGroup.servers.length + '个');
-            return;
-        }
         mergeGroups(groupIndex, dragSourceIndex);
     });
 }
@@ -989,7 +1033,11 @@ function undoLastMerge() {
     showToast('已撤回上一步合并操作');
 }
 
-function updateUndoButton() { document.getElementById('undo-btn').disabled = state.mergeHistory.length === 0; }
+function updateUndoButton() {
+    var disabled = state.mergeHistory.length === 0;
+    var floatBtn = document.getElementById('undo-float');
+    if (floatBtn) floatBtn.disabled = disabled;
+}
 
 // ==================== Toast ====================
 let toastTimer = null;
@@ -1098,9 +1146,12 @@ function tryProcess() {
     state.unmatchedServers = unmatchedServers;
     state.mergeHistory = [];
     state.displayMode = 'servers'; state.cardOverrides = {};
+    resetColorMap();
+    state.matchedData.forEach(function(g) { getColorForGroup(g.smallCross); });
     var vtb = document.getElementById('view-toggle-btn');
     vtb.textContent = '切换Top10视图'; vtb.classList.remove('active');
     document.getElementById('toolbar').style.display = 'block';
+    document.getElementById('undo-float').classList.add('shown');
     updateUndoButton();
     renderStats(); renderResults(); renderUnmatched();
 }
@@ -1109,7 +1160,7 @@ function tryProcess() {
 document.getElementById('search').addEventListener('input', (e) => { state.searchQuery = e.target.value; renderResults(); });
 document.getElementById('sort').addEventListener('change', (e) => { state.sortBy = e.target.value; renderResults(); });
 document.getElementById('filter-empty').addEventListener('change', (e) => { state.filterEmpty = e.target.checked; renderResults(); });
-document.getElementById('undo-btn').addEventListener('click', () => undoLastMerge());
+document.getElementById('undo-float').addEventListener('click', () => undoLastMerge());
 document.getElementById('view-toggle-btn').addEventListener('click', function() {
     state.displayMode = state.displayMode === 'servers' ? 'top10' : 'servers';
     state.cardOverrides = {};
@@ -1125,6 +1176,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     state.searchQuery = ''; state.sortBy = 'mainServer'; state.filterEmpty = false;
     state.files = { merge: null, rank: null }; state.mergeHistory = []; pinnedChip = null;
     state.displayMode = 'servers'; state.cardOverrides = {};
+    resetColorMap();
     var vtb = document.getElementById('view-toggle-btn');
     vtb.textContent = '切换Top10视图'; vtb.classList.remove('active');
     document.querySelectorAll('.upload-card').forEach(card => {
@@ -1133,6 +1185,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
         card.querySelector('input[type="file"]').value = '';
     });
     document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('undo-float').classList.remove('shown');
     document.getElementById('search').value = '';
     document.getElementById('sort').value = 'mainServer';
     document.getElementById('filter-empty').checked = false;
@@ -1151,19 +1204,7 @@ window.addEventListener('resize', () => { if (pinnedChip && tooltip.classList.co
 // ==================== Scrape Script Copy ====================
 document.getElementById('scrape-btn').addEventListener('click', async () => {
     const scriptText = document.getElementById('scrape-script').textContent.trim();
-    try {
-        await navigator.clipboard.writeText(scriptText);
-        showToast('脚本已复制');
-    } catch (e) {
-        const ta = document.createElement('textarea');
-        ta.value = scriptText;
-        ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); showToast('抓取脚本已复制到剪贴板，粘贴到角色列表页控制台即可使用'); }
-        catch (err) { showToast('复制失败，请手动复制'); }
-        document.body.removeChild(ta);
-    }
+    await copyToClipboard(scriptText, '抓取脚本已复制到剪贴板，粘贴到角色列表页控制台即可使用');
 });
     </script>
 </body>
