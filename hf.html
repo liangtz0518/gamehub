@@ -40,7 +40,7 @@ body {
     min-height: 100vh;
 }
 
-#app { max-width: 1400px; margin: 0 auto; padding: 24px 20px 60px; }
+#app { max-width: 1700px; margin: 0 auto; padding: 24px 20px 60px; }
 
 /* ==================== Header ==================== */
 header { text-align: center; margin-bottom: 28px; }
@@ -63,6 +63,7 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .upload-title { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
 .upload-hint { font-size: 13px; color: var(--text-secondary); }
 .upload-card.loaded .upload-hint { color: var(--green-text); font-weight: 500; word-break: break-all; }
+.upload-card-sm { flex: 0 0 180px; }
 
 /* ==================== Scrape Button ==================== */
 .scrape-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
@@ -107,11 +108,11 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .merge-hint { margin-top: 10px; font-size: 13px; color: var(--text-secondary); background: var(--primary-light); padding: 6px 14px; border-radius: var(--radius-sm); }
 
 /* ==================== Results ==================== */
-#results { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+#results { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 16px; }
 
 .server-card {
     background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 16px 18px; border-left: 4px solid var(--primary);
+    padding: 16px 20px; border-left: 4px solid var(--primary);
     transition: box-shadow 0.2s, transform 0.2s, opacity 0.2s;
 }
 .server-card:hover { box-shadow: var(--shadow-hover); }
@@ -142,7 +143,7 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .server-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .server-table thead th {
     font-size: 11px; color: var(--text-secondary); font-weight: 500; text-align: left;
-    padding: 5px 8px; border-bottom: 1px solid var(--border);
+    padding: 6px 10px; border-bottom: 1px solid var(--border);
     position: sticky; top: 0; background: var(--card-bg); z-index: 1;
 }
 .server-table thead th.srv-power { text-align: right; }
@@ -161,7 +162,7 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .server-table .server-row.is-main { background: #f0f4ff; }
 .server-table .server-row.is-main:hover { background: #e0e8ff; }
 
-.server-table td { padding: 5px 8px; vertical-align: middle; }
+.server-table td { padding: 6px 10px; vertical-align: middle; }
 
 .server-table .srv-id {
     width: 52px; font-weight: 600; position: relative; white-space: nowrap;
@@ -272,22 +273,22 @@ header p { color: var(--text-secondary); font-size: 15px; }
 .top10-wrap::-webkit-scrollbar-track { background: transparent; }
 .top10-wrap::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
 
-.top10-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.top10-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
 .top10-table thead th {
     font-size: 11px; color: var(--text-secondary); font-weight: 500; text-align: left;
-    padding: 5px 8px; border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; background: var(--card-bg); z-index: 1;
+    padding: 6px 8px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--card-bg); z-index: 1; white-space: nowrap;
 }
 .top10-table thead th.t10-power { text-align: right; }
 .top10-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
 .top10-table tbody tr:last-child { border-bottom: none; }
 .top10-table tbody tr:hover { background: var(--primary-light); }
-.top10-table td { padding: 5px 8px; vertical-align: middle; }
+.top10-table td { padding: 6px 8px; vertical-align: middle; }
 .top10-table .t10-rank { width: 32px; font-weight: 700; color: var(--text-secondary); text-align: center; }
 .top10-table thead th.t10-rank { text-align: center; }
 .top10-table .t10-rank.top3 { color: #e65100; }
-.top10-table .t10-name { font-weight: 500; color: var(--text); }
-.top10-table .t10-server { width: 50px; color: var(--text-secondary); font-size: 12px; text-align: center; }
+.top10-table .t10-name { font-weight: 500; color: var(--text); white-space: nowrap; }
+.top10-table .t10-server { width: 52px; color: var(--text-secondary); font-size: 12px; text-align: center; }
 .top10-table thead th.t10-server { text-align: center; }
 .top10-table .t10-power {
     text-align: right; white-space: nowrap; font-weight: 600;
@@ -300,7 +301,9 @@ header p { color: var(--text-secondary); font-size: 15px; }
     color: #e65100; font-variant-numeric: tabular-nums;
 }
 .top10-table thead th.t10-recharge { text-align: right; }
-.top10-table .t10-active { text-align: center; font-weight: 600; font-size: 12px; white-space: nowrap; }
+.top10-table .t10-gs { color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+.top10-table thead th.t10-gs { text-align: left; }
+.top10-table .t10-active { text-align: center; font-weight: 600; font-size: 12px; white-space: nowrap; width: 44px; }
 .top10-table .t10-active.active { color: var(--green-badge); }
 .top10-table .t10-active.inactive { color: var(--gray-text); }
 .top10-table thead th.t10-active { text-align: center; }
@@ -309,9 +312,13 @@ header p { color: var(--text-secondary); font-size: 15px; }
 /* ==================== Responsive ==================== */
 @media (max-width: 768px) {
     #upload-section { flex-direction: column; }
+    .upload-card-sm { flex: 1; }
     #results { grid-template-columns: 1fr; }
     .controls { flex-direction: column; align-items: stretch; }
     .controls input[type="text"] { min-width: auto; }
+}
+@media (max-width: 1100px) {
+    #results { grid-template-columns: 1fr; }
 }
     </style>
 </head>
@@ -336,6 +343,14 @@ header p { color: var(--text-secondary); font-size: 15px; }
                 <div class="upload-text">
                     <div class="upload-title">角色列表</div>
                     <div class="upload-hint">点击或拖拽 .xlsx / .csv / .tsv 文件到此处</div>
+                </div>
+                <input type="file" accept=".xlsx,.xls,.csv,.tsv,.txt" hidden>
+            </div>
+            <div class="upload-card upload-card-sm" id="upload-gs" data-type="gs">
+                <div class="upload-icon">👤</div>
+                <div class="upload-text">
+                    <div class="upload-title">GS</div>
+                    <div class="upload-hint">可选，上传GS归属文件</div>
                 </div>
                 <input type="file" accept=".xlsx,.xls,.csv,.tsv,.txt" hidden>
             </div>
@@ -485,8 +500,9 @@ const state = {
     mergeRows: null, rankRows: null, rankFormat: 'v1',
     mergeGroups: [], rankData: {}, matchedData: [], unmatchedServers: [],
     searchQuery: '', sortBy: 'mainServer', filterEmpty: false,
-    files: { merge: null, rank: null }, mergeHistory: [],
+    files: { merge: null, rank: null, gs: null }, mergeHistory: [],
     displayMode: 'servers', cardOverrides: {},
+    gsMap: {},
 };
 
 // ==================== Color Palette ====================
@@ -570,6 +586,19 @@ function parseLastLogin(val) {
     ms = Date.parse(String(val).trim().replace(/\//g, '-'));
     if (!isNaN(ms)) return ms;
     return 0;
+}
+
+// ==================== GS Data Processing ====================
+function processGSData(rows) {
+    var map = {};
+    for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if (!row) continue;
+        var charId = String(row[3] || '').trim();
+        var gsName = String(row[14] || '').trim();
+        if (charId && gsName) map[charId] = gsName;
+    }
+    return map;
 }
 
 // ==================== Data Processing ====================
@@ -793,8 +822,9 @@ function renderTop10View(group) {
     table.className = 'top10-table';
     var thead = document.createElement('thead');
     var isV2 = state.rankFormat === 'v2';
+    var hasGS = Object.keys(state.gsMap).length > 0;
     if (isV2) {
-        thead.innerHTML = '<tr><th class="t10-rank">#</th><th>角色名</th><th class="t10-server">区服</th><th class="t10-power">战力</th><th>ID</th><th class="t10-recharge">充值金额</th><th class="t10-active">活跃</th></tr>';
+        thead.innerHTML = '<tr><th class="t10-rank">#</th><th>角色名</th><th class="t10-server">区服</th><th class="t10-power">战力</th><th>ID</th><th class="t10-recharge">充值金额</th>' + (hasGS ? '<th class="t10-gs">GS</th>' : '') + '<th class="t10-active">活跃</th></tr>';
     } else {
         thead.innerHTML = '<tr><th class="t10-rank">#</th><th>角色名</th><th class="t10-server">区服</th><th class="t10-power">战力</th></tr>';
     }
@@ -802,7 +832,7 @@ function renderTop10View(group) {
     var tbody = document.createElement('tbody');
     if (top10.length === 0) {
         var tr = document.createElement('tr');
-        var colspan = isV2 ? 7 : 4;
+        var colspan = isV2 ? (hasGS ? 8 : 7) : 4;
         tr.innerHTML = '<td colspan="' + colspan + '" class="top10-empty">该跨服暂无上榜角色</td>';
         tbody.appendChild(tr);
     } else {
@@ -816,6 +846,7 @@ function renderTop10View(group) {
             if (isV2) {
                 html += '<td class="t10-id">' + escapeHtml(c.id || '\u2014') + '</td>';
                 html += '<td class="t10-recharge">' + formatRecharge(c.recharge) + '</td>';
+                if (hasGS) html += '<td class="t10-gs">' + escapeHtml(state.gsMap[c.id] || '\u2014') + '</td>';
                 var isActive = c.lastLoginMs && (Date.now() - c.lastLoginMs) <= 86400000;
                 html += '<td class="t10-active' + (isActive ? ' active' : ' inactive') + '">' + (isActive ? '活跃' : 'X') + '</td>';
             }
@@ -1120,6 +1151,15 @@ uploadCards.forEach(card => {
 async function handleFile(file, expectedType, card) {
     try {
         const rows = await parseFile(file);
+        if (expectedType === 'gs') {
+            state.gsMap = processGSData(rows);
+            state.files.gs = file;
+            card.classList.add('loaded');
+            card.querySelector('.upload-hint').textContent = file.name;
+            if (state.matchedData.length > 0) renderResults();
+            showToast('GS数据已加载，共' + Object.keys(state.gsMap).length + '条');
+            return;
+        }
         let detectedType = detectFileType(rows);
         if (detectedType === 'unknown') detectedType = expectedType;
         let targetCard = card;
@@ -1174,14 +1214,15 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     state.mergeRows = null; state.rankRows = null; state.rankFormat = 'v1';
     state.mergeGroups = []; state.rankData = {}; state.matchedData = []; state.unmatchedServers = [];
     state.searchQuery = ''; state.sortBy = 'mainServer'; state.filterEmpty = false;
-    state.files = { merge: null, rank: null }; state.mergeHistory = []; pinnedChip = null;
+    state.files = { merge: null, rank: null, gs: null }; state.mergeHistory = []; pinnedChip = null;
     state.displayMode = 'servers'; state.cardOverrides = {};
+    state.gsMap = {};
     resetColorMap();
     var vtb = document.getElementById('view-toggle-btn');
     vtb.textContent = '切换Top10视图'; vtb.classList.remove('active');
     document.querySelectorAll('.upload-card').forEach(card => {
         card.classList.remove('loaded');
-        card.querySelector('.upload-hint').textContent = '点击或拖拽 .xlsx / .csv / .tsv 文件到此处';
+        card.querySelector('.upload-hint').textContent = card.dataset.type === 'gs' ? '可选，上传GS归属文件' : '点击或拖拽 .xlsx / .csv / .tsv 文件到此处';
         card.querySelector('input[type="file"]').value = '';
     });
     document.getElementById('toolbar').style.display = 'none';
