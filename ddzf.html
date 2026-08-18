@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -548,6 +549,173 @@
         .card:nth-child(2) { animation-delay: 0.06s; }
         .card:nth-child(3) { animation-delay: 0.12s; }
         .card:nth-child(4) { animation-delay: 0.18s; }
+
+        /* ===== DAILY RECHARGE SECTION ===== */
+        .day-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 20px 24px;
+        }
+        .day-btn {
+            padding: 12px 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-align: center;
+            font-family: inherit;
+            letter-spacing: -0.01em;
+        }
+        .day-btn:hover {
+            background: #ebebf0;
+            border-color: #d2d2d7;
+            transform: translateY(-1px);
+        }
+        .day-btn:active {
+            transform: scale(0.97);
+            background: #e0e0e5;
+        }
+        .day-btn.has-config {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .day-btn .day-badge {
+            display: inline-block;
+            font-size: 0.625rem;
+            color: var(--success);
+            margin-left: 3px;
+            vertical-align: super;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 420px;
+            max-width: 90vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.92) translateY(10px);
+            transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .modal-overlay.show .modal {
+            transform: scale(1) translateY(0);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-header .modal-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: all var(--transition);
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .modal-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all var(--transition);
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .modal-option:last-child { border-bottom: none; }
+        .modal-option:hover { background: var(--bg-hover); }
+        .modal-option.selected {
+            background: var(--accent-light);
+        }
+        .modal-option .option-check {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            border: 2px solid #d2d2d7;
+            flex-shrink: 0;
+            transition: all var(--transition);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: transparent;
+        }
+        .modal-option:hover .option-check { border-color: #b0b0b8; }
+        .modal-option.selected .option-check {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .modal-option .option-label {
+            flex: 1;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        .modal-option .option-items-count {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            background: var(--bg-input);
+            padding: 2px 8px;
+            border-radius: 980px;
+        }
+        .modal-option.selected .option-items-count {
+            background: rgba(0, 113, 227, 0.12);
+            color: var(--accent);
+        }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+        .modal-footer .btn { flex: 1; }
     </style>
 </head>
 <body>
@@ -609,6 +777,18 @@
             </div>
         </div>
 
+        <!-- 单日累充礼包 -->
+        <div class="card">
+            <div class="card-header">
+                <span class="label">单日累充礼包</span>
+            </div>
+            <div class="card-body no-pad">
+                <div class="day-btn-grid" id="dayBtnGrid">
+                    <!-- 第1天 ~ 第8天 + 其他，由 JS 动态生成 -->
+                </div>
+            </div>
+        </div>
+
         <!-- 道具配置 -->
         <div class="card">
             <div class="card-header">
@@ -643,7 +823,7 @@
             <!-- Selected Items Header -->
             <div class="selected-header-row">
                 <span class="label" style="font-weight:600;color:var(--text-primary);">已选道具</span>
-                <span class="selected-count">已选 <strong id="selectedCount">0</strong> / 10</span>
+                <span class="selected-count">已选 <strong id="selectedCount">0</strong> 个</span>
             </div>
 
             <!-- Selected Items List -->
@@ -661,6 +841,23 @@
 
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
+
+<!-- MODAL: 单日累充礼包 -->
+<div id="rechargeModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">单日累充礼包</span>
+            <button class="modal-close" id="modalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- 选项由 JS 动态生成 -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn" id="modalCancelBtn">取消</button>
+            <button class="btn btn-primary" id="modalConfirmBtn">确认添加</button>
+        </div>
+    </div>
+</div>
 
 <script>
     // 道具库
@@ -968,8 +1165,206 @@
 { id: "32104", name: "龙元·不灭之元" },
 { id: "32093", name: "龙元·遁甲之元" },
 { id: "32094", name: "龙元·遁甲之元" },
-{ id: "29622", name: "龙元·龙元精魄" }
+{ id: "29622", name: "龙元·龙元精魄" },
+{ id: "58152", name: "累充10元礼包" },
+{ id: "58153", name: "累充30元礼包" },
+{ id: "58154", name: "累充60元礼包" },
+{ id: "58155", name: "累充120元礼包" },
+{ id: "58156", name: "累充180元礼包" },
+{ id: "58157", name: "累充240元礼包" },
+{ id: "58158", name: "累充360元礼包" },
+{ id: "58159", name: "累充500元礼包1" },
+{ id: "58160", name: "累充500元礼包2" },
+{ id: "58161", name: "累充700元礼包1" },
+{ id: "58162", name: "累充700元礼包2" },
+{ id: "58163", name: "累充1000元礼包1" },
+{ id: "58164", name: "累充1000元礼包2" },
+{ id: "58165", name: "累充1500元礼包1" },
+{ id: "58166", name: "累充1500元礼包2" },
+{ id: "58167", name: "累充2000元礼包1" },
+{ id: "58168", name: "累充2000元礼包2" },
+{ id: "58169", name: "累充3000元礼包1" },
+{ id: "58170", name: "累充3000元礼包2" },
+{ id: "58171", name: "累充5000元礼包1" },
+{ id: "58172", name: "累充5000元礼包2" },
+{ id: "58173", name: "累充7000元礼包1" },
+{ id: "58174", name: "累充7000元礼包2" },
+{ id: "58175", name: "累充10000元礼包1" },
+{ id: "58176", name: "累充10000元礼包2" },
+{ id: "58177", name: "累充15000元礼包1" },
+{ id: "58178", name: "累充15000元礼包2" },
+{ id: "58179", name: "累充20000元礼包1" },
+{ id: "58180", name: "累充20000元礼包2" },
+{ id: "58181", name: "累充30000元礼包1" },
+{ id: "58182", name: "累充30000元礼包2" },
+{ id: "58183", name: "累充50000元礼包1" },
+{ id: "58184", name: "累充50000元礼包2" },
+{ id: "58185", name: "累充70000元礼包1" },
+{ id: "58186", name: "累充70000元礼包2" },
+{ id: "58187", name: "累充100000元礼包1" },
+{ id: "58188", name: "累充100000元礼包2" },
+{ id: "58189", name: "累充130000元礼包1" },
+{ id: "58190", name: "累充130000元礼包2" },
+{ id: "58191", name: "累充160000元礼包1" },
+{ id: "58192", name: "累充160000元礼包2" },
+{ id: "58289", name: "累充200000元礼包1" },
+{ id: "58290", name: "累充200000元礼包2" }
     ];
+
+    // ===== 单日累充礼包配置 =====
+    // 在此处配置每个天数每个金额对应的道具ID列表
+    // 格式: DAILY_RECHARGE_CONFIG[天数][金额] = [{ id: "道具ID", count: 数量 }, ...]
+    // 天数: 1~8 对应"第1天"~"第8天"，'other' 对应"其他"
+    // 金额: 5, 10, 30, 60, 98, 128, 198, 300, 500, 1000, 2000, 3000, 5000, 10000
+    const DAILY_RECHARGE_AMOUNTS = [5, 10, 30, 60, 98, 128, 198, 300, 500, 1000, 2000, 3000, 5000, 10000];
+    const DAILY_RECHARGE_DAYS = [1, 2, 3, 4, 5, 6, 7, 8, 'other'];
+
+    const DAILY_RECHARGE_CONFIG = {
+        1: { // 第1天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        2: { // 第2天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        3: { // 第3天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        4: { // 第4天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        5: { // 第5天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        6: { // 第6天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        7: { // 第7天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        8: { // 第8天
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+        'other': { // 其他
+            5:    [{ id: "", count: 1 }],
+            10:   [{ id: "", count: 1 }],
+            30:   [{ id: "", count: 1 }],
+            60:   [{ id: "", count: 1 }],
+            98:   [{ id: "", count: 1 }],
+            128:  [{ id: "", count: 1 }],
+            198:  [{ id: "", count: 1 }],
+            300:  [{ id: "", count: 1 }],
+            500:  [{ id: "", count: 1 }],
+            1000: [{ id: "", count: 1 }],
+            2000: [{ id: "", count: 1 }],
+            3000: [{ id: "", count: 1 }],
+            5000: [{ id: "", count: 1 }],
+            10000:[{ id: "", count: 1 }],
+        },
+    };
 
     // ===== GLOBAL STATE =====
     let selectedItems = [];
@@ -1028,10 +1423,6 @@
                 if (selectedItemIds.has(item.id)) {
                     selectedItemIds.delete(item.id);
                 } else {
-                    if (selectedItemIds.size + selectedItems.length >= 10) {
-                        showToast('已经10個啦，衰仔', true);
-                        return;
-                    }
                     selectedItemIds.add(item.id);
                 }
                 renderItemList();
@@ -1082,19 +1473,19 @@
     // ===== ADD / CLEAR SELECTIONS =====
     function addSelected() {
         if (selectedItemIds.size === 0) { showToast('咩都冇选，加咩加啊', true); return; }
-        if (selectedItems.length >= 10) { showToast('最多只能选择 10 个道具', true); return; }
-        const maxSlots = 10 - selectedItems.length;
         const toAdd = [];
-        let count = 0;
         for (let id of selectedItemIds) {
-            if (count >= maxSlots) break;
             const item = ITEM_LIBRARY.find(i => i.id === id);
-            if (item) { toAdd.push(item); count++; }
+            if (item) { toAdd.push(item); }
         }
         let added = 0;
         for (let item of toAdd) {
-            if (selectedItems.length >= 10) break;
-            selectedItems.push({ id: item.id, name: item.name, count: 1 });
+            const existing = selectedItems.find(i => i.id === item.id);
+            if (existing) {
+                existing.count = (existing.count || 0) + 1;
+            } else {
+                selectedItems.push({ id: item.id, name: item.name, count: 1 });
+            }
             added++;
         }
         if (added > 0) {
@@ -1122,6 +1513,137 @@
         renderSelectedList();
         showToast('已清空全部配置信息');
     }
+
+    // ===== 单日累充礼包 MODAL =====
+    let modalCurrentDay = null;
+    let modalSelectedAmounts = new Set();
+    const rechargeModal = document.getElementById('rechargeModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    const dayBtnGrid = document.getElementById('dayBtnGrid');
+
+    function getDayLabel(day) {
+        return day === 'other' ? '其他' : `第${day}天`;
+    }
+
+    function renderDayButtons() {
+        dayBtnGrid.innerHTML = '';
+        DAILY_RECHARGE_DAYS.forEach(day => {
+            const btn = document.createElement('button');
+            btn.className = 'day-btn';
+            btn.textContent = getDayLabel(day);
+            // 检查是否有已配置的道具
+            const dayConfig = DAILY_RECHARGE_CONFIG[day];
+            let hasItems = false;
+            if (dayConfig) {
+                for (let amount of DAILY_RECHARGE_AMOUNTS) {
+                    if (dayConfig[amount] && dayConfig[amount].some(i => i.id)) {
+                        hasItems = true;
+                        break;
+                    }
+                }
+            }
+            if (hasItems) {
+                btn.classList.add('has-config');
+                const badge = document.createElement('span');
+                badge.className = 'day-badge';
+                badge.textContent = '●';
+                btn.appendChild(badge);
+            }
+            btn.addEventListener('click', () => openRechargeModal(day));
+            dayBtnGrid.appendChild(btn);
+        });
+    }
+
+    function openRechargeModal(day) {
+        modalCurrentDay = day;
+        modalSelectedAmounts.clear();
+        modalTitle.textContent = `${getDayLabel(day)} - 单日累充礼包`;
+        renderModalOptions();
+        rechargeModal.classList.add('show');
+    }
+
+    function closeRechargeModal() {
+        rechargeModal.classList.remove('show');
+        modalCurrentDay = null;
+        modalSelectedAmounts.clear();
+    }
+
+    function renderModalOptions() {
+        modalBody.innerHTML = '';
+        const dayConfig = DAILY_RECHARGE_CONFIG[modalCurrentDay] || {};
+        DAILY_RECHARGE_AMOUNTS.forEach(amount => {
+            const items = dayConfig[amount] || [];
+            const validItems = items.filter(i => i.id);
+            const div = document.createElement('div');
+            const isSel = modalSelectedAmounts.has(amount);
+            div.className = 'modal-option' + (isSel ? ' selected' : '');
+            div.innerHTML = `
+                <span class="option-check">${isSel ? '✓' : ''}</span>
+                <span class="option-label">${getDayLabel(modalCurrentDay)}-${amount}元</span>
+                <span class="option-items-count">${validItems.length} 个道具</span>
+            `;
+            div.addEventListener('click', () => {
+                if (modalSelectedAmounts.has(amount)) {
+                    modalSelectedAmounts.delete(amount);
+                } else {
+                    modalSelectedAmounts.add(amount);
+                }
+                renderModalOptions();
+            });
+            modalBody.appendChild(div);
+        });
+    }
+
+    function confirmRechargeModal() {
+        if (modalSelectedAmounts.size === 0) {
+            showToast('请至少选择一个金额选项', true);
+            return;
+        }
+        let added = 0;
+        let skipped = 0;
+        for (let amount of DAILY_RECHARGE_AMOUNTS) {
+            if (!modalSelectedAmounts.has(amount)) continue;
+            const dayConfig = DAILY_RECHARGE_CONFIG[modalCurrentDay] || {};
+            const items = dayConfig[amount] || [];
+            for (let itemConfig of items) {
+                if (!itemConfig.id) { skipped++; continue; }
+                // 查找道具名称
+                const libItem = ITEM_LIBRARY.find(i => i.id === itemConfig.id);
+                const name = libItem ? libItem.name : `未知道具`;
+                const count = itemConfig.count || 1;
+                // 避免重复添加相同ID
+                const existing = selectedItems.find(i => i.id === itemConfig.id);
+                if (existing) {
+                    existing.count = (existing.count || 0) + count;
+                } else {
+                    selectedItems.push({ id: itemConfig.id, name: name, count: count });
+                }
+                added++;
+            }
+        }
+        closeRechargeModal();
+        renderSelectedList();
+        renderItemList();
+        renderDayButtons();
+        if (added > 0) {
+            let msg = `已添加 ${added} 个道具`;
+            if (skipped > 0) msg += `（跳过 ${skipped} 个未配置的）`;
+            showToast(msg);
+        } else {
+            showToast('所选选项中没有已配置的道具ID', true);
+        }
+    }
+
+    modalCloseBtn.addEventListener('click', closeRechargeModal);
+    modalCancelBtn.addEventListener('click', closeRechargeModal);
+    modalConfirmBtn.addEventListener('click', confirmRechargeModal);
+    rechargeModal.addEventListener('click', function(e) {
+        if (e.target === rechargeModal) closeRechargeModal();
+    });
 
     // ===== SCHEMES =====
     const STORAGE_SCHEMES = 'mailTool_schemes';
@@ -1170,7 +1692,6 @@
     }
     function loadSchemeData(items) {
         if (!items || !items.length) return;
-        if (items.length > 10) items = items.slice(0, 10);
         const newSelected = [];
         for (let it of items) {
             const libItem = ITEM_LIBRARY.find(i => i.id === it.id);
@@ -1280,36 +1801,108 @@
     function generateAndCopy() {
         const serverValue = serverValueInput.value.trim();
         const roleId = roleIdInput.value.trim();
-        const items = [];
-        for (let i = 0; i < 10; i++) {
-            if (i < selectedItems.length) {
-                items.push({ id: selectedItems[i].id, count: String(selectedItems[i].count) });
-            } else {
-                items.push({ id: "", count: "" });
-            }
+
+        if (selectedItems.length === 0) {
+            showToast('请先添加道具', true);
+            return;
         }
-        const config = { serverValue: serverValue || "0", roleId: roleId || "", items, subject: "1", content: "1" };
-        const script = `// 自动填充脚本（先清空后填充）
+
+        const allItems = selectedItems.map(item => ({
+            id: item.id,
+            count: String(item.count)
+        }));
+
+        const config = {
+            serverValue: serverValue || "0",
+            roleId: roleId || "",
+            items: allItems,
+            subject: "1",
+            content: "1"
+        };
+
+        const totalBatches = Math.ceil(allItems.length / 10);
+
+        const script = `// 自动填充脚本（手动分批模式）
+// 共 ${allItems.length} 个道具，每批 10 个，分 ${totalBatches} 批
+// 用法：粘贴执行 → 自动填第一批 → 点"发送" → 控制台按 ↑ + 回车重新执行 → 自动填下一批 … 循环至完成
+// 重新开始：运行 __daodaoBatchStop() 清除队列
 (function() {
+    const STORAGE_KEY = '__daodao_batch_fill';
+    const BATCH_SIZE = 10;
     const config = ${JSON.stringify(config, null, 4)};
+
+    // 读取持久化队列
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+
+    // ===== 主流程（每次执行只走一条分支） =====
+
+    // 1) 首次执行：无队列或队列与本次配置不匹配 → 初始化并填第一批
+    if (!state || !state.items || state.items.length === 0 || state._sig !== ${allItems.length}) {
+        state = {
+            _sig: ${allItems.length},
+            items: config.items,
+            currentIndex: 0,
+            totalItems: config.items.length,
+            serverValue: config.serverValue,
+            roleId: config.roleId,
+            subject: config.subject,
+            content: config.content
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        console.log('[初始化] 共 ' + state.totalItems + ' 个道具，分 ' + Math.ceil(state.totalItems / BATCH_SIZE) + ' 批');
+        doFill();
+        console.log('>>> 请点击页面"发送"按钮发送当前批次');
+        console.log('>>> 发送后：控制台按 ↑ + 回车 重新执行本脚本，自动填充下一批');
+        return;
+    }
+
+    // 2) 全部完成：清除队列
+    if (state.currentIndex >= state.totalItems) {
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('✅ 所有 ' + state.totalItems + ' 个道具已全部填充完成！');
+        return;
+    }
+
+    // 3) 重新执行：检测"物品1"ID输入框是否为空
+    if (!isItem1IdEmpty()) {
+        console.log('⚠️ 当前批次尚未发送（物品1 ID输入框仍有内容）。');
+        console.log('>>> 请先点击页面"发送"按钮发送当前批次，发送后按 ↑ + 回车 填充下一批');
+        return;
+    }
+
+    // 4) 物品1为空 → 上一批已发送成功，推进并填充下一批
+    console.log('[检测到物品1为空，上一批已发送] 自动推进到下一批');
+    state.currentIndex += BATCH_SIZE;
+    if (state.currentIndex >= state.totalItems) {
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('✅ 所有 ' + state.totalItems + ' 个道具已全部填充完成！');
+        return;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    doFill();
+    console.log('>>> 请点击页面"发送"按钮发送当前批次');
+    console.log('>>> 发送后：控制台按 ↑ + 回车 重新执行本脚本，自动填充下一批');
+
     function triggerEvent(el, type) {
         if (!el) return;
         el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
     }
+
     function clearForm() {
         const select = document.querySelector('#select_server');
         if (select) { select.value = "0"; triggerEvent(select, 'change'); if (typeof $ !== 'undefined' && $(select).data('select2')) $(select).trigger('change'); }
         const roleInput = document.querySelector('#role_id');
         if (roleInput) { roleInput.value = ""; triggerEvent(roleInput, 'input'); triggerEvent(roleInput, 'change'); }
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= BATCH_SIZE; i++) {
             const th = Array.from(document.querySelectorAll('th')).find(el => el.textContent.trim() === \`物品\${i}\`);
             if (th) {
                 const row = th.closest('tr');
+                // 物品行有多个 text 输入框（ID/数量/过期时间），全部清空
                 const inputs = row.querySelectorAll(\`input[name="item\${i}[]"][type="text"]\`);
-                if (inputs.length >= 2) {
-                    inputs[0].value = ""; inputs[1].value = "";
-                    triggerEvent(inputs[0], 'input'); triggerEvent(inputs[0], 'change');
-                    triggerEvent(inputs[1], 'input'); triggerEvent(inputs[1], 'change');
+                for (const inp of inputs) {
+                    inp.value = "";
+                    triggerEvent(inp, 'input'); triggerEvent(inp, 'change');
                 }
             }
         }
@@ -1317,38 +1910,72 @@
         if (subjectInput) { subjectInput.value = ""; triggerEvent(subjectInput, 'input'); triggerEvent(subjectInput, 'change'); }
         const contentArea = document.querySelector('textarea[name="content"]');
         if (contentArea) { contentArea.value = ""; triggerEvent(contentArea, 'input'); triggerEvent(contentArea, 'change'); }
-        console.log('[清空] 已重置所有表单字段');
     }
+
     function fillForm() {
         const select = document.querySelector('#select_server');
-        if (select) { select.value = config.serverValue; triggerEvent(select, 'change'); if (typeof $ !== 'undefined' && $(select).data('select2')) $(select).trigger('change'); console.log(\`✓ 区服: \${select.options[select.selectedIndex]?.text}\`); }
+        if (select) { select.value = state.serverValue; triggerEvent(select, 'change'); if (typeof $ !== 'undefined' && $(select).data('select2')) $(select).trigger('change'); }
         const roleInput = document.querySelector('#role_id');
-        if (roleInput) { roleInput.value = config.roleId; triggerEvent(roleInput, 'input'); triggerEvent(roleInput, 'change'); console.log(\`✓ 角色ID: \${config.roleId}\`); }
-        for (let i = 1; i <= 10; i++) {
-            const item = config.items[i-1];
-            if (!item || (!item.id && !item.count)) continue;
-            const th = Array.from(document.querySelectorAll('th')).find(el => el.textContent.trim() === \`物品\${i}\`);
-            if (th) {
-                const row = th.closest('tr');
-                const inputs = row.querySelectorAll(\`input[name="item\${i}[]"][type="text"]\`);
-                if (inputs.length >= 2) {
-                    if (item.id) { inputs[0].value = item.id; triggerEvent(inputs[0], 'input'); triggerEvent(inputs[0], 'change'); }
-                    if (item.count) { inputs[1].value = item.count; triggerEvent(inputs[1], 'input'); triggerEvent(inputs[1], 'change'); }
-                    console.log(\`✓ 物品\${i}: ID=\${inputs[0].value}, 数量=\${inputs[1].value}\`);
+        if (roleInput) { roleInput.value = state.roleId; triggerEvent(roleInput, 'input'); triggerEvent(roleInput, 'change'); }
+
+        const batch = state.items.slice(state.currentIndex, state.currentIndex + BATCH_SIZE);
+        for (let i = 0; i < BATCH_SIZE; i++) {
+            if (i < batch.length) {
+                const item = batch[i];
+                const th = Array.from(document.querySelectorAll('th')).find(el => el.textContent.trim() === \`物品\${i+1}\`);
+                if (th) {
+                    const row = th.closest('tr');
+                    const inputs = row.querySelectorAll(\`input[name="item\${i+1}[]"][type="text"]\`);
+                    if (inputs.length >= 2) {
+                        if (item.id) { inputs[0].value = item.id; triggerEvent(inputs[0], 'input'); triggerEvent(inputs[0], 'change'); }
+                        if (item.count) { inputs[1].value = item.count; triggerEvent(inputs[1], 'input'); triggerEvent(inputs[1], 'change'); }
+                    }
                 }
             }
         }
+
         const subjectInput = document.querySelector('input[name="subject"]');
-        if (subjectInput) { subjectInput.value = config.subject; triggerEvent(subjectInput, 'input'); triggerEvent(subjectInput, 'change'); console.log(\`✓ 标题: \${config.subject}\`); }
+        if (subjectInput) { subjectInput.value = state.subject; triggerEvent(subjectInput, 'input'); triggerEvent(subjectInput, 'change'); }
         const contentArea = document.querySelector('textarea[name="content"]');
-        if (contentArea) { contentArea.value = config.content; triggerEvent(contentArea, 'input'); triggerEvent(contentArea, 'change'); console.log('✓ 邮件内容已填'); }
-        console.log('✅ 填充完成');
+        if (contentArea) { contentArea.value = state.content; triggerEvent(contentArea, 'input'); triggerEvent(contentArea, 'change'); }
+
+        const batchNum = Math.floor(state.currentIndex / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(state.totalItems / BATCH_SIZE);
+        console.log(\`[批次 \${batchNum}/\${totalBatches}] 已填充 \${batch.length} 个道具 (\${state.currentIndex + 1}-\${state.currentIndex + batch.length})\`);
+        if (state.currentIndex + BATCH_SIZE < state.totalItems) {
+            console.log('>>> 请点击页面"发送"按钮发送当前批次，发送后按 ↑ + 回车 填充下一批');
+        } else {
+            console.log('>>> 这是最后一批，请点击"发送"完成，发送后按 ↑ + 回车 确认完成');
+        }
     }
-    clearForm();
-    fillForm();
+
+    function doFill() {
+        clearForm();
+        fillForm();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // 检测"物品1"的 ID 输入框是否为空
+    function isItem1IdEmpty() {
+        const firstTh = Array.from(document.querySelectorAll('th')).find(el => (el.textContent || '').trim() === '物品1');
+        if (!firstTh) return false;
+        const row = firstTh.closest('tr');
+        if (!row) return false;
+        const inputs = row.querySelectorAll('input[name="item1[]"][type="text"]');
+        if (inputs.length < 2) return false;
+        return inputs[0].value.trim() === '';
+    }
+
+    // 工具：清除队列，重新开始
+    window.__daodaoBatchStop = function() {
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('已清除批量填充队列，可重新粘贴脚本从第一批开始');
+        delete window.__daodaoBatchStop;
+    };
 })();`;
+
         navigator.clipboard.writeText(script).then(() => {
-            showToast('已复制到剪贴板');
+            showToast(`已复制到剪贴板（${allItems.length} 个道具 / ${totalBatches} 批）`);
         }).catch(() => {
             showToast('复制失败，请手动复制', true);
         });
@@ -1373,6 +2000,7 @@
     renderSelectedList();
     renderSchemeList();
     renderRoleList();
+    renderDayButtons();
 </script>
 </body>
 </html>
