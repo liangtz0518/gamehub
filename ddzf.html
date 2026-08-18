@@ -580,18 +580,6 @@
             transform: scale(0.97);
             background: #e0e0e5;
         }
-        .day-btn.has-config {
-            border-color: var(--accent);
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-        .day-btn .day-badge {
-            display: inline-block;
-            font-size: 0.625rem;
-            color: var(--success);
-            margin-left: 3px;
-            vertical-align: super;
-        }
 
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -805,8 +793,9 @@
                 </div>
                 <div id="itemList" class="item-library"></div>
                 <div class="item-search-actions">
+                    <button id="selectAllBtn" class="btn" style="flex:1;">全选</button>
                     <button id="addSelectedBtn" class="btn btn-primary" style="flex:1;">添加选中</button>
-                    <button id="clearSearchSelectionBtn" class="btn">清空选中</button>
+                    <button id="clearSearchSelectionBtn" class="btn" style="flex:1;">清空选中</button>
                 </div>
             </div>
         </div>
@@ -1208,161 +1197,263 @@
 { id: "58191", name: "累充160000元礼包1" },
 { id: "58192", name: "累充160000元礼包2" },
 { id: "58289", name: "累充200000元礼包1" },
-{ id: "58290", name: "累充200000元礼包2" }
+{ id: "58290", name: "累充200000元礼包2" },
+{ id: "58040", name: "第一天-5元" },
+{ id: "58041", name: "第一天-10元" },
+{ id: "58042", name: "第一天-30元" },
+{ id: "58043", name: "第一天-60元" },
+{ id: "58044", name: "第一天-98元" },
+{ id: "58045", name: "第一天-128元" },
+{ id: "58046", name: "第一天-198元" },
+{ id: "58047", name: "第一天-300元" },
+{ id: "58048", name: "第一天-500元" },
+{ id: "58049", name: "第一天-1000元" },
+{ id: "58050", name: "第一天-2000元" },
+{ id: "58051", name: "第一天-3000元" },
+{ id: "58052", name: "第一天-5000元" },
+{ id: "58053", name: "第一天-10000元" },
+{ id: "58054", name: "第二天-5元" },
+{ id: "58055", name: "第二天-10元" },
+{ id: "58056", name: "第二天-30元" },
+{ id: "58057", name: "第二天-60元" },
+{ id: "58058", name: "第二天-98元" },
+{ id: "58059", name: "第二天-128元" },
+{ id: "58060", name: "第二天-198元" },
+{ id: "58061", name: "第二天-300元" },
+{ id: "58062", name: "第二天-500元" },
+{ id: "58063", name: "第二天-1000元" },
+{ id: "58064", name: "第二天-2000元" },
+{ id: "58065", name: "第二天-3000元" },
+{ id: "58066", name: "第二天-5000元" },
+{ id: "58067", name: "第二天-10000元" },
+{ id: "58068", name: "第三天-5元" },
+{ id: "58069", name: "第三天-10元" },
+{ id: "58070", name: "第三天-30元" },
+{ id: "58071", name: "第三天-60元" },
+{ id: "58072", name: "第三天-98元" },
+{ id: "58073", name: "第三天-128元" },
+{ id: "58074", name: "第三天-198元" },
+{ id: "58075", name: "第三天-300元" },
+{ id: "58076", name: "第三天-500元" },
+{ id: "58077", name: "第三天-1000元" },
+{ id: "58078", name: "第三天-2000元" },
+{ id: "58079", name: "第三天-3000元" },
+{ id: "58080", name: "第三天-5000元" },
+{ id: "58081", name: "第三天-10000元" },
+{ id: "58082", name: "第四天-5元" },
+{ id: "58083", name: "第四天-10元" },
+{ id: "58084", name: "第四天-30元" },
+{ id: "58085", name: "第四天-60元" },
+{ id: "58086", name: "第四天-98元" },
+{ id: "58087", name: "第四天-128元" },
+{ id: "58088", name: "第四天-198元" },
+{ id: "58089", name: "第四天-300元" },
+{ id: "58090", name: "第四天-500元" },
+{ id: "58091", name: "第四天-1000元" },
+{ id: "58092", name: "第四天-2000元" },
+{ id: "58093", name: "第四天-3000元" },
+{ id: "58094", name: "第四天-5000元" },
+{ id: "58095", name: "第四天-10000元" },
+{ id: "58096", name: "第五天-5元" },
+{ id: "58097", name: "第五天-10元" },
+{ id: "58098", name: "第五天-30元" },
+{ id: "58099", name: "第五天-60元" },
+{ id: "58100", name: "第五天-98元" },
+{ id: "58101", name: "第五天-128元" },
+{ id: "58102", name: "第五天-198元" },
+{ id: "58103", name: "第五天-300元" },
+{ id: "58104", name: "第五天-500元" },
+{ id: "58105", name: "第五天-1000元" },
+{ id: "58106", name: "第五天-2000元" },
+{ id: "58107", name: "第五天-3000元" },
+{ id: "58108", name: "第五天-5000元" },
+{ id: "58109", name: "第五天-10000元" },
+{ id: "58110", name: "第六天-5元" },
+{ id: "58111", name: "第六天-10元" },
+{ id: "58112", name: "第六天-30元" },
+{ id: "58113", name: "第六天-60元" },
+{ id: "58114", name: "第六天-98元" },
+{ id: "58115", name: "第六天-128元" },
+{ id: "58116", name: "第六天-198元" },
+{ id: "58117", name: "第六天-300元" },
+{ id: "58118", name: "第六天-500元" },
+{ id: "58119", name: "第六天-1000元" },
+{ id: "58120", name: "第六天-2000元" },
+{ id: "58121", name: "第六天-3000元" },
+{ id: "58122", name: "第六天-5000元" },
+{ id: "58123", name: "第六天-10000元" },
+{ id: "58124", name: "第七天-5元" },
+{ id: "58125", name: "第七天-10元" },
+{ id: "58126", name: "第七天-30元" },
+{ id: "58127", name: "第七天-60元" },
+{ id: "58128", name: "第七天-98元" },
+{ id: "58129", name: "第七天-128元" },
+{ id: "58130", name: "第七天-198元" },
+{ id: "58131", name: "第七天-300元" },
+{ id: "58132", name: "第七天-500元" },
+{ id: "58133", name: "第七天-1000元" },
+{ id: "58134", name: "第七天-2000元" },
+{ id: "58135", name: "第七天-3000元" },
+{ id: "58136", name: "第七天-5000元" },
+{ id: "58137", name: "第七天-10000元" },
+{ id: "58138", name: "第八天-5元" },
+{ id: "58139", name: "第八天-10元" },
+{ id: "58140", name: "第八天-30元" },
+{ id: "58141", name: "第八天-60元" },
+{ id: "58142", name: "第八天-98元" },
+{ id: "58143", name: "第八天-128元" },
+{ id: "58144", name: "第八天-198元" },
+{ id: "58145", name: "第八天-300元" },
+{ id: "58146", name: "第八天-500元" },
+{ id: "58147", name: "第八天-1000元" },
+{ id: "58148", name: "第八天-2000元" },
+{ id: "58149", name: "第八天-3000元" },
+{ id: "58150", name: "第八天-5000元" },
+{ id: "58151", name: "第八及-10000元" }
     ];
 
     // ===== 单日累充礼包配置 =====
     // 在此处配置每个天数每个金额对应的道具ID列表
     // 格式: DAILY_RECHARGE_CONFIG[天数][金额] = [{ id: "道具ID", count: 数量 }, ...]
-    // 天数: 1~8 对应"第1天"~"第8天"，'other' 对应"其他"
+    // 天数: 1~8 对应"第1天"~"第8天"（"其他"按钮不适用本配置，见下方 OTHER_RECHARGE_CONFIG）
     // 金额: 5, 10, 30, 60, 98, 128, 198, 300, 500, 1000, 2000, 3000, 5000, 10000
+    // "其他"礼包配置: 数组形式，每个元素为一个自定义礼包，label 为弹窗中显示的名称
+    // 格式: { label: "礼包名称", items: [{ id: "道具ID", count: 数量 }, ...] }
+    const OTHER_RECHARGE_CONFIG = [
+        // { label: "自定义礼包A", items: [{ id: "道具ID", count: 1 }] },
+        // { label: "自定义礼包B", items: [{ id: "道具ID", count: 1 }, { id: "道具ID", count: 2 }] },
+    ];
     const DAILY_RECHARGE_AMOUNTS = [5, 10, 30, 60, 98, 128, 198, 300, 500, 1000, 2000, 3000, 5000, 10000];
     const DAILY_RECHARGE_DAYS = [1, 2, 3, 4, 5, 6, 7, 8, 'other'];
 
     const DAILY_RECHARGE_CONFIG = {
         1: { // 第1天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58040", count: 1 }],
+            10:   [{ id: "58041", count: 1 }],
+            30:   [{ id: "58042", count: 1 }],
+            60:   [{ id: "58043", count: 1 }],
+            98:   [{ id: "58044", count: 1 }],
+            128:  [{ id: "58045", count: 1 }],
+            198:  [{ id: "58046", count: 1 }],
+            300:  [{ id: "58047", count: 1 }],
+            500:  [{ id: "58048", count: 1 }],
+            1000: [{ id: "58049", count: 1 }],
+            2000: [{ id: "58050", count: 1 }],
+            3000: [{ id: "58051", count: 1 }],
+            5000: [{ id: "58052", count: 1 }],
+            10000:[{ id: "58053", count: 1 }],
         },
         2: { // 第2天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58054", count: 1 }],
+            10:   [{ id: "58055", count: 1 }],
+            30:   [{ id: "58056", count: 1 }],
+            60:   [{ id: "58057", count: 1 }],
+            98:   [{ id: "58058", count: 1 }],
+            128:  [{ id: "58059", count: 1 }],
+            198:  [{ id: "58060", count: 1 }],
+            300:  [{ id: "58061", count: 1 }],
+            500:  [{ id: "58062", count: 1 }],
+            1000: [{ id: "58063", count: 1 }],
+            2000: [{ id: "58064", count: 1 }],
+            3000: [{ id: "58065", count: 1 }],
+            5000: [{ id: "58066", count: 1 }],
+            10000:[{ id: "58067", count: 1 }],
         },
         3: { // 第3天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58068", count: 1 }],
+            10:   [{ id: "58069", count: 1 }],
+            30:   [{ id: "58070", count: 1 }],
+            60:   [{ id: "58071", count: 1 }],
+            98:   [{ id: "58072", count: 1 }],
+            128:  [{ id: "58073", count: 1 }],
+            198:  [{ id: "58074", count: 1 }],
+            300:  [{ id: "58075", count: 1 }],
+            500:  [{ id: "58076", count: 1 }],
+            1000: [{ id: "58077", count: 1 }],
+            2000: [{ id: "58078", count: 1 }],
+            3000: [{ id: "58079", count: 1 }],
+            5000: [{ id: "58080", count: 1 }],
+            10000:[{ id: "58081", count: 1 }],
         },
         4: { // 第4天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58082", count: 1 }],
+            10:   [{ id: "58083", count: 1 }],
+            30:   [{ id: "58084", count: 1 }],
+            60:   [{ id: "58085", count: 1 }],
+            98:   [{ id: "58086", count: 1 }],
+            128:  [{ id: "58087", count: 1 }],
+            198:  [{ id: "58088", count: 1 }],
+            300:  [{ id: "58089", count: 1 }],
+            500:  [{ id: "58090", count: 1 }],
+            1000: [{ id: "58091", count: 1 }],
+            2000: [{ id: "58092", count: 1 }],
+            3000: [{ id: "58093", count: 1 }],
+            5000: [{ id: "58094", count: 1 }],
+            10000:[{ id: "58095", count: 1 }],
         },
         5: { // 第5天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58096", count: 1 }],
+            10:   [{ id: "58097", count: 1 }],
+            30:   [{ id: "58098", count: 1 }],
+            60:   [{ id: "58099", count: 1 }],
+            98:   [{ id: "58100", count: 1 }],
+            128:  [{ id: "58101", count: 1 }],
+            198:  [{ id: "58102", count: 1 }],
+            300:  [{ id: "58103", count: 1 }],
+            500:  [{ id: "58104", count: 1 }],
+            1000: [{ id: "58105", count: 1 }],
+            2000: [{ id: "58106", count: 1 }],
+            3000: [{ id: "58107", count: 1 }],
+            5000: [{ id: "58108", count: 1 }],
+            10000:[{ id: "58109", count: 1 }],
         },
         6: { // 第6天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58110", count: 1 }],
+            10:   [{ id: "58111", count: 1 }],
+            30:   [{ id: "58112", count: 1 }],
+            60:   [{ id: "58113", count: 1 }],
+            98:   [{ id: "58114", count: 1 }],
+            128:  [{ id: "58115", count: 1 }],
+            198:  [{ id: "58116", count: 1 }],
+            300:  [{ id: "58117", count: 1 }],
+            500:  [{ id: "58118", count: 1 }],
+            1000: [{ id: "58119", count: 1 }],
+            2000: [{ id: "58120", count: 1 }],
+            3000: [{ id: "58121", count: 1 }],
+            5000: [{ id: "58122", count: 1 }],
+            10000:[{ id: "58123", count: 1 }],
         },
         7: { // 第7天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58124", count: 1 }],
+            10:   [{ id: "58125", count: 1 }],
+            30:   [{ id: "58126", count: 1 }],
+            60:   [{ id: "58127", count: 1 }],
+            98:   [{ id: "58128", count: 1 }],
+            128:  [{ id: "58129", count: 1 }],
+            198:  [{ id: "58130", count: 1 }],
+            300:  [{ id: "58131", count: 1 }],
+            500:  [{ id: "58132", count: 1 }],
+            1000: [{ id: "58133", count: 1 }],
+            2000: [{ id: "58134", count: 1 }],
+            3000: [{ id: "58135", count: 1 }],
+            5000: [{ id: "58136", count: 1 }],
+            10000:[{ id: "58137", count: 1 }],
         },
         8: { // 第8天
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
-        },
-        'other': { // 其他
-            5:    [{ id: "", count: 1 }],
-            10:   [{ id: "", count: 1 }],
-            30:   [{ id: "", count: 1 }],
-            60:   [{ id: "", count: 1 }],
-            98:   [{ id: "", count: 1 }],
-            128:  [{ id: "", count: 1 }],
-            198:  [{ id: "", count: 1 }],
-            300:  [{ id: "", count: 1 }],
-            500:  [{ id: "", count: 1 }],
-            1000: [{ id: "", count: 1 }],
-            2000: [{ id: "", count: 1 }],
-            3000: [{ id: "", count: 1 }],
-            5000: [{ id: "", count: 1 }],
-            10000:[{ id: "", count: 1 }],
+            5:    [{ id: "58138", count: 1 }],
+            10:   [{ id: "58139", count: 1 }],
+            30:   [{ id: "58140", count: 1 }],
+            60:   [{ id: "58141", count: 1 }],
+            98:   [{ id: "58142", count: 1 }],
+            128:  [{ id: "58143", count: 1 }],
+            198:  [{ id: "58144", count: 1 }],
+            300:  [{ id: "58145", count: 1 }],
+            500:  [{ id: "58146", count: 1 }],
+            1000: [{ id: "58147", count: 1 }],
+            2000: [{ id: "58148", count: 1 }],
+            3000: [{ id: "58149", count: 1 }],
+            5000: [{ id: "58150", count: 1 }],
+            10000:[{ id: "58151", count: 1 }],
         },
     };
 
@@ -1504,6 +1595,28 @@
         showToast('已清空搜索选中');
     }
 
+    // 全选当前搜索结果中的全部道具
+    function selectAllSearchResults() {
+        const keyword = searchInput.value.trim();
+        if (keyword === '') {
+            showToast('请先输入关键词搜索道具', true);
+            return;
+        }
+        const lowerKw = keyword.toLowerCase();
+        const filtered = ITEM_LIBRARY.filter(item =>
+            item.name.toLowerCase().includes(lowerKw) || item.id.toLowerCase().includes(lowerKw)
+        );
+        if (filtered.length === 0) {
+            showToast('当前没有搜索到道具', true);
+            return;
+        }
+        const before = selectedItemIds.size;
+        filtered.forEach(item => selectedItemIds.add(item.id));
+        const added = selectedItemIds.size - before;
+        renderItemList();
+        showToast(`已全选 ${filtered.length} 个搜索结果${added > 0 ? `（新增选中 ${added} 个）` : ''}`);
+    }
+
     function clearAllSelected() {
         serverValueInput.value = '';
         roleIdInput.value = '';
@@ -1535,24 +1648,6 @@
             const btn = document.createElement('button');
             btn.className = 'day-btn';
             btn.textContent = getDayLabel(day);
-            // 检查是否有已配置的道具
-            const dayConfig = DAILY_RECHARGE_CONFIG[day];
-            let hasItems = false;
-            if (dayConfig) {
-                for (let amount of DAILY_RECHARGE_AMOUNTS) {
-                    if (dayConfig[amount] && dayConfig[amount].some(i => i.id)) {
-                        hasItems = true;
-                        break;
-                    }
-                }
-            }
-            if (hasItems) {
-                btn.classList.add('has-config');
-                const badge = document.createElement('span');
-                badge.className = 'day-badge';
-                badge.textContent = '●';
-                btn.appendChild(badge);
-            }
             btn.addEventListener('click', () => openRechargeModal(day));
             dayBtnGrid.appendChild(btn);
         });
@@ -1574,6 +1669,36 @@
 
     function renderModalOptions() {
         modalBody.innerHTML = '';
+        // "其他"模式：按自定义礼包配置渲染（不再按金额档）
+        if (modalCurrentDay === 'other') {
+            if (!OTHER_RECHARGE_CONFIG.length) {
+                modalBody.innerHTML = '<div class="placeholder-text" style="padding:24px;">暂无</div>';
+                return;
+            }
+            OTHER_RECHARGE_CONFIG.forEach((pack, idx) => {
+                const key = 'idx_' + idx;
+                const validItems = (pack.items || []).filter(i => i.id);
+                const div = document.createElement('div');
+                const isSel = modalSelectedAmounts.has(key);
+                div.className = 'modal-option' + (isSel ? ' selected' : '');
+                div.innerHTML = `
+                    <span class="option-check">${isSel ? '✓' : ''}</span>
+                    <span class="option-label">${escapeHtml(pack.label || ('礼包' + (idx + 1)))}</span>
+                    <span class="option-items-count">${validItems.length} 个道具</span>
+                `;
+                div.addEventListener('click', () => {
+                    if (modalSelectedAmounts.has(key)) {
+                        modalSelectedAmounts.delete(key);
+                    } else {
+                        modalSelectedAmounts.add(key);
+                    }
+                    renderModalOptions();
+                });
+                modalBody.appendChild(div);
+            });
+            return;
+        }
+        // 第1~8天模式：按金额档渲染
         const dayConfig = DAILY_RECHARGE_CONFIG[modalCurrentDay] || {};
         DAILY_RECHARGE_AMOUNTS.forEach(amount => {
             const items = dayConfig[amount] || [];
@@ -1600,35 +1725,57 @@
 
     function confirmRechargeModal() {
         if (modalSelectedAmounts.size === 0) {
-            showToast('请至少选择一个金额选项', true);
+            showToast('请至少选择一个礼包选项', true);
             return;
         }
         let added = 0;
         let skipped = 0;
-        for (let amount of DAILY_RECHARGE_AMOUNTS) {
-            if (!modalSelectedAmounts.has(amount)) continue;
-            const dayConfig = DAILY_RECHARGE_CONFIG[modalCurrentDay] || {};
-            const items = dayConfig[amount] || [];
-            for (let itemConfig of items) {
-                if (!itemConfig.id) { skipped++; continue; }
-                // 查找道具名称
-                const libItem = ITEM_LIBRARY.find(i => i.id === itemConfig.id);
-                const name = libItem ? libItem.name : `未知道具`;
-                const count = itemConfig.count || 1;
-                // 避免重复添加相同ID
-                const existing = selectedItems.find(i => i.id === itemConfig.id);
-                if (existing) {
-                    existing.count = (existing.count || 0) + count;
-                } else {
-                    selectedItems.push({ id: itemConfig.id, name: name, count: count });
+        // "其他"模式：遍历自定义礼包配置
+        if (modalCurrentDay === 'other') {
+            OTHER_RECHARGE_CONFIG.forEach((pack, idx) => {
+                const key = 'idx_' + idx;
+                if (!modalSelectedAmounts.has(key)) return;
+                const items = pack.items || [];
+                for (let itemConfig of items) {
+                    if (!itemConfig.id) { skipped++; continue; }
+                    const libItem = ITEM_LIBRARY.find(i => i.id === itemConfig.id);
+                    const name = libItem ? libItem.name : `未知道具`;
+                    const count = itemConfig.count || 1;
+                    const existing = selectedItems.find(i => i.id === itemConfig.id);
+                    if (existing) {
+                        existing.count = (existing.count || 0) + count;
+                    } else {
+                        selectedItems.push({ id: itemConfig.id, name: name, count: count });
+                    }
+                    added++;
                 }
-                added++;
+            });
+        } else {
+            // 第1~8天模式：按金额档添加
+            for (let amount of DAILY_RECHARGE_AMOUNTS) {
+                if (!modalSelectedAmounts.has(amount)) continue;
+                const dayConfig = DAILY_RECHARGE_CONFIG[modalCurrentDay] || {};
+                const items = dayConfig[amount] || [];
+                for (let itemConfig of items) {
+                    if (!itemConfig.id) { skipped++; continue; }
+                    // 查找道具名称
+                    const libItem = ITEM_LIBRARY.find(i => i.id === itemConfig.id);
+                    const name = libItem ? libItem.name : `未知道具`;
+                    const count = itemConfig.count || 1;
+                    // 避免重复添加相同ID
+                    const existing = selectedItems.find(i => i.id === itemConfig.id);
+                    if (existing) {
+                        existing.count = (existing.count || 0) + count;
+                    } else {
+                        selectedItems.push({ id: itemConfig.id, name: name, count: count });
+                    }
+                    added++;
+                }
             }
         }
         closeRechargeModal();
         renderSelectedList();
         renderItemList();
-        renderDayButtons();
         if (added > 0) {
             let msg = `已添加 ${added} 个道具`;
             if (skipped > 0) msg += `（跳过 ${skipped} 个未配置的）`;
@@ -1665,23 +1812,26 @@
         schemes.forEach((scheme, idx) => {
             const div = document.createElement('div');
             div.className = 'list-item';
+            div.title = '点击加载方案';
             div.innerHTML = `
-                <span class="item-label" title="${escapeHtml(scheme.name)}">${escapeHtml(scheme.name)} <span style="color:var(--text-muted);font-size:0.7rem;">(${scheme.items.length})</span></span>
+                <span class="item-label" title="点击加载方案">${escapeHtml(scheme.name)} <span style="color:var(--text-muted);font-size:0.7rem;">(${scheme.items.length})</span></span>
                 <div class="list-actions">
-                    <button class="btn btn-sm btn-load" data-idx="${idx}">加载</button>
                     <button class="btn btn-sm btn-del" data-idx="${idx}">删除</button>
                 </div>
             `;
             container.appendChild(div);
         });
-        container.querySelectorAll('.btn-load').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx);
+        container.querySelectorAll('.list-item').forEach(div => {
+            div.addEventListener('click', (e) => {
+                // 点击"删除"按钮时不加载
+                if (e.target.closest('.btn-del')) return;
+                const idx = parseInt(div.querySelector('.btn-del').dataset.idx);
                 loadSchemeData(loadSchemes()[idx].items);
             });
         });
         container.querySelectorAll('.btn-del').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const idx = parseInt(btn.dataset.idx);
                 let schemes = loadSchemes();
                 schemes.splice(idx, 1);
@@ -1990,6 +2140,7 @@
     searchInput.addEventListener('input', renderItemList);
     document.getElementById('addSelectedBtn').addEventListener('click', addSelected);
     document.getElementById('clearSearchSelectionBtn').addEventListener('click', clearSearchSelection);
+    document.getElementById('selectAllBtn').addEventListener('click', selectAllSearchResults);
     document.getElementById('clearAllSelectedBtn').addEventListener('click', clearAllSelected);
     document.getElementById('generateBtn').addEventListener('click', generateAndCopy);
     document.getElementById('saveSchemeBtn').addEventListener('click', saveCurrentScheme);
