@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GS聊天</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 26px 16px 70px;
+    background: #f2f5fa;
+    color: #1e293b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { max-width: 1240px; margin: 0 auto; }
+
+  h1 { font-size: 22px; margin: 0 0 6px; letter-spacing: .3px; }
+  .sub { color: #64748b; font-size: 13px; margin: 0 0 20px; }
+
+  /* ---------- 输入面板 ---------- */
+  .panel {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.06), 0 10px 30px -18px rgba(15,23,42,.35);
+    margin-bottom: 20px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 170px;
+    resize: vertical;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #334155;
+    background: #fbfcfe;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  textarea:focus { border-color: #5b7cfa; box-shadow: 0 0 0 3px rgba(91,124,250,.13); }
+  textarea::placeholder { color: #a8b3c4; }
+
+  .actions {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px;
+  }
+  button {
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #334155;
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .15s;
+  }
+  button:hover { background: #f8fafc; border-color: #cbd5e1; }
+  button.primary {
+    background: linear-gradient(135deg, #5b7cfa, #4f46e5);
+    color: #fff; border-color: transparent;
+    box-shadow: 0 6px 16px -6px rgba(79,70,229,.7);
+  }
+  button.primary:hover { filter: brightness(1.06); }
+  .opt {
+    margin-left: auto; display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: #64748b; cursor: pointer; user-select: none;
+  }
+  .opt input { accent-color: #5b7cfa; width: 15px; height: 15px; }
+
+  /* ---------- 筛选栏 ---------- */
+  .filters {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: #fff; border-radius: 12px; padding: 12px 16px; margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.05);
+  }
+  .filters[hidden] { display: none; }
+  .filters label { font-size: 13px; color: #475569; display: inline-flex; align-items: center; gap: 7px; }
+  .filters select {
+    border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;
+    font-size: 13px; color: #334155; background: #fbfcfe;
+    font-family: inherit; cursor: pointer; min-width: 110px;
+  }
+  .filters select:focus { border-color: #5b7cfa; outline: none; box-shadow: 0 0 0 3px rgba(91,124,250,.13); }
+  .filter-count { margin-left: auto; font-size: 12.5px; color: #94a3b8; }
+
+  /* ---------- 分组 ---------- */
+  .group { margin-bottom: 26px; }
+  .group-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .owner-chip {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: #fff; padding: 5px 16px 5px 5px;
+    border-radius: 999px; font-weight: 600; font-size: 14px;
+    box-shadow: 0 1px 4px rgba(15,23,42,.08);
+  }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff; font-size: 13px; font-weight: 700;
+    flex: none;
+  }
+  .group-count { font-size: 12.5px; color: #94a3b8; }
+
+  /* ---------- 卡片 ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.05);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -12px rgba(15,23,42,.35);
+  }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .main-name { font-size: 17px; font-weight: 700; line-height: 1.3; word-break: break-all; }
+  .main-name.muted { color: #b6c0cf; font-weight: 500; }
+  .main-id { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+  .tags { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: none; }
+  .tag {
+    font-size: 11.5px; padding: 3px 9px; border-radius: 6px;
+    white-space: nowrap; line-height: 1.5;
+  }
+  .tag-game { color: #4f46e5; background: #eef2ff; }
+  .tag-server { color: #0e7490; background: #ecfeff; }
+  .tag-sub { color: #b45309; background: #fef3c7; }
+  .tag-acct { color: #be123c; background: #ffe4e6; }
+
+  .divider { height: 1px; background: #f1f5f9; }
+
+  .roles { display: flex; flex-direction: column; gap: 2px; }
+  .role-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; padding: 4px 0;
+  }
+  .role-label { font-size: 11px; color: #a3aebf; width: 40px; flex: none; }
+  .role-name { font-weight: 600; color: #1e293b; word-break: break-all; }
+  .role-meta { font-size: 12px; color: #8b97a8; }
+  .role-row.invalid { opacity: .42; }
+  .role-row.invalid .role-name { font-weight: 500; }
+  .role-empty { font-size: 12.5px; color: #b6c0cf; padding: 2px 0; }
+
+  /* ---------- 质检按钮 ---------- */
+  .qa-btn {
+    margin-left: auto;
+    flex: none;
+    border: 1px solid #5b7cfa;
+    color: #4f46e5;
+    background: #eef2ff;
+    padding: 3px 13px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .15s;
+  }
+  .qa-btn:hover { background: #e0e7ff; filter: brightness(1.02); }
+  .qa-btn:active { transform: translateY(1px); }
+  .qa-btn.main { align-self: flex-end; margin-left: 8px; vertical-align: middle; }
+
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  /* ---------- 其他 ---------- */
+  .empty {
+    background: #fff; border-radius: 14px; padding: 46px 20px;
+    text-align: center; color: #94a3b8; font-size: 14px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.05);
+  }
+  .empty .big { font-size: 30px; margin-bottom: 10px; opacity: .5; }
+  .hint { font-size: 12.5px; color: #94a3b8; margin-top: 6px; line-height: 1.8; }
+  .hint code { background: #eef2f7; padding: 1px 6px; border-radius: 5px; color: #64748b; }
+  .hint b { color: #475569; }
+
+  /* ---------- 账号明细：紧凑卡片 ---------- */
+  .cards.compact {
+    grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+    gap: 10px;
+  }
+  .card.compact { padding: 11px 13px; gap: 9px; }
+  .card.compact:hover { transform: translateY(-2px); }
+  .card.compact .main-name { font-size: 15px; }
+  .card.compact .main-id { font-size: 11px; margin-top: 2px; color: #94a3b8; }
+  .card.compact .tags { align-items: flex-start; gap: 4px; }
+
+  .compact-meta {
+    display: flex; flex-wrap: wrap; gap: 3px 14px;
+    font-size: 12px; color: #64748b;
+    border-top: 1px solid #f1f5f9; padding-top: 7px;
+  }
+  .compact-meta b { color: #475569; font-weight: 600; }
+  .compact-meta .st { color: #0e7490; }
+
+  .compact-foot {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .compact-foot .qa-btn { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>GS聊天查看</h1>
+  <p class="sub"></p>
+
+  <section class="panel">
+    <textarea id="input" spellcheck="false"
+      placeholder="在这里粘贴数据（Ctrl+V 后点击「整理数据」）...&#10;&#10;支持两种格式：&#10;① 大R信息&#10;② 账号明细"></textarea>
+    <div class="actions">
+      <button class="primary" id="btnParse">整理数据</button>
+      <button id="btnClear">清空</button>
+      <label class="opt"><input type="checkbox" id="hideInvalid" checked> 隐藏无效角色</label>
+    </div>
+    <p class="hint">    </p>
+  </section>
+
+  <section class="filters" id="filters" hidden>
+    <label>游戏
+      <select id="filterGame"><option value="">全部</option></select>
+    </label>
+    <label>归属人
+      <select id="filterOwner"><option value="">全部</option></select>
+    </label>
+    <label data-account hidden>主副号
+      <select id="filterSub"><option value="">全部</option></select>
+    </label>
+    <label data-account hidden>账号类型
+      <select id="filterAcct"><option value="">全部</option></select>
+    </label>
+    <label data-account hidden>带服状态
+      <select id="filterStatus"><option value="">全部</option></select>
+    </label>
+    <span class="filter-count" id="filterCount"></span>
+  </section>
+  <main id="result"></main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const inputEl    = document.getElementById('input');
+  const resultEl   = document.getElementById('result');
+  const hideEl     = document.getElementById('hideInvalid');
+  const filtersEl  = document.getElementById('filters');
+  const filterGameEl   = document.getElementById('filterGame');
+  const filterOwnerEl  = document.getElementById('filterOwner');
+  const filterSubEl    = document.getElementById('filterSub');
+  const filterAcctEl   = document.getElementById('filterAcct');
+  const filterStatusEl = document.getElementById('filterStatus');
+  const filterCountEl  = document.getElementById('filterCount');
+
+  let rows = [];
+  let currentFormat = 1;   // 1 = 大R信息(格式1)；2 = 账号明细(格式2)
+
+  /* ============ 工具函数 ============ */
+  const INVALID_TOKENS = new Set(['', '未找到', '0', '-', '—', '无', 'null', 'none', 'n/a', '#n/a']);
+
+  function invalid(v) {
+    return v == null || INVALID_TOKENS.has(String(v).trim().toLowerCase());
+  }
+
+  function roleValid(role) {
+    return !(invalid(role.id) && invalid(role.name));
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+  }
+
+  function colorFor(name) {
+    let h = 0;
+    for (const ch of String(name)) h = (h * 31 + ch.codePointAt(0)) % 360;
+    return `hsl(${h} 62% 56%)`;
+  }
+
+  /* ============ 质检跳转配置 ============
+     按游戏前缀匹配（如“大道争锋2包”匹配前缀“大道争锋”）。
+     url     : 目标后台地址；为空表示已知游戏但地址暂未配置。
+     param   : 要预填角色ID的输入框 name（大道争锋“玩家聊天列表”页该框 name="role_id"）。
+     大道争锋直接深链到「玩家聊天列表」页（即 客服系统→聊天监控→玩家聊天列表 的终点），
+     角色ID 通过 ?role_id= 携带，由配套油猴脚本在目标页自动填入。
+     逍遥蜀山地址暂未提供，先登记前缀但 url 留空，点击时给出提示。 */
+  const QA_MAP = [
+    {
+      prefix: '大道争锋',
+      url: 'http://cpmanage.xy.mumuyouxi.com/gm/chat/chat_list',
+      param: 'role_id'
+    },
+    {
+      prefix: '逍遥蜀山',
+      url: '',            // 暂未提供，稍后补充
+      param: 'role_id'
+    }
+  ];
+
+  function findGame(game) {
+    const g = String(game || '').trim();
+    for (const m of QA_MAP) {
+      if (g.indexOf(m.prefix) === 0) return m;   // 前缀匹配
+    }
+    return null;
+  }
+
+  function openQA(game, id) {
+    const cfg = findGame(game);
+    if (!cfg) {
+      alert('「' + (game || '未知游戏') + '」暂无查看聊天配置。');
+      return;
+    }
+    if (!cfg.url) {
+      alert('「' + cfg.prefix + '」的查看聊天地址暂未配置（稍后补充）。');
+      return;
+    }
+    const target = cfg.url + '?' + cfg.param + '=' + encodeURIComponent(id);
+    window.open(target, '_blank', 'noopener');
+  }
+
+  /* ============ 解析 ============ */
+  // 自动识别粘贴数据的格式：
+  //   格式1（大R）：归属人 / 游戏 / 区服 / 角色名 / 角色ID + 3 个关联角色，共 14 列
+  //   格式2（账号）：游戏 / 开服日期 / 区服 / 主副号 / 带服状态 / 抛服日期 /
+  //                 账号类型 / 进驻人 / GS角色名 / ID，共 10 列
+  function detectFormat(text) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    for (const raw of lines) {
+      if (!raw.trim()) continue;
+      const cells = raw.split('\t').map(s => s.trim());
+      if (cells[0] === '游戏' && cells.includes('GS角色名')) return 2;
+      if (cells[0] === '归属人' || cells[0] === '姓名') return 1;
+    }
+    // 无表头时按关键列名兜底判断
+    if (text.includes('进驻人') || text.includes('GS角色名') || text.includes('账号类型')) return 2;
+    return 1;
+  }
+
+  // 格式1：大R 信息（归属人 + 主角色 + 3 关联角色）
+  function parseFormat1(text) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    const out = [];
+    for (const raw of lines) {
+      if (!raw.trim()) continue;
+      const cells = raw.split('\t').map(s => s.trim());
+
+      // 跳过表头行
+      if (cells[0] === '归属人' || cells[0] === '姓名') continue;
+      if (cells[1] === '游戏' || cells[0] === '游戏') continue;
+      if (cells.length < 4) continue;
+
+      while (cells.length < 14) cells.push('');
+
+      // 至少要有一个主角色名或角色ID
+      if (!cells[3] && !cells[4]) continue;
+
+      out.push({
+        owner:    cells[0],
+        game:     cells[1],
+        server:   cells[2],
+        roleName: cells[3],
+        roleId:   cells[4],
+        roles: [0, 1, 2].map(i => ({
+          id:     cells[5 + i * 3],
+          server: cells[6 + i * 3],
+          name:   cells[7 + i * 3]
+        })),
+        meta: null
+      });
+    }
+    return out;
+  }
+
+  // 格式2：账号明细（每条即一个账号，按 进驻人 归属）
+  function parseFormat2(text) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    const out = [];
+    for (const raw of lines) {
+      if (!raw.trim()) continue;
+      const cells = raw.split('\t').map(s => s.trim());
+
+      // 跳过表头
+      if (cells[0] === '游戏' && cells.includes('GS角色名')) continue;
+      if (cells.length < 9) continue;
+
+      const game     = cells[0];
+      const server   = cells[2];
+      const sub      = cells[3];   // 主副号：主带 / 副带
+      const status   = cells[4];   // 带服状态：抛服 / 在带
+      const acctType = cells[6];   // 账号类型：本服对抗 / 陪玩 / 跨服对抗 …
+      const owner    = cells[7];   // 进驻人
+      const name     = cells[8];   // GS角色名
+      const id       = cells[9];   // ID
+
+      // 至少需要角色名或 ID
+      if (!name && !id) continue;
+
+      out.push({
+        owner:    owner,
+        game:     game,
+        server:   server,
+        roleName: name,
+        roleId:   id,
+        roles: [],                 // 该格式每条即一个账号，无关联角色
+        meta: { sub: sub, status: status, acctType: acctType }
+      });
+    }
+    return out;
+  }
+
+  /* ============ 渲染片段 ============ */
+  function roleRowHTML(role, idx, game) {
+    const ok     = roleValid(role);
+    const name   = invalid(role.name)   ? '未找到' : role.name;
+    const server = invalid(role.server) ? ''       : role.server;
+    const id     = invalid(role.id)     ? ''       : role.id;
+    const known  = !!findGame(game);
+
+    const qaBtn = (id && known)
+      ? `<button class="qa-btn" data-game="${esc(game)}" data-id="${esc(id)}">查看聊天</button>`
+      : '';
+
+    return `<div class="role-row ${ok ? '' : 'invalid'}">
+      <span class="role-label">角色${idx}</span>
+      <span class="role-name">${esc(name)}</span>
+      ${server ? `<span class="role-meta">${esc(server)} 区</span>` : ''}
+      ${id ? `<span class="role-meta mono">${esc(id)}</span>` : ''}
+      ${qaBtn}
+    </div>`;
+  }
+
+  function cardHTML(r, hideInvalid) {
+    const rolesHtml = r.roles
+      .map((role, i) => {
+        if (hideInvalid && !roleValid(role)) return '';
+        return roleRowHTML(role, i + 1, r.game);
+      })
+      .join('');
+
+    const mainMissing = invalid(r.roleName);
+    const mainId      = invalid(r.roleId) ? '' : r.roleId;
+    const mainKnown   = !!findGame(r.game);
+    const mainQaBtn   = (mainId && mainKnown)
+      ? `<button class="qa-btn main" data-game="${esc(r.game)}" data-id="${esc(mainId)}">查看聊天</button>`
+      : '';
+
+    return `<article class="card">
+      <div class="card-top">
+        <div class="main">
+          <div class="main-name ${mainMissing ? 'muted' : ''}">${esc(mainMissing ? '未找到' : r.roleName)}</div>
+          <div class="main-id mono">ID ${esc(invalid(r.roleId) ? '—' : r.roleId)}${mainQaBtn}</div>
+        </div>
+        <div class="tags">
+          ${invalid(r.game)   ? '' : `<span class="tag tag-game">${esc(r.game)}</span>`}
+          ${invalid(r.server) ? '' : `<span class="tag tag-server">${esc(r.server)} 区</span>`}
+          ${r.meta && r.meta.sub      ? `<span class="tag tag-sub">${esc(r.meta.sub)}</span>` : ''}
+          ${r.meta && r.meta.acctType ? `<span class="tag tag-acct">${esc(r.meta.acctType)}</span>` : ''}
+        </div>
+      </div>
+      ${rolesHtml ? `<div class="divider"></div><div class="roles">${rolesHtml}</div>` : ''}
+    </article>`;
+  }
+
+  // 账号明细（格式2）紧凑卡片：单账号、字段密集、留白少
+  function cardHTML2(r) {
+    const mainMissing = invalid(r.roleName);
+    const mainId      = invalid(r.roleId) ? '' : r.roleId;
+    const mainKnown   = !!findGame(r.game);
+    const qaBtn = (mainId && mainKnown)
+      ? `<button class="qa-btn" data-game="${esc(r.game)}" data-id="${esc(mainId)}">查看聊天</button>`
+      : '';
+
+    const m = r.meta || {};
+    const sub      = m.sub;
+    const status   = m.status;
+    const acctType = m.acctType;
+
+    return `<article class="card compact">
+      <div class="card-top">
+        <div class="main">
+          <div class="main-name ${mainMissing ? 'muted' : ''}">${esc(mainMissing ? '未找到' : r.roleName)}</div>
+          <div class="main-id">ID <span class="mono">${esc(invalid(r.roleId) ? '—' : r.roleId)}</span></div>
+        </div>
+        <div class="tags">
+          ${invalid(r.game) ? '' : `<span class="tag tag-game">${esc(r.game)}</span>`}
+        </div>
+      </div>
+      <div class="compact-meta">
+        ${invalid(r.server) ? '' : `<span>区服 <b>${esc(r.server)}</b></span>`}
+        ${sub ? `<span>${esc(sub)}</span>` : ''}
+        ${status ? `<span class="st">${esc(status)}</span>` : ''}
+      </div>
+      <div class="compact-foot">
+        ${acctType ? `<span class="tag tag-acct">${esc(acctType)}</span>` : ''}
+        ${qaBtn}
+      </div>
+    </article>`;
+  }
+
+  /* ============ 主渲染 ============ */
+  function render() {
+    if (!rows.length) {
+      filtersEl.hidden = true;
+      resultEl.innerHTML = `<div class="empty">
+        <div class="big">📋</div>
+        暂无数据，请在上方粘贴 Excel 内容后点击「整理数据」
+      </div>`;
+      return;
+    }
+
+    const hideInvalid = hideEl.checked;
+    const fg = filterGameEl.value;
+    const fo = filterOwnerEl.value;
+    // 主副号 / 账号类型 / 带服状态 仅对账号明细（格式2）生效
+    const fs = currentFormat === 2 ? filterSubEl.value    : '';
+    const fa = currentFormat === 2 ? filterAcctEl.value   : '';
+    const ft = currentFormat === 2 ? filterStatusEl.value : '';
+
+    // 按筛选条件过滤
+    const data = rows.filter(r =>
+      (!fg || r.game === fg) &&
+      (!fo || r.owner === fo) &&
+      (!fs || (r.meta && r.meta.sub === fs)) &&
+      (!fa || (r.meta && r.meta.acctType === fa)) &&
+      (!ft || (r.meta && r.meta.status === ft))
+    );
+
+    if (!data.length) {
+      filterCountEl.textContent = `显示 0 / ${rows.length} 条`;
+      resultEl.innerHTML = `<div class="empty">
+        <div class="big">🔍</div>
+        当前筛选条件下没有匹配的记录
+      </div>`;
+      return;
+    }
+
+    filterCountEl.textContent = `显示 ${data.length} / ${rows.length} 条`;
+
+    // 按归属人分组
+    const groups = new Map();
+    for (const r of data) {
+      const key = invalid(r.owner) ? '（未填写归属人）' : r.owner;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(r);
+    }
+
+    let html = '';
+    for (const [owner, list] of groups) {
+      html += `<section class="group">
+        <div class="group-head">
+          <span class="owner-chip">
+            <span class="avatar" style="background:${colorFor(owner)}">${esc(owner.slice(0, 1))}</span>
+            ${esc(owner)}
+          </span>
+          <span class="group-count">${list.length} 条记录</span>
+        </div>
+        <div class="cards ${currentFormat === 2 ? 'compact' : ''}">${list.map(r => (currentFormat === 2 ? cardHTML2(r) : cardHTML(r, hideInvalid))).join('')}</div>
+      </section>`;
+    }
+    resultEl.innerHTML = html;
+  }
+
+  /* ============ 筛选下拉填充 ============ */
+  function fillSelect(sel, items) {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">全部</option>' +
+      items.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    if (items.includes(cur)) sel.value = cur;   // 保留原有选择（若仍存在）
+  }
+
+  function populateFilters() {
+    if (!rows.length) { filtersEl.hidden = true; return; }
+    filtersEl.hidden = false;
+
+    const games  = [...new Set(rows.map(r => r.game).filter(g => !invalid(g)))].sort();
+    const owners = [...new Set(rows.map(r => r.owner).filter(o => !invalid(o)))].sort();
+
+    fillSelect(filterGameEl, games);
+    fillSelect(filterOwnerEl, owners);
+
+    // 主副号 / 账号类型 / 带服状态 仅对账号明细（格式2）显示并填充
+    const accountLabels = filtersEl.querySelectorAll('[data-account]');
+    if (currentFormat === 2) {
+      const subs   = [...new Set(rows.map(r => r.meta && r.meta.sub).filter(v => v && !invalid(v)))].sort();
+      const accts  = [...new Set(rows.map(r => r.meta && r.meta.acctType).filter(v => v && !invalid(v)))].sort();
+      const status = [...new Set(rows.map(r => r.meta && r.meta.status).filter(v => v && !invalid(v)))].sort();
+      fillSelect(filterSubEl, subs);
+      fillSelect(filterAcctEl, accts);
+      fillSelect(filterStatusEl, status);
+      accountLabels.forEach(el => el.hidden = false);
+    } else {
+      accountLabels.forEach(el => el.hidden = true);
+    }
+  }
+
+  /* ============ 交互 ============ */
+  function doParse() {
+    currentFormat = detectFormat(inputEl.value);
+    rows = currentFormat === 2 ? parseFormat2(inputEl.value) : parseFormat1(inputEl.value);
+    populateFilters();
+    render();
+  }
+
+  document.getElementById('btnParse').addEventListener('click', doParse);
+  hideEl.addEventListener('change', render);
+  filterGameEl.addEventListener('change', render);
+  filterOwnerEl.addEventListener('change', render);
+  filterSubEl.addEventListener('change', render);
+  filterAcctEl.addEventListener('change', render);
+  filterStatusEl.addEventListener('change', render);
+
+  // 查看聊天 按钮（事件委托，适配动态渲染的卡片）
+  resultEl.addEventListener('click', e => {
+    const btn = e.target.closest('.qa-btn');
+    if (!btn) return;
+    openQA(btn.getAttribute('data-game'), btn.getAttribute('data-id'));
+  });
+
+  document.getElementById('btnClear').addEventListener('click', () => {
+    inputEl.value = '';
+    rows = [];
+    render();
+    inputEl.focus();
+  });
+
+  /* 初始化 */
+  render();
+
+  /* 支持从 Excel 直接 Ctrl+V 粘贴到页面任意位置（自动填入输入框，但需点击「整理数据」才整理） */
+  document.addEventListener('paste', e => {
+    if (document.activeElement === inputEl) return;
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    if (text && text.includes('\t')) {
+      inputEl.value = text;
+      inputEl.focus();
+      e.preventDefault();
+    }
+  });
+})();
+</script>
+</body>
+</html>
