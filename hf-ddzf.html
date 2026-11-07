@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大道合服</title>
+<style>
+:root{
+  --bg:#f0f2f5; --card:#fff; --primary:#4a6cf7; --primary-light:#e8edfe;
+  --text:#1a1a2e; --muted:#6c7a89; --border:#e2e8f0; --hover:#cbd5e0;
+  --shadow:0 2px 12px rgba(0,0,0,.06); --shadow-hover:0 4px 20px rgba(0,0,0,.12);
+  --radius:10px; --green-bg:#e8f5e9; --green-text:#2e7d32;
+  --amber-bg:#fff4e5; --amber-text:#b26a00; --amber-border:#ffd8a8;
+  --gray-bg:#f5f6f7; --gray-text:#adb5bd; --red-bg:#fdecec; --red-text:#c0392b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+#app{max-width:1680px;margin:0 auto;padding:24px 20px 60px}
+header{text-align:center;margin-bottom:26px}
+header h1{font-size:28px;font-weight:700;margin-bottom:4px}
+header p{color:var(--muted);font-size:14px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.input-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;margin-bottom:20px}
+@media(max-width:900px){.input-grid{grid-template-columns:1fr}}
+.panel-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.panel-head h2{font-size:16px;font-weight:600}
+.tag{font-size:12px;padding:2px 9px;border-radius:20px;background:var(--primary-light);color:var(--primary)}
+.tag.ok{background:var(--green-bg);color:var(--green-text)}
+textarea{width:100%;min-height:190px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:ui-monospace,Consolas,"Microsoft YaHei",monospace;font-size:13px;line-height:1.7;color:var(--text);background:#fcfdff;outline:none}
+textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:7px;padding:8px 15px;font-size:13px;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--hover);box-shadow:var(--shadow)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:#3a5ce0}
+.btn.ghost{color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7}
+.hidden{display:none!important}
+.drop-zone{border:1.5px dashed var(--border);border-radius:9px;background:#fcfdff;padding:26px 14px;text-align:center;cursor:pointer;transition:.15s;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.drop-zone:hover,.drop-zone.over{border-color:var(--primary);background:var(--primary-light)}
+.drop-zone .big{font-size:14px;color:var(--text);font-weight:600}
+.drop-zone .small{font-size:12px;color:var(--muted)}
+.role-status{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.7;word-break:break-all}
+.role-status.ok{color:var(--green-text)}
+.role-status.error{color:var(--red-text)}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:18px;box-shadow:var(--shadow)}
+.toolbar input[type=search],.toolbar select{border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--text);background:#fff;outline:none}
+.toolbar input[type=search]{min-width:210px}
+.toolbar label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer}
+.toolbar .spacer{flex:1}
+#result-count{font-size:13px;color:var(--muted)}
+#view-toggle-btn{padding:7px 14px;border:1px solid var(--primary);border-radius:6px;background:#fff;color:var(--primary);font-size:13px;cursor:pointer;white-space:nowrap;transition:.15s}
+#view-toggle-btn:hover{background:var(--primary);color:#fff}
+#view-toggle-btn.active{background:var(--primary);color:#fff}
+#btn-refresh-time{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap;transition:.15s}
+#btn-refresh-time:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ==================== Results / Card ==================== */
+.groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:1240px){.groups{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:820px){.groups{grid-template-columns:1fr}}
+.server-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;border-left:4px solid var(--primary);transition:box-shadow .2s;min-width:0}
+.server-card:hover{box-shadow:var(--shadow-hover)}
+.server-card.single{border-left-color:var(--gray-text)}
+.card-header{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;min-width:0}
+.main-server-badge{font-size:14px;font-weight:700;color:#fff;background:var(--primary);padding:2px 10px;border-radius:20px;white-space:nowrap;flex:0 0 auto}
+.server-card.single .main-server-badge{background:#8a97a6}
+.card-tag{font-size:11px;color:var(--muted);background:var(--gray-bg);padding:2px 7px;border-radius:4px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.card-tag.clickable{cursor:pointer}
+.card-tag.clickable:hover{background:var(--primary-light);color:var(--primary)}
+.card-tag.nodata{background:var(--red-bg);color:var(--red-text)}
+.card-view-toggle{padding:3px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--muted);font-size:12px;cursor:pointer;line-height:1.4;white-space:nowrap;margin-left:auto;flex:0 0 auto;transition:.15s}
+.card-view-toggle:hover{border-color:var(--primary);color:var(--primary)}
+.card-view-toggle.active{background:var(--primary-light);border-color:var(--primary);color:var(--primary);font-weight:600}
+.card-subs{font-size:11px;color:var(--muted);background:#fafbfd;border:1px solid var(--border);border-radius:6px;padding:5px 8px;margin-bottom:8px;line-height:1.8}
+.card-subs .sub-label{margin-right:6px}
+.chip{display:inline-block;font-size:11px;background:var(--gray-bg);color:#5a6673;border-radius:4px;padding:1px 6px;margin:0 3px 3px 0;cursor:default}
+
+/* ==================== Tables ==================== */
+.table-wrap{margin-bottom:9px;max-height:292px;overflow:auto;border-radius:6px;border:1px solid var(--border)}
+.table-wrap::-webkit-scrollbar{width:5px;height:5px}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--hover);border-radius:3px}
+.server-table,.top10-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.server-table{table-layout:fixed}
+.server-table thead th,.top10-table thead th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1;white-space:nowrap}
+/* 约束表头与内容的对齐：标题不再与数据一左一右 */
+.server-table thead th.srv-id,.server-table td.srv-id,
+.server-table thead th.srv-player,.server-table td.srv-player{text-align:left}
+.server-table thead th.srv-power,.server-table td.srv-power,
+.server-table thead th.num-right,.server-table td.num-right{text-align:right}
+.top10-table thead th.t10-rank,.top10-table thead th.t10-server,
+.top10-table thead th.t10-active{text-align:center}
+.top10-table thead th.t10-power,.top10-table thead th.t10-recharge{text-align:right}
+.top10-table thead th.t10-name,.top10-table thead th.t10-id{text-align:left}
+.server-table .server-row{cursor:default;border-bottom:1px solid #f0f0f0;transition:background .12s}
+.server-table .server-row:last-child{border-bottom:none}
+.server-table .server-row.has-chars{color:var(--green-text)}
+.server-table .server-row.no-chars{color:var(--gray-text)}
+.server-table .server-row.is-main{background:#f0f4ff}
+.server-table .server-row:hover{background:var(--primary-light)}
+.server-table td{padding:5px 8px;vertical-align:middle}
+.server-table th:nth-child(1),.server-table td:nth-child(1){width:58px}
+.server-table th:nth-child(3),.server-table td:nth-child(3){width:92px}
+.server-table th:nth-child(4),.server-table td:nth-child(4){width:100px}
+.server-table .srv-id{font-weight:600;position:relative;white-space:nowrap}
+.server-table .is-main .srv-id::before{content:'\2605';font-size:11px;color:var(--primary);margin-right:2px}
+.server-table .srv-player{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.server-table .has-chars .srv-player{color:var(--text)}
+.server-table .srv-power{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600;color:var(--green-text)}
+.num-right{white-space:nowrap;font-variant-numeric:tabular-nums}
+.top10-table tbody tr{border-bottom:1px solid #f0f0f0;transition:background .12s}
+.top10-table tbody tr:last-child{border-bottom:none}
+.top10-table tbody tr:hover{background:var(--primary-light)}
+.top10-table td{padding:5px 7px;vertical-align:middle;white-space:nowrap}
+.top10-table .t10-rank{width:30px;font-weight:700;color:var(--muted);text-align:center}
+.top10-table .t10-rank.top3{color:#e65100}
+.top10-table .t10-name{font-weight:500;min-width:78px}
+.top10-table .t10-server{width:46px;color:var(--muted);font-size:12px;text-align:center}
+.top10-table .t10-power{width:88px;text-align:right;font-weight:600;color:var(--green-text);font-variant-numeric:tabular-nums}
+.top10-table .t10-id{width:84px;color:var(--muted);font-size:12px;cursor:pointer}
+.top10-table .t10-id:hover{color:var(--primary);text-decoration:underline}
+.top10-table .t10-recharge{width:84px;text-align:right;font-weight:600;color:#e65100;font-variant-numeric:tabular-nums}
+.top10-table .t10-active{width:44px;text-align:center;font-size:14px;font-weight:700;cursor:help}
+.top10-table .t10-active.ok{color:var(--green-text)}
+.top10-table .t10-active.no{color:var(--red-text)}
+.badge-inner{display:inline-block;margin-left:5px;font-size:10px;line-height:1.5;padding:0 5px;border-radius:3px;background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border);font-weight:600;vertical-align:1px}
+.active-note{font-size:12px;color:var(--muted);white-space:nowrap}
+.top10-empty{text-align:center;padding:20px 0;color:var(--gray-text);font-style:italic}
+
+/* ==================== Card Footer ==================== */
+.card-footer{display:flex;gap:12px;font-size:11.5px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center;justify-content:flex-start}
+.card-footer span{white-space:nowrap}
+.card-footer .footer-highlight{color:var(--green-text);font-weight:600}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:70px 20px;font-size:14px;background:var(--card);border:1px dashed var(--border);border-radius:var(--radius)}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:32px;line-height:1.9}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:99999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>大道争锋·合服</h1>
+    <p></p>
+  </header>
+
+  <section class="input-grid">
+    <div class="panel">
+      <div class="panel-head"><h2>① 合服列表</h2><span class="tag">纯文本粘贴</span></div>
+      <textarea id="merge-input" placeholder="1服-->[已合服:2、15、16]&#10;最高在线:[2]&#10;登录人数:[2]&#10;充值金额:[0]&#10;前三战力:[2479576131w、287400642w、53035077w]"></textarea>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-parse">解析</button>
+        <button class="btn ghost" id="btn-clear">清空</button>
+      </div>
+
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>② 角色列表</h2><span class="tag" id="role-tag">文件导入</span></div>
+      <div class="drop-zone" id="drop-zone">
+        <div class="big">点击选择，或把导出的文件拖到这里</div>
+      </div>
+      <input type="file" id="role-file" class="hidden" accept=".xls,.xlsx,.csv,.tsv,.html,.htm,.txt">
+      <div class="btn-row">
+        <button class="btn" id="btn-role-clear">移除角色数据</button>
+      </div>
+      <div id="role-status" class="role-status">未加载角色列表 · 看板仍可只靠合服列表运行</div>
+    </div>
+  </section>
+
+  <section id="toolbar" class="toolbar hidden">
+    <input id="search" type="search" placeholder="搜索主服号 / 从服号 / 角色名 / 角色ID">
+    <select id="sort">
+      <option value="main">按主服号</option>
+      <option value="login">按登录人数</option>
+      <option value="recharge">按充值金额</option>
+      <option value="online">按最高在线</option>
+      <option value="power">按第一战力</option>
+      <option value="subs">按从服数量</option>
+      <option value="roles">按角色数</option>
+      <option value="roleRecharge">按角色累充</option>
+      <option value="roleOnline">按活跃玩家数</option>
+    </select>
+    <label><input type="checkbox" id="only-data"> 只看有数据</label>
+    <label><input type="checkbox" id="only-single"> 只看未合服</label>
+    <label><input type="checkbox" id="exclude-inner"> 排除内玩</label>
+    <span id="active-note" class="active-note"></span>
+    <button id="btn-refresh-time" title="把活跃判定基准刷新为当前时间，并重新计算 √/× 与活跃玩家数">刷新时间</button>
+    <button id="view-toggle-btn">切换Top10视图</button>
+    <span class="spacer"></span>
+    <span id="result-count"></span>
+  </section>
+  <section id="groups" class="groups"></section>
+  <div id="empty" class="empty">「牛马加油」</div>
+
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s){ return document.querySelector(s); };
+  var state = {
+    groups:[],
+    displayMode:'servers', cardOverrides:{}, subOpen:{},
+    baseTime:Date.now(),
+    roles:{ loaded:false, list:[], byServer:{}, index:{}, headers:[], fileName:'' }
+  };
+
+  var HEAD_RE = /^\s*(\d+)\s*服\s*[^\[]*\[\s*(已合服|未合服)\s*[:：]?\s*([^\]]*)\]\s*$/;
+  var FIELD_DEFS = [
+    ['maxOnline', /^\s*最高在线\s*[:：]\s*\[\s*([^\]]*)\s*\]\s*$/],
+    ['loginCount', /^\s*登录人数\s*[:：]\s*\[\s*([^\]]*)\s*\]\s*$/],
+    ['recharge', /^\s*充值金额\s*[:：]\s*\[\s*([^\]]*)\s*\]\s*$/],
+    ['topPower', /^\s*前三战力\s*[:：]\s*\[\s*([^\]]*)\s*\]\s*$/]
+  ];
+
+  function toNum(v){
+    if(v === null || v === undefined) return null;
+    var s = String(v).trim().replace(/[,，\s¥￥元]/g,'');
+    if(!s || !/^-?\d+(\.\d+)?$/.test(s)) return null;
+    return Number(s);
+  }
+  function numOr0(v){ var n = toNum(v); return n === null ? 0 : n; }
+  function truthy(v){ return /^(是|1|true|yes)$/i.test(String(v || '').trim()); }
+
+  /* 把角色表里的登录时间解析成毫秒时间戳；支持 YYYY-MM-DD HH:mm:ss、Excel 序列号、毫秒时间戳 */
+  function parseDateMs(v){
+    if(v === null || v === undefined) return 0;
+    var s = String(v).trim();
+    if(!s) return 0;
+    if(/^\d+(\.\d+)?$/.test(s)){
+      var n = Number(s);
+      if(n > 1e11) return n;
+      if(n > 1 && n < 100000){
+        var d = new Date(Math.round((n - 25569) * 86400000));
+        return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
+          d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()).getTime();
+      }
+      return 0;
+    }
+    var m = s.match(/^(\d{4})[\-\/年.](\d{1,2})[\-\/月.](\d{1,2})(?:[日\sT]+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+    if(m){
+      return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]),
+        Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0)).getTime();
+    }
+    var t = Date.parse(s);
+    return isNaN(t) ? 0 : t;
+  }
+
+  function parseSubs(v){
+    if(!v) return [];
+    var out = [];
+    String(v).split(/[、,，;；\s]+/).forEach(function(part){
+      part = part.trim();
+      if(!part) return;
+      var range = part.match(/^(\d+)\s*[-~－—]\s*(\d+)$/);
+      if(range){
+        var a = Number(range[1]), b = Number(range[2]);
+        if(b >= a && b - a < 500){ for(var i=a;i<=b;i++) out.push(i); return; }
+      }
+      var n = toNum(part);
+      if(n !== null) out.push(n);
+    });
+    return out;
+  }
+  function parseTop(v){
+    if(!v || !String(v).trim()) return [];
+    var out = [];
+    String(v).split(/[、,，;；\s]+/).forEach(function(x){
+      x = x.trim(); if(!x) return;
+      var raw = x;
+      var isWan = /[wW万]$/.test(x);
+      var n = toNum(x.replace(/[wW万]$/,''));
+      if(n !== null) out.push({ raw:raw, value:n, wan:isWan });
+    });
+    return out;
+  }
+
+  function parseMergeText(text){
+    var lines = String(text || '').replace(/\r\n?/g,'\n').split('\n');
+    var groups = [], cur = null;
+    lines.forEach(function(line, idx){
+      if(!line.trim()) return;
+      var m = line.match(HEAD_RE);
+      if(m){
+        if(cur) groups.push(cur);
+        cur = {
+          main:Number(m[1]), status:m[2], subs:parseSubs(m[3]),
+          maxOnline:null, loginCount:null, recharge:null, top3:[],
+          servers:[], roles:[], roleStats:null, line:idx+1
+        };
+        return;
+      }
+      if(!cur) return;
+      for(var i=0;i<FIELD_DEFS.length;i++){
+        var key = FIELD_DEFS[i][0], re = FIELD_DEFS[i][1];
+        var f = line.match(re);
+        if(f){
+          if(key === 'topPower') cur.top3 = parseTop(f[1]);
+          else cur[key] = toNum(f[1]);
+          break;
+        }
+      }
+    });
+    if(cur) groups.push(cur);
+
+    groups.forEach(function(g){
+      var seen = {};
+      [g.main].concat(g.subs).forEach(function(s){ if(!seen[s]){ seen[s]=1; g.servers.push(s); } });
+      g.servers.sort(function(a,b){ return a-b; });
+    });
+    return { groups:groups };
+  }
+
+  /* ---------------- 角色列表解析 ---------------- */
+
+  var ROLE_ALIASES = {
+    server:    ['区服ID','区服id','区服','服务器ID','服号'],
+    roleId:    ['角色ID','角色id','角色编号'],
+    name:      ['角色名','角色名称','昵称'],
+    level:     ['等级'],
+    power:     ['战力','战斗力'],
+    recharge:  ['累充金额','充值金额','累计充值','累充'],
+    regTime:   ['注册时间','创建时间'],
+    lastLogin: ['最后登录时间','最后登录','最近登录'],
+    inner:     ['是否内玩','内玩'],
+    online:    ['是否在线','在线状态','在线']
+  };
+  function normHeader(h){ return String(h || '').replace(/\(.*?\)|（.*?）/g,'').replace(/[\s:：]/g,'').trim(); }
+  function mapHeaders(headers){
+    var norm = headers.map(normHeader), idx = {};
+    Object.keys(ROLE_ALIASES).forEach(function(key){
+      idx[key] = -1;
+      var aliases = ROLE_ALIASES[key].map(normHeader);
+      for(var a=0;a<aliases.length;a++){
+        var p = norm.indexOf(aliases[a]);
+        if(p >= 0){ idx[key] = p; return; }
+      }
+      for(var b=0;b<aliases.length;b++){
+        for(var c=0;c<norm.length;c++){
+          if(norm[c] && (norm[c].indexOf(aliases[b]) >= 0 || aliases[b].indexOf(norm[c]) >= 0)){
+            idx[key] = c; return;
+          }
+        }
+      }
+    });
+    return idx;
+  }
+  function cell(row, i){ return i >= 0 && i < row.length ? String(row[i] === undefined ? '' : row[i]).trim() : ''; }
+
+  function buildRoles(headers, rows){
+    var idx = mapHeaders(headers);
+    if(idx.server < 0 || idx.name < 0){
+      throw new Error('表头里找不到「区服ID」或「角色名」，实际表头：' + headers.join(' | '));
+    }
+    var list = [];
+    rows.forEach(function(row){
+      if(!row || !row.length) return;
+      var sv = cell(row, idx.server);
+      if(!/^\d+$/.test(sv)) return;
+      list.push({
+        server:Number(sv),
+        id:cell(row, idx.roleId),
+        name:cell(row, idx.name),
+        level:numOr0(cell(row, idx.level)),
+        power:numOr0(cell(row, idx.power)),
+        recharge:numOr0(cell(row, idx.recharge)),
+        regTime:cell(row, idx.regTime),
+        lastLogin:cell(row, idx.lastLogin),
+        loginMs:parseDateMs(cell(row, idx.lastLogin)),
+        inner:truthy(cell(row, idx.inner)),
+        online:truthy(cell(row, idx.online))
+      });
+    });
+    if(!list.length) throw new Error('没有解析到有效角色行（区服ID 需为纯数字）');
+    return { list:list, headers:headers, mapping:idx };
+  }
+  function splitDelimited(line, sep){
+    var out = [], cur = '', quoted = false;
+    for(var i=0;i<line.length;i++){
+      var ch = line[i];
+      if(ch === '"'){
+        if(quoted && line[i+1] === '"'){ cur += '"'; i++; }
+        else quoted = !quoted;
+      } else if(ch === sep && !quoted){ out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out.map(function(s){ return s.trim(); });
+  }
+  function parseDelimited(text){
+    var lines = String(text).replace(/\r\n?/g,'\n').split('\n').filter(function(l){ return l.trim(); });
+    if(!lines.length) throw new Error('文件是空的');
+    var sep = lines[0].indexOf('\t') >= 0 ? '\t' : ',';
+    var rows = lines.map(function(l){ return splitDelimited(l, sep); });
+    var headers = rows[0].map(function(h){ return h.replace(/^\ufeff/,'').trim(); });
+    return buildRoles(headers, rows.slice(1));
+  }
+  function parseHtmlTable(text){
+    var doc = new DOMParser().parseFromString(text, 'text/html');
+    var table = doc.querySelector('#data_sorter') || doc.querySelector('table');
+    if(!table) throw new Error('文件里没有找到 HTML 表格');
+    var trs = Array.prototype.slice.call(table.querySelectorAll('tr'));
+    var headIdx = -1, headers = [];
+    for(var i=0;i<Math.min(trs.length, 10);i++){
+      var cells = Array.prototype.slice.call(trs[i].querySelectorAll('th,td')).map(function(c){ return (c.textContent || '').trim(); });
+      if(cells.some(function(c){ return /角色名|区服ID|角色ID/.test(c); })){ headIdx = i; headers = cells; break; }
+    }
+    if(headIdx < 0) throw new Error('表格里没找到含「区服ID / 角色名」的表头行');
+    var rows = trs.slice(headIdx + 1).map(function(tr){
+      return Array.prototype.slice.call(tr.querySelectorAll('td')).map(function(td){ return (td.textContent || '').trim(); });
+    });
+    return buildRoles(headers, rows);
+  }
+  function parseRoleText(text){
+    if(/<table[\s>]/i.test(text)) return parseHtmlTable(text);
+    return parseDelimited(text);
+  }
+  function decodeBuffer(buf){
+    var bytes = new Uint8Array(buf);
+    var hasBom = bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF;
+    var s = new TextDecoder('utf-8').decode(bytes);
+    if(hasBom) s = s.replace(/^\ufeff/,'');
+    if(/\ufffd/.test(s.slice(0, 50000))){
+      try{
+        var g = new TextDecoder('gbk').decode(bytes);
+        if(!/\ufffd/.test(g.slice(0, 50000))) return g.replace(/^\ufeff/,'');
+      }catch(e){}
+    }
+    return s;
+  }
+  function indexRoles(list){
+    var index = {}, byServer = {};
+    list.forEach(function(r){
+      (byServer[r.server] = byServer[r.server] || []).push(r);
+      [r.name, r.id].forEach(function(t){
+        if(!t) return;
+        (index[t] = index[t] || {})[r.server] = 1;
+      });
+    });
+    Object.keys(byServer).forEach(function(s){
+      byServer[s].sort(function(a,b){ return b.power - a.power; });
+    });
+    return { index:index, byServer:byServer };
+  }
+  function recomputeRoleGroups(){
+    var excludeInner = $('#exclude-inner') ? $('#exclude-inner').checked : false;
+    state.groups.forEach(function(g){
+      var list = [];
+      g.servers.forEach(function(s){
+        (state.roles.byServer[s] || []).forEach(function(r){
+          if(!excludeInner || !r.inner) list.push(r);
+        });
+      });
+      list.sort(function(a,b){ return b.power - a.power; });
+      var st = { count:list.length, online:0, active:0, inner:0, recharge:0, maxPower:0, byServer:{} };
+      list.forEach(function(r){
+        if(r.online) st.online++;
+        if(isActive(r)) st.active++;
+        if(r.inner) st.inner++;
+        st.recharge += r.recharge;
+        if(r.power > st.maxPower) st.maxPower = r.power;
+        (st.byServer[r.server] = st.byServer[r.server] || []).push(r);
+      });
+      g.roles = list;
+      g.roleStats = state.roles.loaded ? st : null;
+    });
+  }
+  function loadRoleFile(file){
+    if(!file) return;
+    var status = $('#role-status');
+    status.className = 'role-status';
+    status.textContent = '正在读取 ' + file.name + ' …';
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      setTimeout(function(){
+        try{
+          var text = decodeBuffer(ev.target.result);
+          var parsed = parseRoleText(text);
+          var ix = indexRoles(parsed.list);
+          state.baseTime = Date.now();
+          state.roles = {
+            loaded:true, list:parsed.list, byServer:ix.byServer, index:ix.index,
+            headers:parsed.headers, fileName:file.name
+          };
+          recomputeRoleGroups();
+          render();
+          status.className = 'role-status ok';
+          status.textContent = '已加载 ' + file.name + '：' + fmtNum(parsed.list.length) +
+            ' 个角色，覆盖 ' + Object.keys(ix.byServer).length + ' 个区服，识别到 ' +
+            parsed.headers.length + ' 列 · 活跃基准（当前时间）' + fmtDateTime(state.baseTime);
+          $('#role-tag').textContent = '已加载';
+          $('#role-tag').className = 'tag ok';
+        }catch(err){
+          status.className = 'role-status error';
+          status.textContent = '解析失败：' + err.message;
+        }
+      }, 20);
+    };
+    reader.onerror = function(){ status.className = 'role-status error'; status.textContent = '文件读取失败'; };
+    reader.readAsArrayBuffer(file);
+  }
+  function clearRoles(){
+    state.roles = { loaded:false, list:[], byServer:{}, index:{}, headers:[], fileName:'' };
+    $('#role-file').value = '';
+    $('#role-status').className = 'role-status';
+    $('#role-status').textContent = '未加载角色列表 · 看板仍可只靠合服列表运行';
+    $('#role-tag').textContent = '文件导入';
+    $('#role-tag').className = 'tag';
+    recomputeRoleGroups();
+    render();
+  }
+
+  /* ---------------- 工具函数 ---------------- */
+
+  function hasData(g){
+    return g.maxOnline !== null || g.loginCount !== null || g.recharge !== null || g.top3.length > 0;
+  }
+  function fmtNum(n){ return n === null || n === undefined ? '—' : Number(n).toLocaleString('zh-CN'); }
+
+  /* 与原版一致的带单位显示 */
+  function formatPower(n){
+    if(!n || n === 0) return '0';
+    if(n >= 1e12) return (n / 1e12).toFixed(2) + '万亿';
+    if(n >= 1e8)  return (n / 1e8).toFixed(2) + '亿';
+    if(n >= 1e4)  return (n / 1e4).toFixed(2) + '万';
+    return String(n);
+  }
+  function formatRecharge(v){
+    if(!v || v === 0) return '¥0';
+    if(v >= 1e8) return '¥' + (v / 1e8).toFixed(2) + '亿';
+    if(v >= 1e4) return '¥' + (v / 1e4).toFixed(2) + '万';
+    return '¥' + Number(v).toFixed(2);
+  }
+  /* 活跃判定基准固定为「当前时间」，由「刷新时间」按钮更新 */
+  function activeBaseMs(){ return state.baseTime; }
+  function isActive(r){
+    var base = activeBaseMs();
+    return !!(r && r.loginMs && (base - r.loginMs) <= 86400000 && r.loginMs <= base);
+  }
+  function refreshTime(){
+    state.baseTime = Date.now();
+    recomputeRoleGroups();
+    render();
+    toast('已刷新活跃基准：' + fmtDateTime(state.baseTime));
+  }
+  function fmtDateTime(ms){
+    if(!ms) return '—';
+    var d = new Date(ms), p = function(n){ return n < 10 ? '0' + n : '' + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+      ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function innerBadge(r){ return r && r.inner ? '<span class="badge-inner" title="内部账号">内玩</span>' : ''; }
+  function esc(s){
+    return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function gKey(g){ return 'g' + g.main + '_' + g.line; }
+  function groupByKey(key){
+    for(var i=0;i<state.groups.length;i++) if(gKey(state.groups[i]) === key) return state.groups[i];
+    return null;
+  }
+  function getCardMode(g){ return state.cardOverrides[g.main] || state.displayMode; }
+  function toast(msg){
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    setTimeout(function(){ t.classList.remove('visible'); }, 1800);
+  }
+  function copyText(s){
+    if(!s) return;
+    try{
+      if(typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(s);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = s; document.body.appendChild(ta); ta.select();
+        if(document.execCommand) document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      toast('已复制角色ID ' + s);
+    }catch(e){}
+  }
+
+  /* ---------------- 渲染 ---------------- */
+
+  function roleHitServers(q){
+    if(!q || !state.roles.loaded) return null;
+    var exact = state.roles.index[q];
+    if(exact) return exact;
+    var res = {}, keys = Object.keys(state.roles.index);
+    for(var i=0;i<keys.length;i++){
+      if(keys[i].indexOf(q) < 0) continue;
+      var srv = state.roles.index[keys[i]];
+      Object.keys(srv).forEach(function(s){ res[s] = 1; });
+    }
+    return res;
+  }
+  function filteredGroups(){
+    var q = $('#search').value.trim();
+    var sort = $('#sort').value;
+    var onlyData = $('#only-data').checked;
+    var onlySingle = $('#only-single').checked;
+    var roleHit = roleHitServers(q);
+    var list = state.groups.filter(function(g){
+      if(onlyData && !hasData(g)) return false;
+      if(onlySingle && g.status !== '未合服') return false;
+      if(!q) return true;
+      if(String(g.main).indexOf(q) >= 0) return true;
+      if(g.subs.some(function(s){ return String(s).indexOf(q) >= 0; })) return true;
+      if(roleHit && g.servers.some(function(s){ return roleHit[s]; })) return true;
+      return false;
+    });
+    var val = function(g){
+      switch(sort){
+        case 'login': return g.loginCount === null ? -1 : g.loginCount;
+        case 'recharge': return g.recharge === null ? -1 : g.recharge;
+        case 'online': return g.maxOnline === null ? -1 : g.maxOnline;
+        case 'power': return g.top3.length ? g.top3[0].value : -1;
+        case 'subs': return g.subs.length;
+        case 'roles': return g.roleStats ? g.roleStats.count : -1;
+        case 'roleRecharge': return g.roleStats ? g.roleStats.recharge : -1;
+        case 'roleOnline': return g.roleStats ? g.roleStats.active : -1;
+        default: return null;
+      }
+    };
+    list.sort(function(a,b){
+      if(sort === 'main') return a.main - b.main;
+      var d = val(b) - val(a);
+      return d !== 0 ? d : a.main - b.main;
+    });
+    return list;
+  }
+
+  function renderServerTableHtml(g){
+    var st = g.roleStats;
+    var list = g.servers.map(function(s){
+      var arr = st ? (st.byServer[s] || []) : [];
+      return { id:s, chars:arr, count:arr.length };
+    });
+    list.sort(function(a,b){
+      if(a.count > 0 && b.count === 0) return -1;
+      if(a.count === 0 && b.count > 0) return 1;
+      if(a.count > 0 && b.count > 0){
+        var pa = a.chars[0] ? a.chars[0].power : 0;
+        var pb = b.chars[0] ? b.chars[0].power : 0;
+        if(pb !== pa) return pb - pa;
+      }
+      return a.id - b.id;
+    });
+    var rows = list.map(function(x){
+      var top = x.chars[0];
+      var tip = x.chars.length
+        ? x.chars.slice(0,5).map(function(c,i){
+            return (i+1) + '. ' + c.name + (c.inner ? '[内玩]' : '') + ' ' + formatPower(c.power);
+          }).join('\n')
+        : '该区服无角色数据';
+      var pay = x.chars.reduce(function(a,c){ return a + c.recharge; }, 0);
+      return '<tr class="server-row ' + (x.count > 0 ? 'has-chars' : 'no-chars') + (x.id === g.main ? ' is-main' : '') + '" title="' + esc(tip) + '">' +
+        '<td class="srv-id">' + x.id + '</td>' +
+        '<td class="srv-player">' + (top ? esc(top.name) + innerBadge(top) : '—') + '</td>' +
+        '<td class="srv-power">' + (top ? formatPower(top.power) : '—') + '</td>' +
+        '<td class="num-right">' + (st ? formatRecharge(pay) : '—') + '</td></tr>';
+    }).join('');
+    return '<div class="table-wrap"><table class="server-table"><thead><tr>' +
+      '<th class="srv-id">区服</th><th class="srv-player">最强玩家</th>' +
+      '<th class="srv-power">战力</th><th class="num-right">充值金额</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function renderTop10Html(g){
+    var top10 = g.roles.slice(0, 10), base = activeBaseMs(), body;
+    if(!top10.length){
+      body = '<tr><td colspan="7" class="top10-empty">' +
+        (state.roles.loaded ? '该合服组暂无上榜角色' : '尚未导入角色列表') + '</td></tr>';
+    } else {
+      body = top10.map(function(c, i){
+        var active = isActive(c);
+        var hours = c.loginMs ? ((base - c.loginMs) / 3600000) : null;
+        var tip = c.loginMs
+          ? '最后登录 ' + c.lastLogin + '（距基准 ' + (hours < 0 ? '0' : hours.toFixed(1)) + ' 小时）· ' + (active ? '24小时内活跃 √' : '超过24小时未登录 ×')
+          : '无最后登录时间，按未活跃 ×';
+        return '<tr>' +
+          '<td class="t10-rank' + (i < 3 ? ' top3' : '') + '">' + (i+1) + '</td>' +
+          '<td class="t10-name">' + esc(c.name) + innerBadge(c) + '</td>' +
+          '<td class="t10-server">' + c.server + '</td>' +
+          '<td class="t10-power">' + formatPower(c.power) + '</td>' +
+          '<td class="t10-id" data-copy="' + esc(c.id) + '" title="点击复制角色ID">' + esc(c.id || '—') + '</td>' +
+          '<td class="t10-recharge">' + formatRecharge(c.recharge) + '</td>' +
+          '<td class="t10-active ' + (active ? 'ok' : 'no') + '" title="' + esc(tip) + '">' + (active ? '√' : '×') + '</td></tr>';
+      }).join('');
+    }
+    return '<div class="table-wrap"><table class="top10-table"><thead><tr>' +
+      '<th class="t10-rank">#</th><th>角色名</th><th>区服</th><th class="t10-power">战力</th>' +
+      '<th>角色ID</th><th class="t10-recharge">累充</th><th class="t10-active">活跃</th>' +
+      '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+
+  function cardHtml(g){
+    var key = gKey(g), mode = getCardMode(g), st = g.roleStats;
+    var subLabel = g.status === '未合服' ? '未合服' : '合服 ' + g.subs.length + ' 服';
+    var tags = '<span class="card-tag clickable" data-sub="' + key + '" title="点击展开从服列表：' + esc(g.subs.join('、') || '无') + '">' +
+      subLabel + (g.status === '未合服' ? '' : ' ▾') + '</span>';
+    var mi = '最高在线 ' + (g.maxOnline === null ? '—' : fmtNum(g.maxOnline)) +
+      ' · 登录 ' + (g.loginCount === null ? '—' : fmtNum(g.loginCount)) +
+      ' · 充值 ' + (g.recharge === null ? '—' : formatRecharge(g.recharge));
+    tags += '<span class="card-tag" title="来自合服列表">' + mi + '</span>';
+    if(!hasData(g)) tags += '<span class="card-tag nodata">无数据</span>';
+
+    var subRow = '';
+    if(state.subOpen[key] && g.subs.length){
+      subRow = '<div class="card-subs"><span class="sub-label">合服从服（' + g.subs.length + '）：</span>' +
+        g.subs.map(function(s){ return '<span class="chip">' + s + '服</span>'; }).join('') + '</div>';
+    }
+    var body = mode === 'top10' ? renderTop10Html(g) : renderServerTableHtml(g);
+
+    var foot = '<span>该组 ' + g.servers.length + ' 个区服</span>';
+    if(st){
+      foot += '<span class="footer-highlight">活跃玩家 ' + fmtNum(st.active) + ' · 内玩 ' + fmtNum(st.inner) + '</span>';
+      if(g.roles.length){
+        var t = g.roles[0];
+        foot += '<span class="footer-highlight">最高战力 ' + esc(t.name) + ' ' + formatPower(t.power) + ' (' + t.server + '服)</span>';
+      }
+    } else {
+      foot += '<span>尚未导入角色列表</span>';
+    }
+
+    return '<div class="server-card' + (g.status === '未合服' ? ' single' : '') + '" data-key="' + key + '">' +
+      '<div class="card-header"><span class="main-server-badge">主服 ' + g.main + '</span>' + tags +
+        '<button class="card-view-toggle' + (mode === 'top10' ? ' active' : '') + '" data-view="' + key + '" title="' +
+        (mode === 'top10' ? '切换到区服列表视图' : '切换到Top10视图') + '">' + (mode === 'top10' ? '区服' : 'Top10') + '</button></div>' +
+      subRow + body + '<div class="card-footer">' + foot + '</div></div>';
+  }
+
+  function render(){
+    var note = $('#active-note');
+    if(note) note.textContent = '基准 ' + fmtDateTime(activeBaseMs()) + '（当前时间） · 24h';
+    var list = filteredGroups();
+    var hasAny = state.groups.length > 0;
+    $('#toolbar').classList.toggle('hidden', !hasAny);
+    $('#empty').classList.toggle('hidden', hasAny);
+    if(!hasAny){ $('#groups').innerHTML = ''; return; }
+    $('#result-count').textContent = '显示 ' + list.length + ' / ' + state.groups.length + ' 组';
+    $('#groups').innerHTML = list.length ? list.map(cardHtml).join('') : '<div class="empty">没有符合筛选条件的合服组</div>';
+  }
+
+  function resetView(){
+    state.displayMode = 'servers';
+    state.cardOverrides = {};
+    state.subOpen = {};
+    var b = $('#view-toggle-btn');
+    b.textContent = '切换Top10视图';
+    b.classList.remove('active');
+  }
+  function doParse(){
+    var text = $('#merge-input').value;
+    var r = parseMergeText(text);
+    state.groups = r.groups;
+    if(!r.groups.length && text.trim()){
+      toast('未识别到合服组，请检查「N服-->[已合服/未合服]」格式');
+    }
+    resetView();
+    recomputeRoleGroups();
+    render();
+  }
+
+  /* ---------------- 事件 ---------------- */
+
+  $('#btn-parse').addEventListener('click', doParse);
+  $('#btn-clear').addEventListener('click', function(){
+    $('#merge-input').value = ''; state.groups = [];
+    resetView(); recomputeRoleGroups(); render();
+  });
+  $('#btn-role-clear').addEventListener('click', clearRoles);
+
+  ['#search','#sort','#only-data','#only-single'].forEach(function(sel){
+    $(sel).addEventListener('input', render);
+    $(sel).addEventListener('change', render);
+  });
+  $('#exclude-inner').addEventListener('change', function(){ recomputeRoleGroups(); render(); });
+  $('#btn-refresh-time').addEventListener('click', refreshTime);
+  $('#view-toggle-btn').addEventListener('click', function(){
+    state.displayMode = state.displayMode === 'servers' ? 'top10' : 'servers';
+    state.cardOverrides = {};
+    var b = $('#view-toggle-btn');
+    b.textContent = state.displayMode === 'servers' ? '切换Top10视图' : '切换区服列表视图';
+    b.classList.toggle('active', state.displayMode === 'top10');
+    render();
+  });
+
+  var drop = $('#drop-zone'), fileInput = $('#role-file');
+  drop.addEventListener('click', function(){ fileInput.click(); });
+  ['dragenter','dragover'].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave','drop'].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function(e){
+    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) loadRoleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', function(e){ if(e.target.files[0]) loadRoleFile(e.target.files[0]); });
+
+  $('#groups').addEventListener('click', function(e){
+    var d = e.target.dataset || {};
+    if(d.view){
+      var g = groupByKey(d.view);
+      if(g){
+        var cur = getCardMode(g);
+        state.cardOverrides[g.main] = cur === 'servers' ? 'top10' : 'servers';
+        render();
+      }
+      return;
+    }
+    if(d.sub){
+      if(state.subOpen[d.sub]) delete state.subOpen[d.sub]; else state.subOpen[d.sub] = true;
+      render(); return;
+    }
+    if(d.copy){ copyText(d.copy); return; }
+  });
+
+  recomputeRoleGroups();
+  render();
+})();
+</script>
+</body>
+</html>
