@@ -747,6 +747,13 @@
     <!-- ===== LEFT SIDEBAR: ROLES + SCHEMES ===== -->
     <div class="sidebar-left" style="display:flex;flex-direction:column;gap:24px;">
 
+        <!-- 数据导入 / 导出 -->
+        <div style="display:flex;gap:10px;">
+            <button id="exportDataBtn" class="btn" style="flex:1;">⬇ 导出数据</button>
+            <button id="importDataBtn" class="btn" style="flex:1;">⬆ 导入数据</button>
+        </div>
+        <input type="file" id="importFileInput" accept=".json,application/json" style="display:none;">
+
         <!-- 常用角色 -->
         <div class="card">
             <div class="card-header">
@@ -939,6 +946,24 @@
         <div class="modal-footer">
             <button class="btn" id="schemeModalCancelBtn">取消</button>
             <button class="btn btn-primary" id="schemeModalConfirmBtn">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: 导入数据确认 -->
+<div id="importModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">导入数据</span>
+            <button class="modal-close" id="importModalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="importModalInfo" style="padding:16px 24px;color:var(--text-secondary);font-size:0.8125rem;line-height:1.7;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" id="importModalCancelBtn">取消</button>
+            <button class="btn" id="importModalReplaceBtn">覆盖导入</button>
+            <button class="btn btn-primary" id="importModalMergeBtn">合并导入</button>
         </div>
     </div>
 </div>
@@ -2860,6 +2885,133 @@
         inp.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') confirmSchemeModal();
         });
+    });
+
+    // ===== 数据导入 / 导出（常用角色 + 常用方案） =====
+    const importFileInput = document.getElementById('importFileInput');
+    const importModal = document.getElementById('importModal');
+    const importModalInfo = document.getElementById('importModalInfo');
+    let pendingImport = null;
+
+    function exportData() {
+        const roles = loadRoles();
+        const schemes = loadSchemes();
+        const data = {
+            app: 'dadao-mail-tool',
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            roles: roles,
+            schemes: schemes
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        a.href = url;
+        a.download = `大道争锋配置_${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`已导出 ${roles.length} 个角色、${schemes.length} 个方案`);
+    }
+
+    function openImport(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const data = JSON.parse(reader.result);
+                const roles = Array.isArray(data.roles)
+                    ? data.roles.filter(r => r && typeof r === 'object' && (String(r.serverValue || '').trim() || String(r.roleId || '').trim()))
+                        .map(r => ({
+                            serverValue: String(r.serverValue || '').trim(),
+                            roleId: String(r.roleId || '').trim(),
+                            roleName: String(r.roleName || '').trim(),
+                            category: String(r.category || '').trim()
+                        }))
+                    : [];
+                const schemes = Array.isArray(data.schemes)
+                    ? data.schemes.filter(s => s && typeof s === 'object' && s.name && Array.isArray(s.items))
+                        .map(s => ({
+                            name: String(s.name).trim(),
+                            category: String(s.category || '').trim(),
+                            items: s.items.filter(i => i && i.id).map(i => ({ id: String(i.id), count: Number(i.count) || 1 }))
+                        }))
+                    : [];
+                if (!data.roles && !data.schemes) throw new Error('invalid');
+                if (!roles.length && !schemes.length) {
+                    showToast('文件中没有有效的角色或方案数据', true);
+                    return;
+                }
+                pendingImport = { roles: roles, schemes: schemes };
+                importModalInfo.innerHTML =
+                    `文件包含 <strong style="color:var(--text-primary);">${roles.length}</strong> 个常用角色、` +
+                    `<strong style="color:var(--text-primary);">${schemes.length}</strong> 个常用方案。<br><br>` +
+                    `<strong style="color:var(--text-primary);">合并导入</strong>：保留现有数据，追加文件中的数据（自动跳过重复项）。<br>` +
+                    `<strong style="color:var(--danger);">覆盖导入</strong>：清空现有角色和方案，替换为文件内容，不可恢复。`;
+                importModal.classList.add('show');
+            } catch (e) {
+                showToast('导入失败：文件格式不正确', true);
+            }
+        };
+        reader.onerror = () => { showToast('导入失败：文件读取错误', true); };
+        reader.readAsText(file);
+    }
+
+    function closeImportModal() {
+        importModal.classList.remove('show');
+        pendingImport = null;
+    }
+
+    function doImport(mode) {
+        if (!pendingImport) { closeImportModal(); return; }
+        const newRoles = pendingImport.roles;
+        const newSchemes = pendingImport.schemes;
+        if (mode === 'merge') {
+            const roles = loadRoles();
+            const schemes = loadSchemes();
+            let addR = 0, dupR = 0;
+            newRoles.forEach(r => {
+                const dup = roles.some(x =>
+                    (x.serverValue || '') === r.serverValue &&
+                    (x.roleId || '') === r.roleId &&
+                    (x.roleName || '') === r.roleName
+                );
+                if (dup) { dupR++; } else { roles.push(r); addR++; }
+            });
+            let addS = 0, dupS = 0;
+            newSchemes.forEach(s => {
+                const dup = schemes.some(x =>
+                    (x.name || '') === s.name &&
+                    (x.category || '') === s.category &&
+                    JSON.stringify(x.items || []) === JSON.stringify(s.items)
+                );
+                if (dup) { dupS++; } else { schemes.push(s); addS++; }
+            });
+            saveRoles(roles);
+            saveSchemes(schemes);
+            showToast(`导入完成：新增 ${addR} 个角色、${addS} 个方案${(dupR + dupS) ? `，跳过重复 ${dupR + dupS} 项` : ''}`);
+        } else {
+            saveRoles(newRoles);
+            saveSchemes(newSchemes);
+            showToast(`导入完成：已覆盖为 ${newRoles.length} 个角色、${newSchemes.length} 个方案`);
+        }
+        closeImportModal();
+    }
+
+    document.getElementById('exportDataBtn').addEventListener('click', exportData);
+    document.getElementById('importDataBtn').addEventListener('click', () => importFileInput.click());
+    importFileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) openImport(this.files[0]);
+        this.value = '';
+    });
+    document.getElementById('importModalMergeBtn').addEventListener('click', () => doImport('merge'));
+    document.getElementById('importModalReplaceBtn').addEventListener('click', () => doImport('replace'));
+    document.getElementById('importModalCancelBtn').addEventListener('click', closeImportModal);
+    document.getElementById('importModalCloseBtn').addEventListener('click', closeImportModal);
+    importModal.addEventListener('click', function(e) {
+        if (e.target === importModal) closeImportModal();
     });
 
     // ===== ROLES =====
