@@ -135,7 +135,7 @@
             font-size: 0.75rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             background: var(--bg-input);
             color: var(--text-primary);
             white-space: nowrap;
@@ -196,7 +196,7 @@
             border-radius: var(--radius-sm);
             color: var(--text-primary);
             font-size: 0.875rem;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             font-family: inherit;
             letter-spacing: -0.01em;
             -webkit-appearance: none;
@@ -233,7 +233,7 @@
             border-radius: var(--radius-sm);
             color: var(--text-primary);
             font-size: 0.875rem;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             font-family: inherit;
             letter-spacing: -0.01em;
         }
@@ -307,7 +307,7 @@
             padding: 10px 24px;
             cursor: pointer;
             font-size: 0.8125rem;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             color: var(--text-primary);
             letter-spacing: -0.01em;
         }
@@ -323,7 +323,7 @@
             border-radius: 50%;
             border: 2px solid #d2d2d7;
             flex-shrink: 0;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             display: flex; align-items: center; justify-content: center;
             font-size: 11px;
             font-weight: 700;
@@ -398,7 +398,7 @@
             color: var(--text-primary);
             text-align: center;
             font-size: 0.8125rem;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             font-family: inherit;
             -webkit-appearance: none;
         }
@@ -419,7 +419,7 @@
             font-size: 1rem;
             padding: 4px 6px;
             border-radius: 50%;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             line-height: 1;
             width: 28px;
             height: 28px;
@@ -448,7 +448,7 @@
             border-radius: 980px;
             color: #ffffff;
             cursor: pointer;
-            transition: all var(--transition-slow);
+            transition: background-color var(--transition-slow), color var(--transition-slow), border-color var(--transition-slow), box-shadow var(--transition-slow), transform var(--transition-slow);
             font-family: inherit;
             position: relative;
             overflow: hidden;
@@ -475,8 +475,8 @@
             left: 50%;
             transform: translateX(-50%) translateY(-12px);
             background: rgba(29, 29, 31, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: #ffffff;
             padding: 10px 28px;
             border-radius: 980px;
@@ -485,9 +485,10 @@
             letter-spacing: -0.01em;
             z-index: 1000;
             opacity: 0;
-            transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transition: opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
             pointer-events: none;
             box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            will-change: opacity, transform;
         }
         .toast.show {
             opacity: 1;
@@ -517,6 +518,36 @@
             color: var(--danger);
             background: var(--danger-light);
         }
+
+        /* ===== CATEGORY TABS ===== */
+        .cat-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 12px 24px 4px;
+        }
+        .cat-tabs:empty { display: none; }
+        .cat-tab {
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: 980px;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+        }
+        .cat-tab:hover { background: #e8e8ed; color: var(--text-primary); }
+        .cat-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .cat-tab .cat-count { opacity: 0.7; font-size: 0.6875rem; margin-left: 3px; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
@@ -566,7 +597,7 @@
             font-size: 0.8125rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             text-align: center;
             font-family: inherit;
             letter-spacing: -0.01em;
@@ -585,16 +616,15 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.45);
             z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transition: opacity 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            will-change: opacity;
         }
         .modal-overlay.show {
             opacity: 1;
@@ -609,8 +639,9 @@
             max-height: 80vh;
             display: flex;
             flex-direction: column;
-            transform: scale(0.92) translateY(10px);
-            transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transform: scale(0.94) translateY(12px);
+            transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            will-change: transform;
         }
         .modal-overlay.show .modal {
             transform: scale(1) translateY(0);
@@ -636,7 +667,7 @@
             font-size: 1.25rem;
             padding: 4px 8px;
             border-radius: 50%;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             line-height: 1;
         }
         .modal-close:hover {
@@ -655,7 +686,7 @@
             padding: 12px 24px;
             cursor: pointer;
             font-size: 0.875rem;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             color: var(--text-primary);
             border-bottom: 1px solid rgba(0,0,0,0.03);
         }
@@ -669,7 +700,7 @@
             border-radius: 6px;
             border: 2px solid #d2d2d7;
             flex-shrink: 0;
-            transition: all var(--transition);
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
             display: flex; align-items: center; justify-content: center;
             font-size: 13px;
             font-weight: 700;
@@ -723,6 +754,7 @@
                 <button id="addRoleBtn" class="btn btn-sm">添加</button>
             </div>
             <div class="card-body no-pad">
+                <div id="roleCatTabs" class="cat-tabs"></div>
                 <div id="roleList" class="list-container">
                     <div class="placeholder-text">暂无角色</div>
                 </div>
@@ -736,6 +768,7 @@
                 <button id="saveSchemeBtn" class="btn btn-sm">保存当前</button>
             </div>
             <div class="card-body no-pad">
+                <div id="schemeCatTabs" class="cat-tabs"></div>
                 <div id="schemeList" class="list-container">
                     <div class="placeholder-text">暂无方案</div>
                 </div>
@@ -844,6 +877,68 @@
         <div class="modal-footer">
             <button class="btn" id="modalCancelBtn">取消</button>
             <button class="btn btn-primary" id="modalConfirmBtn">确认添加</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: 添加/编辑常用角色 -->
+<div id="roleModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title" id="roleModalTitle">添加常用角色</span>
+            <button class="modal-close" id="roleModalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="padding:16px 24px;display:flex;flex-direction:column;gap:14px;">
+                <div class="form-group">
+                    <label>区服</label>
+                    <input type="text" id="roleModalServer" placeholder="输入区服">
+                </div>
+                <div class="form-group">
+                    <label>角色 ID</label>
+                    <input type="text" id="roleModalRoleId" placeholder="输入角色 ID">
+                </div>
+                <div class="form-group">
+                    <label>角色名</label>
+                    <input type="text" id="roleModalName" placeholder="输入角色名（选填，用于列表显示）">
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <input type="text" id="roleModalCat" list="roleCatList" placeholder="选择已有分类或输入新分类（选填）">
+                    <datalist id="roleCatList"></datalist>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" id="roleModalCancelBtn">取消</button>
+            <button class="btn btn-primary" id="roleModalConfirmBtn">确认添加</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: 保存/编辑常用方案 -->
+<div id="schemeModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title" id="schemeModalTitle">保存方案</span>
+            <button class="modal-close" id="schemeModalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="padding:16px 24px;display:flex;flex-direction:column;gap:14px;">
+                <div class="form-group">
+                    <label>方案名称</label>
+                    <input type="text" id="schemeModalName" placeholder="输入方案名称">
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <input type="text" id="schemeModalCat" list="schemeCatList" placeholder="选择已有分类或输入新分类（选填）">
+                    <datalist id="schemeCatList"></datalist>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" id="schemeModalCancelBtn">取消</button>
+            <button class="btn btn-primary" id="schemeModalConfirmBtn">保存</button>
         </div>
     </div>
 </div>
@@ -2586,6 +2681,36 @@
 
     // ===== SCHEMES =====
     const STORAGE_SCHEMES = 'mailTool_schemes';
+    // 分类通用工具（角色/方案共用）
+    function getCategoryList(list) {
+        const set = new Set();
+        list.forEach(it => { const c = (it.category || '').trim(); if (c) set.add(c); });
+        return Array.from(set);
+    }
+    function renderCatTabs(tabsId, list, filter, onPick) {
+        const tabsDiv = document.getElementById(tabsId);
+        if (!list.length) { tabsDiv.innerHTML = ''; return; }
+        const cats = getCategoryList(list);
+        const uncategorized = list.filter(it => !(it.category || '').trim()).length;
+        if (!cats.length && uncategorized === list.length) { tabsDiv.innerHTML = ''; return; }
+        const mkTab = (key, label, count) =>
+            `<button class="cat-tab${filter === key ? ' active' : ''}" data-key="${escapeHtml(key)}">${escapeHtml(label)}<span class="cat-count">${count}</span></button>`;
+        let html = mkTab('all', '全部', list.length);
+        cats.forEach(c => {
+            html += mkTab('cat:' + c, c, list.filter(it => (it.category || '').trim() === c).length);
+        });
+        if (uncategorized > 0) html += mkTab('none', '未分类', uncategorized);
+        tabsDiv.innerHTML = html;
+        tabsDiv.querySelectorAll('.cat-tab').forEach(t => {
+            t.addEventListener('click', () => onPick(t.dataset.key));
+        });
+    }
+    function matchCatFilter(item, filter) {
+        const c = (item.category || '').trim();
+        if (filter === 'all') return true;
+        if (filter === 'none') return !c;
+        return c === filter.slice(4);
+    }
     function loadSchemes() {
         try { return JSON.parse(localStorage.getItem(STORAGE_SCHEMES)) || []; } catch(e) { return []; }
     }
@@ -2593,21 +2718,28 @@
         localStorage.setItem(STORAGE_SCHEMES, JSON.stringify(schemes));
         renderSchemeList();
     }
+    let schemeCatFilter = 'all';
     function renderSchemeList() {
         const container = document.getElementById('schemeList');
         const schemes = loadSchemes();
-        if (!schemes.length) {
-            container.innerHTML = '<div class="placeholder-text">暂无方案</div>';
+        renderCatTabs('schemeCatTabs', schemes, schemeCatFilter, key => {
+            schemeCatFilter = key;
+            renderSchemeList();
+        });
+        const filtered = schemes.map((s, idx) => ({ s, idx })).filter(({ s }) => matchCatFilter(s, schemeCatFilter));
+        if (!filtered.length) {
+            container.innerHTML = '<div class="placeholder-text">' + (schemes.length ? '该分类下暂无方案' : '暂无方案') + '</div>';
             return;
         }
         container.innerHTML = '';
-        schemes.forEach((scheme, idx) => {
+        filtered.forEach(({ s, idx }) => {
             const div = document.createElement('div');
             div.className = 'list-item';
             div.title = '点击加载方案';
             div.innerHTML = `
-                <span class="item-label" title="点击加载方案">${escapeHtml(scheme.name)} <span style="color:var(--text-muted);font-size:0.7rem;">(${scheme.items.length})</span></span>
+                <span class="item-label" title="点击加载方案">${escapeHtml(s.name)} <span style="color:var(--text-muted);font-size:0.7rem;">(${s.items.length})</span></span>
                 <div class="list-actions">
+                    <button class="btn btn-sm btn-load btn-rename" data-idx="${idx}">编辑</button>
                     <button class="btn btn-sm btn-del" data-idx="${idx}">删除</button>
                 </div>
             `;
@@ -2615,10 +2747,16 @@
         });
         container.querySelectorAll('.list-item').forEach(div => {
             div.addEventListener('click', (e) => {
-                // 点击"删除"按钮时不加载
-                if (e.target.closest('.btn-del')) return;
+                // 点击"删除"或"编辑"按钮时不加载
+                if (e.target.closest('.btn-del') || e.target.closest('.btn-rename')) return;
                 const idx = parseInt(div.querySelector('.btn-del').dataset.idx);
                 loadSchemeData(loadSchemes()[idx].items);
+            });
+        });
+        container.querySelectorAll('.btn-rename').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openSchemeModal('rename', parseInt(btn.dataset.idx));
             });
         });
         container.querySelectorAll('.btn-del').forEach(btn => {
@@ -2651,13 +2789,78 @@
     }
     function saveCurrentScheme() {
         if (selectedItems.length === 0) { showToast('当前没有道具，无法保存', true); return; }
-        const name = prompt('方案名称：', `方案 ${new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}`);
-        if (!name || !name.trim()) return;
-        const schemes = loadSchemes();
-        schemes.push({ name: name.trim(), items: selectedItems.map(i => ({id:i.id, count:i.count})) });
-        saveSchemes(schemes);
-        showToast('方案已保存');
+        openSchemeModal('save');
     }
+
+    // 方案弹窗（保存 / 编辑共用，名称+分类一次填完）
+    const schemeModal = document.getElementById('schemeModal');
+    const schemeModalTitle = document.getElementById('schemeModalTitle');
+    const schemeModalName = document.getElementById('schemeModalName');
+    const schemeModalCat = document.getElementById('schemeModalCat');
+    const schemeModalCatList = document.getElementById('schemeCatList');
+    const schemeModalConfirmBtn = document.getElementById('schemeModalConfirmBtn');
+    let schemeModalMode = 'save';
+    let schemeEditIdx = null;
+
+    function openSchemeModal(mode, editIdx = null) {
+        schemeModalMode = mode;
+        schemeEditIdx = editIdx;
+        const isRename = mode === 'rename';
+        const schemes = loadSchemes();
+        schemeModalTitle.textContent = isRename ? '编辑方案' : '保存方案';
+        schemeModalConfirmBtn.textContent = isRename ? '确认修改' : '保存';
+        // 填充分类下拉建议
+        const cats = getCategoryList(schemes);
+        schemeModalCatList.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}"></option>`).join('');
+        if (isRename) {
+            const scheme = schemes[editIdx];
+            schemeModalName.value = scheme ? scheme.name : '';
+            schemeModalCat.value = scheme ? (scheme.category || '') : '';
+        } else {
+            schemeModalName.value = `方案 ${new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}`;
+            schemeModalCat.value = '';
+        }
+        schemeModal.classList.add('show');
+        setTimeout(() => { schemeModalName.focus(); schemeModalName.select(); }, 100);
+    }
+
+    function closeSchemeModal() {
+        schemeModal.classList.remove('show');
+        schemeEditIdx = null;
+    }
+
+    function confirmSchemeModal() {
+        const name = schemeModalName.value.trim();
+        if (!name) { showToast('请输入方案名称', true); return; }
+        const category = schemeModalCat.value.trim();
+        const schemes = loadSchemes();
+        if (schemeModalMode === 'save') {
+            if (selectedItems.length === 0) { showToast('当前没有道具，无法保存', true); return; }
+            schemes.push({ name: name, category: category, items: selectedItems.map(i => ({id:i.id, count:i.count})) });
+            saveSchemes(schemes);
+            showToast('方案已保存');
+        } else {
+            const scheme = schemes[schemeEditIdx];
+            if (!scheme) { closeSchemeModal(); return; }
+            scheme.name = name;
+            scheme.category = category;
+            saveSchemes(schemes);
+            showToast('方案已更新');
+        }
+        closeSchemeModal();
+    }
+
+    schemeModalConfirmBtn.addEventListener('click', confirmSchemeModal);
+    document.getElementById('schemeModalCloseBtn').addEventListener('click', closeSchemeModal);
+    document.getElementById('schemeModalCancelBtn').addEventListener('click', closeSchemeModal);
+    schemeModal.addEventListener('click', function(e) {
+        if (e.target === schemeModal) closeSchemeModal();
+    });
+    [schemeModalName, schemeModalCat].forEach(inp => {
+        inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') confirmSchemeModal();
+        });
+    });
 
     // ===== ROLES =====
     const STORAGE_ROLES = 'mailTool_roles';
@@ -2668,19 +2871,27 @@
         localStorage.setItem(STORAGE_ROLES, JSON.stringify(roles));
         renderRoleList();
     }
+    let roleCatFilter = 'all';
     function renderRoleList() {
         const container = document.getElementById('roleList');
         const roles = loadRoles();
-        if (!roles.length) {
-            container.innerHTML = '<div class="placeholder-text">暂无角色</div>';
+        renderCatTabs('roleCatTabs', roles, roleCatFilter, key => {
+            roleCatFilter = key;
+            renderRoleList();
+        });
+        const filtered = roles.map((r, idx) => ({ r, idx })).filter(({ r }) => matchCatFilter(r, roleCatFilter));
+        if (!filtered.length) {
+            container.innerHTML = '<div class="placeholder-text">' + (roles.length ? '该分类下暂无角色' : '暂无角色') + '</div>';
             return;
         }
         container.innerHTML = '';
-        roles.forEach((role, idx) => {
+        filtered.forEach(({ r: role, idx }) => {
             const div = document.createElement('div');
             div.className = 'list-item';
+            const displayName = role.roleName ? escapeHtml(role.roleName) : `${escapeHtml(role.serverValue)} · ${escapeHtml(role.roleId)}`;
+            const subInfo = role.roleName ? `${escapeHtml(role.serverValue)} · ${escapeHtml(role.roleId)}` : '';
             div.innerHTML = `
-                <span class="item-label" title="点击填充基本信息">${escapeHtml(role.serverValue)} · ${escapeHtml(role.roleId)}</span>
+                <span class="item-label" title="点击填充基本信息">${displayName}${subInfo ? ` <span style="color:var(--text-muted);font-size:0.7rem;">${subInfo}</span>` : ''}</span>
                 <div class="list-actions">
                     <button class="btn btn-sm btn-load" data-idx="${idx}">编辑</button>
                     <button class="btn btn-sm btn-del" data-idx="${idx}">删除</button>
@@ -2702,7 +2913,7 @@
         container.querySelectorAll('.btn-load').forEach(btn => {
             btn.addEventListener('click', () => {
                 const idx = parseInt(btn.dataset.idx);
-                editRole(idx);
+                openRoleModal(idx);
             });
         });
         container.querySelectorAll('.btn-del').forEach(btn => {
@@ -2715,29 +2926,79 @@
             });
         });
     }
-    function addRole() {
-        const server = prompt('区服：', '');
-        if (server === null) return;
-        const roleId = prompt('角色 ID：', '');
-        if (roleId === null) return;
+
+    // 常用角色弹窗（添加 / 编辑共用，区服、角色ID、角色名、分类一次填完）
+    const roleModal = document.getElementById('roleModal');
+    const roleModalTitle = document.getElementById('roleModalTitle');
+    const roleModalServer = document.getElementById('roleModalServer');
+    const roleModalRoleId = document.getElementById('roleModalRoleId');
+    const roleModalName = document.getElementById('roleModalName');
+    const roleModalCat = document.getElementById('roleModalCat');
+    const roleModalCatList = document.getElementById('roleCatList');
+    const roleModalConfirmBtn = document.getElementById('roleModalConfirmBtn');
+    let roleEditIdx = null;
+
+    function openRoleModal(editIdx = null) {
+        roleEditIdx = editIdx;
+        const isEdit = editIdx !== null;
         const roles = loadRoles();
-        roles.push({ serverValue: server.trim(), roleId: roleId.trim() });
-        saveRoles(roles);
-        showToast('角色已添加');
+        const role = isEdit ? roles[editIdx] : null;
+        roleModalTitle.textContent = isEdit ? '编辑常用角色' : '添加常用角色';
+        roleModalConfirmBtn.textContent = isEdit ? '确认修改' : '确认添加';
+        // 填充分类下拉建议
+        const cats = getCategoryList(roles);
+        roleModalCatList.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}"></option>`).join('');
+        roleModalServer.value = role ? role.serverValue : '';
+        roleModalRoleId.value = role ? role.roleId : '';
+        roleModalName.value = role && role.roleName ? role.roleName : '';
+        roleModalCat.value = role ? (role.category || '') : '';
+        roleModal.classList.add('show');
+        setTimeout(() => { roleModalServer.focus(); }, 100);
     }
-    function editRole(idx) {
+
+    function closeRoleModal() {
+        roleModal.classList.remove('show');
+        roleEditIdx = null;
+    }
+
+    function confirmRoleModal() {
+        const server = roleModalServer.value.trim();
+        const roleId = roleModalRoleId.value.trim();
+        const roleName = roleModalName.value.trim();
+        const category = roleModalCat.value.trim();
+        if (!server && !roleId) {
+            showToast('区服和角色 ID 至少填写一项', true);
+            return;
+        }
         const roles = loadRoles();
-        const role = roles[idx];
-        if (!role) return;
-        const server = prompt('编辑区服：', role.serverValue);
-        if (server === null) return;
-        const roleId = prompt('编辑角色 ID：', role.roleId);
-        if (roleId === null) return;
-        role.serverValue = server.trim();
-        role.roleId = roleId.trim();
-        saveRoles(roles);
-        showToast('角色已更新');
+        if (roleEditIdx !== null) {
+            const role = roles[roleEditIdx];
+            if (!role) { closeRoleModal(); return; }
+            role.serverValue = server;
+            role.roleId = roleId;
+            role.roleName = roleName;
+            role.category = category;
+            saveRoles(roles);
+            showToast('角色已更新');
+        } else {
+            roles.push({ serverValue: server, roleId: roleId, roleName: roleName, category: category });
+            saveRoles(roles);
+            showToast('角色已添加');
+        }
+        closeRoleModal();
     }
+
+    roleModalConfirmBtn.addEventListener('click', confirmRoleModal);
+    document.getElementById('roleModalCloseBtn').addEventListener('click', closeRoleModal);
+    document.getElementById('roleModalCancelBtn').addEventListener('click', closeRoleModal);
+    roleModal.addEventListener('click', function(e) {
+        if (e.target === roleModal) closeRoleModal();
+    });
+    [roleModalServer, roleModalRoleId, roleModalName, roleModalCat].forEach(inp => {
+        inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') confirmRoleModal();
+        });
+    });
 
     // ===== GENERATE =====
     function generateAndCopy() {
@@ -2925,7 +3186,7 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]);
+        return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
     }
 
     // ===== BIND EVENTS =====
@@ -2936,7 +3197,7 @@
     document.getElementById('clearAllSelectedBtn').addEventListener('click', clearAllSelected);
     document.getElementById('generateBtn').addEventListener('click', generateAndCopy);
     document.getElementById('saveSchemeBtn').addEventListener('click', saveCurrentScheme);
-    document.getElementById('addRoleBtn').addEventListener('click', addRole);
+    document.getElementById('addRoleBtn').addEventListener('click', () => openRoleModal());
 
     // ===== INIT =====
     renderItemList();
