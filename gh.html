@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameHub · GameHub</title>
+<title>GameHub</title>
 <link rel="preconnect" href="https://liangtz0518.github.io" crossorigin>
 <link rel="preconnect" href="https://www.kdocs.cn" crossorigin>
 <link rel="dns-prefetch" href="//liangtz0518.github.io">
@@ -322,7 +322,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 @keyframes bar-slide { 0% { left: -32%; } 100% { left: 100%; } }
 @keyframes bar-shine { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
 
-/* ---------- 彩蛋页 ---------- */
+/* ---------- 彩蛋页：弹跳小怪物 ---------- */
 .easter {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
@@ -427,6 +427,193 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
   30% { transform: scale(1.24, .84) translateY(6px); }
   60% { transform: scale(.88, 1.16) translateY(-12px); }
 }
+/* ===== 「找狗玩玩」按钮本身即狗窝 ===== */
+.dog-btn { position: relative; }
+.dog-btn .dog-face {
+  display: none; position: absolute; left: 50%; top: 50%;
+  width: 26px; height: 26px; object-fit: cover;
+  transform: translate(-50%, -50%);
+}
+.dog-btn.occupied { border-color: #c7d2fe; background: #f5f7ff; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.dog-btn.occupied:hover { border-color: #818cf8; background: #eef1ff; }
+.dog-btn.occupied svg { opacity: 0; }
+.dog-btn.occupied .dog-face { display: block; animation: face-idle 2.4s ease-in-out infinite; }
+/* 狗出来后：按钮清空，不显示任何内容，仅保留可点击的框 */
+.dog-btn.vacant svg { opacity: 0; }
+.dog-btn.vacant .dog-face { display: none; }
+.dog-btn.vacant:hover { border-color: #a5b4fc; background: #f5f7ff; }
+@keyframes face-idle {
+  0%, 100% { transform: translate(-50%,-50%) rotate(-4deg); }
+  50%      { transform: translate(-50%,-50%) rotate(5deg) translateY(-1px); }
+}
+.dog-btn.chomp { animation: btn-chomp .5s cubic-bezier(.34,1.5,.5,1); }
+@keyframes btn-chomp {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.22) rotate(-8deg); }
+  55%  { transform: scale(.9) rotate(5deg); }
+  100% { transform: scale(1); }
+}
+/* ===== 退场·漩涡吸走：按钮张开吸力漩涡，把狗卷进去 ===== */
+.vortex {
+  position: fixed; left: 0; top: 0;
+  width: 100px; height: 100px; margin: -50px 0 0 -50px;
+  border-radius: 50%;
+  pointer-events: none; z-index: 9996;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  background: conic-gradient(from 0deg,
+    transparent 0deg, rgba(99,102,241,.06) 55deg,
+    rgba(99,102,241,.5) 145deg, rgba(129,140,248,.92) 195deg,
+    rgba(99,102,241,.42) 250deg, transparent 330deg);
+  -webkit-mask: radial-gradient(circle, transparent 27%, #000 43%, #000 66%, transparent 76%);
+  mask: radial-gradient(circle, transparent 27%, #000 43%, #000 66%, transparent 76%);
+  animation: vortex-spin .86s cubic-bezier(.32,.04,.5,1) forwards;
+}
+.vortex::before {
+  content: ''; position: absolute; inset: 13%;
+  border-radius: 50%;
+  border: 2px dashed rgba(129,140,248,.6);
+}
+.vortex::after {
+  content: ''; position: absolute; inset: 30%;
+  border-radius: 50%;
+  border: 3px solid rgba(99,102,241,.75);
+}
+@keyframes vortex-spin {
+  0%   { opacity: 0; transform: scale(.32) rotate(0deg); }
+  16%  { opacity: .95; }
+  72%  { opacity: .85; }
+  100% { opacity: 0; transform: scale(1.2) rotate(700deg); }
+}
+/* ===== 退场多方案通用粒子 ===== */
+/* 漩涡中心黑洞 */
+.vortex .v-core {
+  position: absolute; inset: 24%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(15,23,42,.92) 0%, rgba(79,70,229,.55) 42%, transparent 72%);
+  animation: v-core-pulse .86s ease-in forwards;
+}
+@keyframes v-core-pulse {
+  0% { transform: scale(.3); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+/* 漩涡吸附光点：从四周螺旋汇入中心 */
+.vortex-spark {
+  position: fixed; left: 0; top: 0; width: 5px; height: 5px; border-radius: 50%;
+  background: #a5b4fc; box-shadow: 0 0 8px #818cf8;
+  pointer-events: none; z-index: 9996; will-change: transform, opacity;
+  animation: spark-suck .72s cubic-bezier(.5,0,.9,.5) forwards;
+}
+@keyframes spark-suck {
+  0% { opacity: 0; transform: translate3d(var(--sp-x,0),var(--sp-y,0),0) scale(.5); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(0,0,0) scale(1.5); }
+}
+/* 尘埃 / 熔滴小粒子 */
+.speck {
+  position: fixed; left: 0; top: 0; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--speck-color, rgba(148,163,184,.6));
+  pointer-events: none; z-index: 9995; will-change: transform, opacity;
+  animation: speck-fly .8s cubic-bezier(.2,.6,.3,1) forwards;
+}
+@keyframes speck-fly {
+  0% { opacity: 0; transform: translate3d(0,0,0) scale(.4); }
+  18% { opacity: var(--speck-op, .75); }
+  100% { opacity: 0; transform: translate3d(var(--sp-dx,0),var(--sp-dy,0),0) scale(var(--sp-sc,1)); }
+}
+/* 涟漪（按钮吞入反馈） */
+.ripple {
+  position: fixed; left: 0; top: 0; width: 60px; height: 60px; margin: -30px 0 0 -30px;
+  border-radius: 50%; border: 3px solid rgba(99,102,241,.6);
+  pointer-events: none; z-index: 9995; will-change: transform, opacity;
+  animation: ripple-out .72s cubic-bezier(.2,.6,.3,1) forwards;
+}
+@keyframes ripple-out {
+  0% { opacity: .9; transform: scale(.3); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+/* 残影（潜行滑步拖尾） */
+.ghost-dog {
+  position: fixed; left: 0; top: 0; width: 230px;
+  transform-origin: center center; pointer-events: none; z-index: 9990;
+  will-change: opacity; backface-visibility: hidden;
+  animation: ghost-fade .52s ease-out forwards;
+}
+@keyframes ghost-fade {
+  0% { opacity: var(--gh-op, .3); }
+  100% { opacity: 0; }
+}
+/* ===== 飞行分身：center origin + GPU 合成（无滤镜、无重绘） ===== */
+.fly-dog {
+  position: fixed; left: 0; top: 0;
+  width: 230px;
+  transform-origin: center center;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+/* 烟圈：纯渐变柔和烟雾环（无硬边框，放大后依然细腻） */
+.smoke-ring {
+  position: fixed; left: 0; top: 0;
+  width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  will-change: transform, opacity;
+  background: radial-gradient(ellipse 100% 84% at 50% 50%,
+    transparent 0%, transparent 33%,
+    rgba(120,140,165,.05) 40%,
+    rgba(120,140,165,.24) 52%,
+    rgba(180,198,220,.14) 61%,
+    transparent 73%);
+  animation: smoke-bloom 1.2s cubic-bezier(.16,.6,.3,1) forwards;
+}
+/* 内层高光环：让烟圈有立体的通透感 */
+.smoke-ring::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(ellipse 86% 70% at 50% 50%,
+    transparent 0%, transparent 49%,
+    rgba(255,255,255,.45) 57%,
+    rgba(148,163,184,.10) 65%, transparent 75%);
+}
+@keyframes smoke-bloom {
+  0%   { opacity: 0; transform: translate3d(0,0,0) scale(.25) rotate(0deg); }
+  12%  { opacity: .92; }
+  55%  { opacity: .68; }
+  100% { opacity: 0; transform: translate3d(var(--sm-dx,22px),var(--sm-dy,-42px),0) scale(var(--sm-scale,4)) rotate(var(--sm-rot,40deg)); }
+}
+/* 礼花炮彩屑：登场弹出瞬间喷射 */
+.confetti {
+  position: fixed; left: 0; top: 0;
+  width: 7px; height: 12px; border-radius: 2px;
+  pointer-events: none; z-index: 9997;
+  will-change: transform, opacity;
+  animation: confetti-burst .95s cubic-bezier(.15,.55,.3,1) forwards;
+}
+@keyframes confetti-burst {
+  0%   { opacity: 0; transform: translate3d(0,0,0) rotate(0) scale(.3); }
+  10%  { opacity: 1; }
+  68%  { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--cf-dx,0),var(--cf-dy,0),0) rotate(var(--cf-rot,360deg)) scale(1); }
+}
+/* ===== 彩蛋页原地逗弄（已在彩蛋页点按钮：不重置） ===== */
+.dog-stage.tease .shiba-img { animation: dog-tease .62s cubic-bezier(.34,1.5,.5,1); }
+@keyframes dog-tease {
+  0%   { transform: translateY(0) rotate(0) scale(1); }
+  25%  { transform: translateY(-22px) rotate(-14deg) scale(1.08); }
+  55%  { transform: translateY(0) rotate(10deg) scale(.95,1.06); }
+  78%  { transform: translateY(-6px) rotate(-5deg) scale(1.03); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+/* ===== 登场落地回弹 ===== */
+.dog-stage.land .shiba-img { animation: dog-land .7s cubic-bezier(.3,1.4,.5,1); }
+@keyframes dog-land {
+  0%   { transform: translateY(0) scale(1.18,.8); }
+  45%  { transform: translateY(-14px) scale(.94,1.1); }
+  72%  { transform: translateY(0) scale(1.05,.95); }
+  100% { transform: translateY(0) scale(1); }
+}
 /* 嘲讽气泡 */
 .taunt-bubble {
   position: absolute; bottom: 100%; left: 50%;
@@ -529,7 +716,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
           系统运行中
         </div>
       </div>
-      <button class="top-btn icon-only dog-btn" id="dogBtn" title="找狗玩玩" aria-label="找狗玩玩">
+      <button class="top-btn icon-only dog-btn vacant" id="dogBtn" title="找狗玩玩" aria-label="找狗玩玩">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4.6 4.4 8.6 7.4 M19.4 4.4 15.4 7.4" stroke-width="2"/>
           <path d="M4.8 3.9 9 7.3 6.7 9.4 Z M19.2 3.9 15 7.3 17.3 9.4 Z" fill="currentColor" opacity=".18" stroke="none"/>
@@ -540,6 +727,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
           <path d="M14.8 15.4 20 13.6" stroke-width="1.5"/>
           <circle cx="20.3" cy="13.5" r="1" fill="currentColor" stroke="none"/>
         </svg>
+        <img class="dog-face" id="dogFace" alt="">
       </button>
       <button class="top-btn" id="openBtn" title="在新窗口打开">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M10 14 20 4"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></svg>
@@ -600,7 +788,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 // ===== 公告区文字：在这里修改你想要的文案（多条用 | 分隔）=====
 const ANNOUNCEMENT_TEXT = '记得写周报，记得写周报，记得写周报，要加道具GS内部群喊一声';
 
-const HUB_VERSION = '2';
+const HUB_VERSION = '1';
 const VERSION_CHECK_URL = 'https://liangtz0518.github.io/gamehub/version.json';
 const VERSION_CHECK_INTERVAL = 10000;
 
@@ -737,28 +925,59 @@ function setProgress(on) {
 }
 
 /* ---------- 选择 / iframe ---------- */
+let exitTimer = null;
 function selectItem(gi) {
   if (gi < 0 || gi >= allItems.length) return;
   activeGlobalIdx = gi;
 
-  // 进入工具页：隐藏彩蛋页，并重置彩蛋速度挡位
-  document.getElementById('easter').classList.remove('show');
-  document.getElementById('monsterStage').dataset.flee = '0';
-  applyExpr(0);
+  const easter = document.getElementById('easter');
+  const stage = document.getElementById('monsterStage');
+  const fromEaster = easter.classList.contains('show');
 
+  // 左侧选中态 / 分类展开立即更新
   const cat = document.getElementById('cat-' + allItems[gi].catIndex);
   if (cat) cat.classList.remove('collapsed');
-
   document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
   const target = document.querySelector('.tool[data-gi="' + gi + '"]');
   if (target) target.classList.add('active');
 
-  document.querySelectorAll('.game-frame').forEach(el => el.classList.remove('active'));
+  function openFrame() {
+    document.querySelectorAll('.game-frame').forEach(el => el.classList.remove('active'));
+    const frame = frameCache[gi] || createFrame(gi);
+    if (!frame) return;
+    frame.classList.add('active');
+    startLoad(gi);
+  }
 
-  const frame = frameCache[gi] || createFrame(gi);
-  if (!frame) return;
-  frame.classList.add('active');
-  startLoad(gi);
+  if (fromEaster) {
+    // 彩蛋页 → 工具：切图6闪亮开心；网站同步显示，狗得瑟飞进顶栏狗窝
+    stage.dataset.flee = '0';
+    applyExpr(0);
+    document.getElementById('tauntBubble').classList.remove('show');
+    stage.classList.remove('running', 'pop', 'entering', 'tease', 'land');
+    const fromRect = stage.getBoundingClientRect();
+    const dogBtn = document.getElementById('dogBtn');
+    const toRect = dogBtn.getBoundingClientRect();
+    // 白底瞬间隐藏（不渐隐、不遮挡），网站立刻显示
+    easter.style.transition = 'none';
+    easter.classList.remove('show');
+    void easter.offsetWidth;
+    easter.style.transition = '';
+    stage.style.visibility = 'hidden';
+    openFrame();
+    // 烟圈传送门：狗摆着拽脸钻进按钮，按钮轻抖反馈
+    flyShiba(fromRect, toRect, 'exit', () => {
+      if (activeGlobalIdx < 0) return; // 期间已被召唤回来
+      document.getElementById('dogFace').src = shibaSrc();
+      dogBtn.classList.remove('vacant');
+      dogBtn.classList.add('occupied');
+      dogBtn.classList.remove('chomp'); void dogBtn.offsetWidth; dogBtn.classList.add('chomp');
+      setTimeout(() => dogBtn.classList.remove('chomp'), 520);
+    });
+  } else {
+    // 已在工具页：直接切换
+    openFrame();
+  }
 }
 function createFrame(gi) {
   const item = allItems[gi];
@@ -924,7 +1143,7 @@ function applyExpr(fleeCount) {
   // 每 3 次逃跑降速一档：动画时长与位移同步变慢（共 8 档，越躲越慢）
   // 挡位1最快(.14s) → 挡位8最慢(.9s)
   const SPEED_TIERS = [
-    { anim: .14, move: .16 },
+    { anim: .145, move: .116 },
     { anim: .20, move: .22 },
     { anim: .27, move: .29 },
     { anim: .36, move: .38 },
@@ -1011,6 +1230,7 @@ function applyExpr(fleeCount) {
   // 鼠标靠近就逃：进入警戒圈立即跑开
   easter.addEventListener('mousemove', (e) => {
     if (!easter.classList.contains('show')) return;
+    if (window.__dogFlying || stage.classList.contains('land') || stage.classList.contains('entering')) return;
     const r = stage.getBoundingClientRect();
     if (distToRect(e.clientX, e.clientY, r.left, r.top, r.width, r.height) < WARN) {
       flee(e.clientX, e.clientY);
@@ -1018,18 +1238,385 @@ function applyExpr(fleeCount) {
   });
 })();
 
-/* ---------- 绑定 ---------- */
-document.getElementById('dogBtn').addEventListener('click', () => {
-  // 回到彩蛋页：隐藏所有 iframe、清除工具选中、恢复欢迎页（不清空预热）
+/* ---------- 小狗飞行 / 登场 / 逗弄 ---------- */
+function shibaSrc() { return document.getElementById('shibaImg').src; }
+// 烟圈粒子：吐烟 -> 放大成传送门 -> 淡出（可指定 dx/dy 方向）
+function spawnSmoke(x, y, delay, scale, dx, dy) {
+  setTimeout(() => {
+    const s = document.createElement('div');
+    s.className = 'smoke-ring';
+    s.style.left = x + 'px'; s.style.top = y + 'px';
+    s.style.setProperty('--sm-scale', scale || 4);
+    if (dx != null) s.style.setProperty('--sm-dx', dx + 'px');
+    if (dy != null) s.style.setProperty('--sm-dy', dy + 'px');
+    s.style.setProperty('--sm-rot', (Math.random() * 90 - 45) + 'deg');
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1100);
+  }, delay);
+}
+// 礼花炮：朝指定方向喷射彩色纸屑（登场弹出瞬间）
+// dirX/dirY 为喷射方向向量；spread 为扇形张角（弧度），默认整圈
+function spawnConfetti(x, y, count, dirX, dirY, spread) {
+  const colors = ['#f43f5e','#f5b50a','#6366f1','#10b981','#38bdf8','#a855f7','#fb7185'];
+  const n = count || 30;
+  const hasDir = dirX != null && dirY != null && (dirX || dirY);
+  const base = hasDir ? Math.atan2(dirY, dirX) : -Math.PI / 2;
+  const sp = hasDir ? (spread != null ? spread : 1.0) : Math.PI * 2;
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    // 有方向：在该方向的扇形内均匀铺开 + 抖动；无方向：整圈
+    const a = hasDir
+      ? base + (i / (n - 1) - .5) * sp + (Math.random() - .5) * .08
+      : (Math.PI * 2 * i) / n + (Math.random() - .5) * .4;
+    const r = 210 + Math.random() * 220;
+    c.style.left = (x - 3) + 'px'; c.style.top = (y - 5) + 'px';
+    c.style.background = colors[i % colors.length];
+    c.style.setProperty('--cf-dx', (Math.cos(a) * r) + 'px');
+    c.style.setProperty('--cf-dy', (Math.sin(a) * r + 58) + 'px');
+    c.style.setProperty('--cf-rot', (Math.random() * 1080 - 540) + 'deg');
+    c.style.animationDuration = (1.15 + Math.random() * .5) + 's';
+    if (i % 3 === 0) { c.style.borderRadius = '50%'; c.style.width = '7px'; c.style.height = '7px'; }
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1750);
+  }
+}
+// 登场路线库（离场改用独立的「退场风格系统」）
+const ENTER_ROUTES = [
+  { arc: -82,  spin: -360, wob: 0  },
+  { arc: 88,   spin: 360,  wob: 0  },
+  { arc: -130, spin: -720, wob: 0  },
+  { arc: -60,  spin: 180,  wob: 50 }
+];
+let lastEnterRoute = -1;
+function pickRoute(arr, prev) {
+  let i = Math.floor(Math.random() * arr.length);
+  if (i === prev) i = (i + 1 + Math.floor(Math.random() * (arr.length - 1))) % arr.length;
+  return i;
+}
+
+/* ===== 粒子工具 ===== */
+function spawnVortex(x, y, dur) {
+  const v = document.createElement('div');
+  v.className = 'vortex';
+  v.style.left = x + 'px'; v.style.top = y + 'px';
+  v.innerHTML = '<i class="v-core"></i>';
+  document.body.appendChild(v);
+  for (let i = 0; i < 11; i++) {
+    const a = (Math.PI * 2 * i) / 11 + Math.random() * .4;
+    const r = 78 + Math.random() * 74;
+    const sp = document.createElement('div');
+    sp.className = 'vortex-spark';
+    sp.style.left = x + 'px'; sp.style.top = y + 'px';
+    sp.style.setProperty('--sp-x', (Math.cos(a) * r) + 'px');
+    sp.style.setProperty('--sp-y', (Math.sin(a) * r) + 'px');
+    sp.style.animationDelay = (.04 + Math.random() * .18) + 's';
+    document.body.appendChild(sp);
+    setTimeout(() => sp.remove(), 1100);
+  }
+  setTimeout(() => v.remove(), dur + 280);
+}
+function spawnSpeck(x, y, dx, dy, color, size, dur, delay) {
+  setTimeout(() => {
+    const p = document.createElement('div');
+    p.className = 'speck';
+    p.style.left = x + 'px'; p.style.top = y + 'px';
+    if (color) p.style.setProperty('--speck-color', color);
+    if (size) { p.style.width = size + 'px'; p.style.height = size + 'px'; }
+    p.style.setProperty('--sp-dx', dx + 'px');
+    p.style.setProperty('--sp-dy', dy + 'px');
+    p.style.animationDuration = (dur || .8) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), (dur || .8) * 1000 + 120);
+  }, delay || 0);
+}
+function spawnRipple(x, y, delay) {
+  setTimeout(() => {
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.left = x + 'px'; r.style.top = y + 'px';
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 900);
+  }, delay || 0);
+}
+function spawnGhost(src, x, y, sc, rot, op, delay) {
+  setTimeout(() => {
+    const g = document.createElement('img');
+    g.className = 'ghost-dog';
+    g.src = src;
+    g.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + sc + ') rotate(' + rot + 'deg)';
+    g.style.setProperty('--gh-op', op);
+    document.body.appendChild(g);
+    setTimeout(() => g.remove(), 620);
+  }, delay || 0);
+}
+
+/* ===== 退场风格系统：5 种运动语言完全不同的方案，每次随机抽一个 ===== */
+const EXIT_STYLES = [
+  // 1) 漩涡吸走（强化：中心黑洞 + 吸附光点 + 螺旋烟圈）
+  {
+    id: 'vortex', dur: 920,
+    build(C) {
+      const { T, K, po, so, sc, K2, point, fx, fy, tx, ty, spin, s0, s1, dx, dy, tcx, tcy } = C;
+      const frames = [
+        { offset: 0,    transform: K(0, s0, 0), opacity: 1 },
+        { offset: .10,  transform: K2(.10, s0*1.12, s0*.84, -8), easing: 'ease-in' },
+        { offset: .20,  transform: K2(.20, s0*.68, s0*1.4, 12), easing: 'ease-in' },
+        { offset: .38,  transform: K(po(.38), sc(.38), spin*so(.38)), easing: 'ease-in' },
+        { offset: .58,  transform: K(po(.58), sc(.58), spin*so(.58)), easing: 'ease-in' },
+        { offset: .78,  transform: K(po(.78), sc(.78), spin*so(.78)), easing: 'ease-in' },
+        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.1) + ') rotate(' + (spin*1.4) + 'deg)', opacity: 0 }
+      ];
+      const effects = () => {
+        spawnVortex(tcx, tcy, 920);
+        const p1 = point(.18), p2 = point(.36), p3 = point(.56);
+        spawnSmoke(p1[0]+16, p1[1]-8, 110, 1.5, dx*.34+24, dy*.34-18);
+        spawnSmoke(p2[0]+10, p2[1],   300, 2.2, dx*.3, dy*.3);
+        spawnSmoke(p3[0],    p3[1]+8, 470, 1.8, dx*.24, dy*.24);
+      };
+      return { frames, effects };
+    }
+  },
+  // 2) 溜之大吉·滑步潜行（贴地滑行 + 回头张望 + 残影 + 尘埃）
+  {
+    id: 'sneak', dur: 900,
+    build(C) {
+      const { T, fx, fy, tx, ty, s0, s1, dx, dy, src } = C;
+      const slide = o => [fx + dx*o, fy + dy*o + Math.sin(Math.PI*o)*14];
+      const SK = (o, sx, sy, rot, sk) => { const p = slide(o); return T(p[0],p[1]) + ' scale('+sx+','+sy+') rotate('+rot+'deg) skewX('+(sk||0)+'deg)'; };
+      const frames = [
+        { offset: 0,    transform: SK(0, s0, s0, 0, 0) },
+        { offset: .12,  transform: SK(.04, s0*1.12, s0*.76, -6, -4), easing: 'ease-out' },
+        { offset: .24,  transform: SK(.14, s0*.86, s0*1.06, 8, 6), easing: 'ease-in' },
+        { offset: .42,  transform: SK(.42, s0*1.18, s0*.72, -14, -8) },
+        { offset: .60,  transform: SK(.62, s0*.9, s0*1.0, 10, 6) },
+        { offset: .78,  transform: SK(.8, s0*1.14, s0*.74, -10, -6) },
+        { offset: .90,  transform: SK(.92, s1*1.3, s1*.6, 0, 0) },
+        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.15) + ')', opacity: 0 }
+      ];
+      const effects = () => {
+        [.32,.55,.74].forEach(o => {
+          const p = slide(o);
+          spawnGhost(src, p[0], p[1], s0*.9, (o*180)%40-20, .3, o*900-120);
+        });
+        for (let i = 0; i < 11; i++) {
+          const o = .1 + Math.random()*.4, p = slide(o);
+          spawnSpeck(p[0]+100+(Math.random()-.5)*60, p[1]+205, -40+Math.random()*80, -30-Math.random()*50,
+            'rgba(148,163,184,.6)', 6+Math.random()*5, .72, o*900);
+        }
+        const p2 = slide(.3);
+        spawnSmoke(p2[0]+120, p2[1]+130, 260, 2.4, 60, -30);
+      };
+      return { frames, effects };
+    }
+  },
+  // 3) 摆烂融化·瘫成饼（叹气 → 瘫软压扁 → 被吸溜 → 涟漪）
+  {
+    id: 'melt', dur: 900,
+    build(C) {
+      const { T, fx, fy, tx, ty, s0, s1, dx, dy, fcx, fcy, tcx, tcy } = C;
+      const melt = o => [fx + dx*o, fy + dy*o];
+      const MK = (o, sx, sy, rot, sk) => { const p = melt(o); return T(p[0], p[1]+Math.sin(Math.PI*o)*8) + ' scale('+sx+','+sy+') rotate('+rot+'deg) skewY('+(sk||0)+'deg)'; };
+      const frames = [
+        { offset: 0,    transform: MK(0, s0, s0, 0, 0) },
+        { offset: .16,  transform: MK(.02, s0*1.05, s0*.9, 0, 0), easing: 'ease-out' },
+        { offset: .34,  transform: MK(.1, s0*1.55, s0*.26, -3, 6), easing: 'ease-in' },
+        { offset: .5,   transform: MK(.32, s0*1.42, s0*.3, 4, -5) },
+        { offset: .68,  transform: MK(.55, s0*1.1, s0*.5, -3, 4) },
+        { offset: .85,  transform: MK(.78, s1*1.5, s1*.35, 0, 0) },
+        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.2) + ',' + (s1*.05) + ')', opacity: 0 }
+      ];
+      const effects = () => {
+        spawnSmoke(fcx+10, fcy-30, 80, 2.6, 10, -70);
+        for (let i = 0; i < 7; i++) {
+          const o = .3 + Math.random()*.3, p = melt(o);
+          spawnSpeck(p[0]+60+(Math.random()-.5)*140, p[1]+205, (Math.random()-.5)*30, 60+Math.random()*70,
+            'rgba(129,140,248,.72)', 7+Math.random()*5, .82, o*900);
+        }
+        spawnRipple(tcx, tcy, 540);
+      };
+      return { frames, effects };
+    }
+  },
+  // 4) 火箭升空·一溜烟（蹲下蓄力 → 尾焰喷射 → 高速冲刺 → 吞入）
+  {
+    id: 'rocket', dur: 840,
+    build(C) {
+      const { T, K, point, fx, fy, tx, ty, s0, s1, spin, tcx, tcy } = C;
+      const frames = [
+        { offset: 0,    transform: K(0, s0, 0) },
+        { offset: .13,  transform: T(fx, fy+16) + ' scale(' + (s0*.84) + ',' + (s0*1.16) + ')', easing: 'ease-out' },
+        { offset: .24,  transform: T(fx, fy-24) + ' scale(' + (s0*.7) + ',' + (s0*1.44) + ')', easing: 'cubic-bezier(.2,1.7,.4,1)' },
+        { offset: .55,  transform: K(.55, s0*.9, spin*.3), easing: 'linear' },
+        { offset: .8,   transform: K(.82, s1*1.1, spin*.5) },
+        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.12) + ') rotate(' + (spin*.7) + 'deg)', opacity: 0 }
+      ];
+      const effects = () => {
+        for (let i = 0; i < 5; i++) {
+          const o = .2 + i*.14, p = point(o);
+          spawnSmoke(p[0]+115, p[1]+115, o*840, 1.6+Math.random(), -8, 30);
+        }
+        spawnRipple(tcx, tcy, 660);
+      };
+      return { frames, effects };
+    }
+  },
+  // 5) 化烟遁走（原地化烟消散 → 烟团沿轨迹飘向按钮被吞）
+  {
+    id: 'smoke', dur: 900,
+    build(C) {
+      const { T, K, point, s0, s1 } = C;
+      const frames = [
+        { offset: 0,    transform: K(0, s0, 0), opacity: 1 },
+        { offset: .25,  transform: K(.12, s0*1.04, s0*.94, 0), opacity: .75, easing: 'ease-out' },
+        { offset: .5,   transform: K(.38, s0*.9, s0*.9, 0), opacity: .4 },
+        { offset: .72,  transform: K(.65, s0*.7, s0*.7, 0), opacity: .22 },
+        { offset: .9,   transform: K(.85, s1*1.2, s1*1.2, 0), opacity: .1 },
+        { offset: 1,    transform: T(C.tx, C.ty) + ' scale(' + (s1*.3) + ')', opacity: 0 }
+      ];
+      const effects = () => {
+        for (let i = 0; i < 10; i++) {
+          const o = Math.random()*.5, p = point(o);
+          spawnSmoke(p[0]+115, p[1]+110, i*68, 2+Math.random()*1.5, C.dx*.5, C.dy*.5-30);
+        }
+      };
+      return { frames, effects };
+    }
+  }
+];
+let lastExitStyle = -1;
+function pickExitStyle() {
+  let i = Math.floor(Math.random() * EXIT_STYLES.length);
+  if (i === lastExitStyle) i = (i + 1 + Math.floor(Math.random() * (EXIT_STYLES.length - 1))) % EXIT_STYLES.length;
+  lastExitStyle = i;
+  return i;
+}
+
+// 飞行分身：退场走风格系统 / 登场保持弹射翻滚落地；全程 translate3d + GPU 合成
+function flyShiba(fromRect, toRect, mode, done) {
+  const fly = document.createElement('img');
+  fly.className = 'fly-dog';
+  fly.src = shibaSrc();
+  document.body.appendChild(fly);
+  window.__dogFlying = true;
+  const NW = 230, NH = fly.offsetHeight || 222;
+  const fcx = fromRect.left + fromRect.width / 2, fcy = fromRect.top + fromRect.height / 2;
+  const tcx = toRect.left + toRect.width / 2, tcy = toRect.top + toRect.height / 2;
+  const fx = fcx - NW / 2, fy = fcy - NH / 2;
+  const tx = tcx - NW / 2, ty = tcy - NH / 2;
+  const s0 = fromRect.width / NW, s1 = toRect.width / NW;
+  const dx = tx - fx, dy = ty - fy;
+  const len = Math.hypot(dx, dy) || 1;
+  const orx = -dy / len, ory = dx / len;
+  const T = (x, y) => 'translate3d(' + x + 'px,' + y + 'px,0)';
+  const isExit = mode === 'exit';
+
+  let frames, effects, dur;
+  if (isExit) {
+    const si = pickExitStyle();
+    const style = EXIT_STYLES[si];
+    fly.dataset.style = style.id;
+    const spin = Math.random() < .5 ? 360 : -360;
+    const arc = -55;
+    const point = o => [fx + dx*o, fy + dy*o + arc*Math.sin(Math.PI*o)];
+    const K = (o, sc, rot) => { const p = point(o); return T(p[0],p[1]) + ' scale('+sc+') rotate('+rot+'deg)'; };
+    const po = o => Math.pow(o, 1.45);
+    const so = o => Math.pow(o, 1.6);
+    const sc = o => s0 + (s1*.18 - s0) * Math.pow(o, 1.2);
+    const K2 = (o, sx, sy, rot) => { const p = point(po(o)); return T(p[0],p[1]) + ' scale('+sx+','+sy+') rotate('+rot+'deg)'; };
+    const C = { T, K, K2, po, so, sc, point, fx, fy, tx, ty, dx, dy, len,
+                s0, s1, spin, fcx, fcy, tcx, tcy, arc, src: fly.src };
+    const built = style.build(C);
+    frames = built.frames; effects = built.effects; dur = style.dur;
+  } else {
+    const ri = pickRoute(ENTER_ROUTES, lastEnterRoute);
+    lastEnterRoute = ri;
+    const R = ENTER_ROUTES[ri];
+    const spin = R.spin;
+    const point = o => {
+      const w = (R.wob || 0) * Math.sin(2 * Math.PI * o);
+      return [fx + dx*o + orx*w, fy + dy*o + R.arc*Math.sin(Math.PI*o) + ory*w];
+    };
+    const K = (o, sc, rot) => { const p = point(o); return T(p[0],p[1]) + ' scale('+sc+') rotate('+rot+'deg)'; };
+    frames = [
+      { offset: 0,    transform: T(fx, fy) + ' scale(' + (s0*.7) + ') rotate(' + spin + 'deg)', opacity: .45 },
+      { offset: .12,  transform: T(fx, fy) + ' scale(' + (s0*2.8) + ') rotate(' + (spin*.88) + 'deg)', opacity: 1, easing: 'cubic-bezier(.2,1.6,.35,1)' },
+      { offset: .48,  transform: K(.48, s0 + (s1-s0)*.48, spin*.5), easing: 'linear' },
+      { offset: .78,  transform: K(.78, s1*1.14, spin*.12), easing: 'ease-out' },
+      { offset: .90,  transform: T(tx, ty + 11) + ' scale(' + (s1*1.22) + ',' + (s1*.8) + ') rotate(0deg)' },
+      { offset: .96,  transform: T(tx, ty - 9) + ' scale(' + (s1*.94) + ',' + (s1*1.07) + ') rotate(0deg)' },
+      { offset: 1,    transform: T(tx, ty) + ' scale(' + s1 + ') rotate(0deg)' }
+    ];
+    effects = () => {
+      spawnConfetti(fcx, fcy + 6, 52, dx, dy, .6);
+      spawnSmoke(fcx + 20, fcy - 6, dur * .06, 2.2, 34, -40);
+    };
+    dur = 980;
+  }
+
+  effects();
+  if (!fly.animate) { fly.remove(); window.__dogFlying = false; if (done) done(); return; }
+  const anim = fly.animate(frames, { duration: dur, fill: 'forwards' });
+  anim.onfinish = () => { fly.remove(); window.__dogFlying = false; if (done) done(); };
+}
+function backToEaster() {
+  const easter = document.getElementById('easter');
+  const stage = document.getElementById('monsterStage');
+  const dogBtn = document.getElementById('dogBtn');
+  const wasOnEaster = easter.classList.contains('show');
+  // 清理工具现场
   activeGlobalIdx = -1;
+  clearTimeout(exitTimer);
   document.querySelectorAll('.game-frame').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
-  const easterEl = document.getElementById('easter');
-  easterEl.classList.add('show');
-  // 回到彩蛋页：速度挡位从头开始
-  document.getElementById('monsterStage').dataset.flee = '0';
+
+  if (wasOnEaster) {
+    // 已在彩蛋页：不重置挡位/表情，只逗它蹦一下
+    stage.classList.remove('running', 'pop', 'tease', 'land', 'entering');
+    void stage.offsetWidth;
+    stage.classList.add('tease');
+    setTimeout(() => stage.classList.remove('tease'), 660);
+    return;
+  }
+
+  // 从工具页回来：重置速度挡位 + 切图6闪亮开心
+  stage.dataset.flee = '0';
+  stage.dataset.moved = '';
   applyExpr(0);
-});
+  document.getElementById('tauntBubble').classList.remove('show');
+  stage.classList.remove('running', 'pop', 'tease', 'land', 'entering');
+
+  // 按钮吐狗：清空按钮内容（变空白），抖动反馈，记录起飞点
+  const fromRect = dogBtn.getBoundingClientRect();
+  dogBtn.classList.remove('occupied');
+  dogBtn.classList.add('vacant');
+  dogBtn.classList.remove('chomp'); void dogBtn.offsetWidth; dogBtn.classList.add('chomp');
+  setTimeout(() => dogBtn.classList.remove('chomp'), 520);
+  // 显示彩蛋页（白底柔和渐显），狗本体先藏起来
+  easter.classList.add('show');
+  stage.style.visibility = 'hidden';
+  // 工作区中央落点
+  const er = easter.getBoundingClientRect();
+  const DW = 240, DH = 232;
+  const toRect = {
+    left: er.left + (er.width - DW) / 2,
+    top: er.top + (er.height - DH) / 2 + 28,
+    width: DW, height: DH
+  };
+  flyShiba(fromRect, toRect, 'enter', () => {
+    // 分身到达：狗本体落位 + 落地回弹
+    stage.style.left = ((easter.clientWidth - DW) / 2) + 'px';
+    stage.style.top = ((easter.clientHeight - DH) / 2 + 28) + 'px';
+    stage.style.transition = 'none';
+    stage.style.visibility = 'visible';
+    void stage.offsetWidth;
+    stage.style.transition = '';
+    stage.classList.add('land');
+    setTimeout(() => stage.classList.remove('land'), 720);
+  });
+}
+/* ---------- 绑定 ---------- */
+document.getElementById('dogBtn').addEventListener('click', backToEaster);
 document.getElementById('openBtn').addEventListener('click', openCurrent);
 document.getElementById('toggleSideBtn').addEventListener('click', toggleSide);
 document.getElementById('upClose').addEventListener('click', () => document.getElementById('updateToast').classList.remove('show'));
