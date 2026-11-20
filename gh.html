@@ -453,100 +453,20 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
   55%  { transform: scale(.9) rotate(5deg); }
   100% { transform: scale(1); }
 }
-/* ===== 退场·漩涡吸走：按钮张开吸力漩涡，把狗卷进去 ===== */
-.vortex {
-  position: fixed; left: 0; top: 0;
-  width: 100px; height: 100px; margin: -50px 0 0 -50px;
-  border-radius: 50%;
-  pointer-events: none; z-index: 9996;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  background: conic-gradient(from 0deg,
-    transparent 0deg, rgba(99,102,241,.06) 55deg,
-    rgba(99,102,241,.5) 145deg, rgba(129,140,248,.92) 195deg,
-    rgba(99,102,241,.42) 250deg, transparent 330deg);
-  -webkit-mask: radial-gradient(circle, transparent 27%, #000 43%, #000 66%, transparent 76%);
-  mask: radial-gradient(circle, transparent 27%, #000 43%, #000 66%, transparent 76%);
-  animation: vortex-spin .86s cubic-bezier(.32,.04,.5,1) forwards;
-}
-.vortex::before {
-  content: ''; position: absolute; inset: 13%;
-  border-radius: 50%;
-  border: 2px dashed rgba(129,140,248,.6);
-}
-.vortex::after {
-  content: ''; position: absolute; inset: 30%;
-  border-radius: 50%;
-  border: 3px solid rgba(99,102,241,.75);
-}
-@keyframes vortex-spin {
-  0%   { opacity: 0; transform: scale(.32) rotate(0deg); }
-  16%  { opacity: .95; }
-  72%  { opacity: .85; }
-  100% { opacity: 0; transform: scale(1.2) rotate(700deg); }
-}
-/* ===== 退场多方案通用粒子 ===== */
-/* 漩涡中心黑洞 */
-.vortex .v-core {
-  position: absolute; inset: 24%; border-radius: 50%;
-  background: radial-gradient(circle, rgba(15,23,42,.92) 0%, rgba(79,70,229,.55) 42%, transparent 72%);
-  animation: v-core-pulse .86s ease-in forwards;
-}
-@keyframes v-core-pulse {
-  0% { transform: scale(.3); opacity: 0; }
-  30% { opacity: 1; }
-  100% { transform: scale(1.7); opacity: 0; }
-}
-/* 漩涡吸附光点：从四周螺旋汇入中心 */
-.vortex-spark {
-  position: fixed; left: 0; top: 0; width: 5px; height: 5px; border-radius: 50%;
-  background: #a5b4fc; box-shadow: 0 0 8px #818cf8;
-  pointer-events: none; z-index: 9996; will-change: transform, opacity;
-  animation: spark-suck .72s cubic-bezier(.5,0,.9,.5) forwards;
-}
-@keyframes spark-suck {
-  0% { opacity: 0; transform: translate3d(var(--sp-x,0),var(--sp-y,0),0) scale(.5); }
-  22% { opacity: 1; }
-  100% { opacity: 0; transform: translate3d(0,0,0) scale(1.5); }
-}
-/* 尘埃 / 熔滴小粒子 */
-.speck {
-  position: fixed; left: 0; top: 0; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--speck-color, rgba(148,163,184,.6));
-  pointer-events: none; z-index: 9995; will-change: transform, opacity;
-  animation: speck-fly .8s cubic-bezier(.2,.6,.3,1) forwards;
-}
-@keyframes speck-fly {
-  0% { opacity: 0; transform: translate3d(0,0,0) scale(.4); }
-  18% { opacity: var(--speck-op, .75); }
-  100% { opacity: 0; transform: translate3d(var(--sp-dx,0),var(--sp-dy,0),0) scale(var(--sp-sc,1)); }
-}
-/* 涟漪（按钮吞入反馈） */
-.ripple {
-  position: fixed; left: 0; top: 0; width: 60px; height: 60px; margin: -30px 0 0 -30px;
-  border-radius: 50%; border: 3px solid rgba(99,102,241,.6);
-  pointer-events: none; z-index: 9995; will-change: transform, opacity;
-  animation: ripple-out .72s cubic-bezier(.2,.6,.3,1) forwards;
-}
-@keyframes ripple-out {
-  0% { opacity: .9; transform: scale(.3); }
-  100% { opacity: 0; transform: scale(2.4); }
-}
-/* 残影（潜行滑步拖尾） */
+/* ===== 小狗转场：柔和烟雾、同步落影与轻微回弹 ===== */
 .ghost-dog {
   position: fixed; left: 0; top: 0; width: 230px;
-  transform-origin: center center; pointer-events: none; z-index: 9990;
-  will-change: opacity; backface-visibility: hidden;
-  animation: ghost-fade .52s ease-out forwards;
+  transform-origin: center center; pointer-events: none; z-index: 9989;
+  will-change: transform, opacity; backface-visibility: hidden;
+  animation: ghost-fade .42s ease-out forwards;
 }
 @keyframes ghost-fade {
-  0% { opacity: var(--gh-op, .3); }
+  0% { opacity: var(--gh-op, .12); }
   100% { opacity: 0; }
 }
-/* ===== 飞行分身：center origin + GPU 合成（无滤镜、无重绘） ===== */
 .fly-dog {
   position: fixed; left: 0; top: 0;
-  width: 230px;
+  width: 230px; height: auto;
   transform-origin: center center;
   pointer-events: none;
   z-index: 9999;
@@ -554,48 +474,66 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
-/* 烟圈：纯渐变柔和烟雾环（无硬边框，放大后依然细腻） */
+.fly-dog-shadow {
+  position: fixed; left: 0; top: 0;
+  width: 104px; height: 18px; margin: -9px 0 0 -52px;
+  border-radius: 50%; pointer-events: none; z-index: 9988;
+  background: radial-gradient(ellipse, rgba(51,65,85,.22), rgba(79,70,229,.08) 48%, transparent 74%);
+  will-change: transform, opacity;
+}
+.dog-aura {
+  position: fixed; left: 0; top: 0;
+  width: 64px; height: 64px; margin: -32px 0 0 -32px;
+  border-radius: 50%; pointer-events: none; z-index: 9995;
+  background: radial-gradient(circle, rgba(255,255,255,.94) 0 16%, rgba(165,180,252,.32) 34%, rgba(99,102,241,.12) 52%, transparent 72%);
+  will-change: transform, opacity;
+}
+.dog-ring {
+  position: fixed; left: 0; top: 0;
+  width: 42px; height: 42px; margin: -21px 0 0 -21px;
+  border: 1.5px solid rgba(99,102,241,.38); border-radius: 50%;
+  pointer-events: none; z-index: 9996; will-change: transform, opacity;
+}
+.dog-mote {
+  position: fixed; left: 0; top: 0;
+  width: var(--mote-size, 5px); height: var(--mote-size, 5px);
+  translate: -50% -50%;
+  border-radius: 50%; pointer-events: none; z-index: 9997;
+  background: var(--mote-color, #a5b4fc);
+  box-shadow: 0 0 7px var(--mote-color, #a5b4fc);
+  will-change: transform, opacity;
+}
 .smoke-ring {
   position: fixed; left: 0; top: 0;
-  width: 44px; height: 44px; margin: -22px 0 0 -22px;
-  border-radius: 50%;
-  pointer-events: none; z-index: 9998;
+  width: 48px; height: 40px; margin: -20px 0 0 -24px;
+  border-radius: 50%; pointer-events: none; z-index: 9998;
   will-change: transform, opacity;
-  background: radial-gradient(ellipse 100% 84% at 50% 50%,
-    transparent 0%, transparent 33%,
-    rgba(120,140,165,.05) 40%,
-    rgba(120,140,165,.24) 52%,
-    rgba(180,198,220,.14) 61%,
-    transparent 73%);
-  animation: smoke-bloom 1.2s cubic-bezier(.16,.6,.3,1) forwards;
+  background: radial-gradient(ellipse at 50% 50%,
+    transparent 0 30%, rgba(148,163,184,.06) 38%,
+    rgba(148,163,184,.23) 51%, rgba(203,213,225,.16) 60%, transparent 74%);
 }
-/* 内层高光环：让烟圈有立体的通透感 */
 .smoke-ring::after {
-  content: ''; position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(ellipse 86% 70% at 50% 50%,
-    transparent 0%, transparent 49%,
-    rgba(255,255,255,.45) 57%,
-    rgba(148,163,184,.10) 65%, transparent 75%);
+  content: ''; position: absolute; inset: 5px 7px; border-radius: 50%;
+  background: radial-gradient(ellipse, transparent 38%, rgba(255,255,255,.62) 54%, transparent 72%);
 }
-@keyframes smoke-bloom {
-  0%   { opacity: 0; transform: translate3d(0,0,0) scale(.25) rotate(0deg); }
-  12%  { opacity: .92; }
-  55%  { opacity: .68; }
-  100% { opacity: 0; transform: translate3d(var(--sm-dx,22px),var(--sm-dy,-42px),0) scale(var(--sm-scale,4)) rotate(var(--sm-rot,40deg)); }
+.dog-btn.dog-release { animation: dog-release .72s cubic-bezier(.22,1,.36,1); }
+.dog-btn.dog-receive { animation: dog-receive .68s cubic-bezier(.22,1,.36,1); }
+@keyframes dog-release {
+  0%, 100% { transform: scale(1); }
+  16% { transform: scale(.82,1.14); }
+  34% { transform: scale(1.16,.88); }
+  55% { transform: scale(.96,1.04); }
+  74% { transform: scale(1.03,.98); }
 }
-/* 礼花炮彩屑：登场弹出瞬间喷射 */
-.confetti {
-  position: fixed; left: 0; top: 0;
-  width: 7px; height: 12px; border-radius: 2px;
-  pointer-events: none; z-index: 9997;
-  will-change: transform, opacity;
-  animation: confetti-burst .95s cubic-bezier(.15,.55,.3,1) forwards;
+@keyframes dog-receive {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.18,.82); }
+  43% { transform: scale(.9,1.12); }
+  66% { transform: scale(1.05,.96); }
+  82% { transform: scale(.98,1.02); }
 }
-@keyframes confetti-burst {
-  0%   { opacity: 0; transform: translate3d(0,0,0) rotate(0) scale(.3); }
-  10%  { opacity: 1; }
-  68%  { opacity: 1; }
-  100% { opacity: 0; transform: translate3d(var(--cf-dx,0),var(--cf-dy,0),0) rotate(var(--cf-rot,360deg)) scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  .dog-btn.dog-release, .dog-btn.dog-receive { animation-duration: .2s; }
 }
 /* ===== 彩蛋页原地逗弄（已在彩蛋页点按钮：不重置） ===== */
 .dog-stage.tease .shiba-img { animation: dog-tease .62s cubic-bezier(.34,1.5,.5,1); }
@@ -646,36 +584,27 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 }
 .easter-hint b { color: var(--accent); font-weight: 700; }
 
-/* ---------- 更新提示 ---------- */
-.update-toast {
-  position: fixed; top: 64px; right: 18px; z-index: 100;
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; border-radius: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  box-shadow: 0 16px 40px rgba(15,23,42,.14);
-  transform: translateX(140%); opacity: 0;
-  transition: transform .4s cubic-bezier(.34,1.35,.64,1), opacity .3s ease;
-  max-width: 340px;
+/* ---------- 更新提示：从「找狗玩玩」按钮叼出的横幅 ---------- */
+.update-card {
+  position: fixed; left: 0; top: 0; z-index: 100;
+  width: 300px; max-width: calc(100vw - 32px);
+  transform-origin: top right; opacity: 0;
+  cursor: pointer; pointer-events: none;
+  will-change: transform, opacity; backface-visibility: hidden;
 }
-.update-toast.show { transform: translateX(0); opacity: 1; }
-.up-icon {
-  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-  display: grid; place-items: center;
-  background: var(--accent-soft); color: var(--accent);
+.update-card.ready { pointer-events: auto; }
+.update-card img {
+  display: block; width: 100%; height: auto;
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, .20), 0 3px 10px rgba(15, 23, 42, .10);
+  transition: box-shadow .25s ease;
 }
-.up-text { display: flex; flex-direction: column; gap: 3px; }
-.up-title { font-size: 12.5px; font-weight: 650; }
-.up-sub { font-size: 11px; color: var(--text-3); }
-.up-btn {
-  border: none; border-radius: 6px; padding: 6px 11px;
-  background: var(--accent); color: #fff;
-  font-size: 11.5px; font-weight: 650; cursor: pointer; white-space: nowrap;
+.update-card.ready:hover img {
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .26), 0 4px 14px rgba(99, 102, 241, .18);
 }
-.up-btn:hover { background: #4338ca; }
-.up-close { border: none; background: none; color: var(--text-3); cursor: pointer; padding: 2px; align-self: flex-start; }
-.up-close:hover { color: var(--text); }
+.update-card .up-blink {
+  position: absolute; left: 50%; top: 0; width: 1px; height: 1px; pointer-events: none;
+}
 
 .tiny-toast {
   position: fixed; bottom: 24px; left: 50%;
@@ -764,20 +693,9 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
   </div>
 </div>
 
-<div class="update-toast" id="updateToast">
-  <div class="up-icon">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
-  </div>
-  <div class="up-text">
-    <span class="up-title" id="upTitle">检测到新版本</span>
-    <span class="up-sub">刷新后即可获取最新内容</span>
-  </div>
-  <button class="up-btn" onclick="doRefresh()">立即刷新</button>
-  <button class="up-close" id="upClose" title="忽略">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-  </button>
+<div class="update-card" id="updateCard" role="button" tabindex="0" title="点击查看更新内容" aria-label="有更新啦，点击查看更新内容">
+  <img src="data:image/webp;base64,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" alt="有更新啦！点击查看更新内容">
 </div>
-
 <div class="tiny-toast" id="tinyToast"></div>
 
 <script>
@@ -788,7 +706,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 // ===== 公告区文字：在这里修改你想要的文案（多条用 | 分隔）=====
 const ANNOUNCEMENT_TEXT = '记得写周报，记得写周报，记得写周报，要加道具GS内部群喊一声';
 
-const HUB_VERSION = '1';
+const HUB_VERSION = '2';
 const VERSION_CHECK_URL = 'https://liangtz0518.github.io/gamehub/version.json';
 const VERSION_CHECK_INTERVAL = 10000;
 
@@ -928,6 +846,7 @@ function setProgress(on) {
 let exitTimer = null;
 function selectItem(gi) {
   if (gi < 0 || gi >= allItems.length) return;
+  if (window.__dogFlying && document.getElementById('easter').classList.contains('show')) return;
   activeGlobalIdx = gi;
 
   const easter = document.getElementById('easter');
@@ -971,8 +890,6 @@ function selectItem(gi) {
       document.getElementById('dogFace').src = shibaSrc();
       dogBtn.classList.remove('vacant');
       dogBtn.classList.add('occupied');
-      dogBtn.classList.remove('chomp'); void dogBtn.offsetWidth; dogBtn.classList.add('chomp');
-      setTimeout(() => dogBtn.classList.remove('chomp'), 520);
     });
   } else {
     // 已在工具页：直接切换
@@ -1067,8 +984,80 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-/* ---------- 版本轮询 ---------- */
+/* ---------- 版本轮询 + 更新横幅（从按钮叼出 / 点图吸回并刷新） ---------- */
 let versionUpdateDetected = false;
+let updateIdleAnim = null;
+let cardOrigin = null;
+
+function cardTarget() {
+  const w = 300;
+  return { x: Math.max(16, window.innerWidth - 18 - w), y: 62, w: w, h: w * 223 / 472 };
+}
+function btnCenter() {
+  const r = document.getElementById('dogBtn').getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+function showUpdateCard() {
+  const card = document.getElementById('updateCard');
+  if (card.dataset.shown === '1') return;
+  card.dataset.shown = '1';
+  const btn = document.getElementById('dogBtn');
+  const b = btnCenter(), t = cardTarget();
+  // 起点：缩在按钮里
+  const sx = b.x - t.w / 2, sy = b.y - t.h / 2;
+  const ex = t.x, ey = t.y;
+  const mx = (sx + ex) / 2, my = Math.min(sy, ey) - 26;
+  cardOrigin = { sx, sy, ex, ey };
+  btn.classList.remove('chomp', 'dog-release'); void btn.offsetWidth;
+  btn.classList.add('chomp');
+  const anim = card.animate([
+    { transform: `translate(${sx}px,${sy}px) scale(.08) rotate(-12deg)`, opacity: 0, offset: 0 },
+    { transform: `translate(${mx}px,${my}px) scale(.55) rotate(7deg)`, opacity: 1, offset: .55 },
+    { transform: `translate(${ex}px,${ey}px) scale(1.06) rotate(-1.5deg)`, opacity: 1, offset: .82 },
+    { transform: `translate(${ex}px,${ey}px) scale(1) rotate(0)`, opacity: 1, offset: 1 }
+  ], { duration: 780, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+  let landed = false;
+  const land = () => {
+    if (landed) return;
+    landed = true;
+    card.classList.add('ready');
+    // 落定后：探头呼吸 + 偶发"眨眼"压缩
+    const img = card.querySelector('img');
+    updateIdleAnim = img.animate([
+      { transform: 'translateY(0) scaleY(1)' },
+      { transform: 'translateY(-3px) scaleY(1.035)', offset: .28 },
+      { transform: 'translateY(0) scaleY(1)', offset: .55 },
+      { transform: 'translateY(1px) scaleY(.945)', offset: .62 },
+      { transform: 'translateY(0) scaleY(1)', offset: .7 },
+      { transform: 'translateY(0) scaleY(1)' }
+    ], { duration: 3400, iterations: Infinity, easing: 'ease-in-out' });
+  };
+  anim.onfinish = land;
+  setTimeout(land, 820); // 兜底：切后台/动画被打断时仍可点击
+}
+function refreshFromCard() {
+  const card = document.getElementById('updateCard');
+  if (card.dataset.leaving === '1') return;
+  card.dataset.leaving = '1';
+  card.classList.remove('ready');
+  if (updateIdleAnim) { updateIdleAnim.cancel(); updateIdleAnim = null; }
+  const o = cardOrigin || cardTarget();
+  const b = btnCenter();
+  const sx = o.sx, sy = o.sy, ex = o.ex, ey = o.ey;
+  const mx = (sx + ex) / 2, my = (sy + ey) / 2 - 18;
+  const btn = document.getElementById('dogBtn');
+  btn.classList.remove('chomp'); void btn.offsetWidth;
+  btn.classList.add('dog-receive');
+  const anim = card.animate([
+    { transform: `translate(${ex}px,${ey}px) scale(1) rotate(0)`, opacity: 1, offset: 0 },
+    { transform: `translate(${mx}px,${my}px) scale(.48) rotate(9deg)`, opacity: .92, offset: .5 },
+    { transform: `translate(${sx}px,${sy}px) scale(.06) rotate(-10deg)`, opacity: 0, offset: 1 }
+  ], { duration: 540, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' });
+  let finished = false;
+  const finish = () => { if (finished) return; finished = true; doRefresh(); };
+  anim.onfinish = finish;
+  setTimeout(finish, 580); // 兜底：确保点击后一定会刷新
+}
 async function checkVersion() {
   if (versionUpdateDetected || !VERSION_CHECK_URL) return;
   try {
@@ -1078,8 +1067,7 @@ async function checkVersion() {
     const remoteVersion = String(data.version || '');
     if (remoteVersion && remoteVersion !== HUB_VERSION) {
       versionUpdateDetected = true;
-      document.getElementById('upTitle').textContent = '检测到新版本 ' + remoteVersion;
-      document.getElementById('updateToast').classList.add('show');
+      showUpdateCard();
     }
   } catch (e) {}
 }
@@ -1240,326 +1228,234 @@ function applyExpr(fleeCount) {
 
 /* ---------- 小狗飞行 / 登场 / 逗弄 ---------- */
 function shibaSrc() { return document.getElementById('shibaImg').src; }
-// 烟圈粒子：吐烟 -> 放大成传送门 -> 淡出（可指定 dx/dy 方向）
+/* 统一的柔和转场：蓄力 -> 弧线移动 -> 缓落/收回。只使用 transform 与 opacity。 */
+const DOG_MOTION = {
+  smooth: t => t * t * (3 - 2 * t),
+  inOut: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+  out: t => 1 - Math.pow(1 - t, 3)
+};
+function removeAfterAnimation(el, frames, options) {
+  document.body.appendChild(el);
+  if (!el.animate) {
+    setTimeout(() => el.remove(), (options.duration || 500) + (options.delay || 0));
+    return null;
+  }
+  const anim = el.animate(frames, options);
+  anim.onfinish = () => el.remove();
+  return anim;
+}
 function spawnSmoke(x, y, delay, scale, dx, dy) {
   setTimeout(() => {
     const s = document.createElement('div');
     s.className = 'smoke-ring';
     s.style.left = x + 'px'; s.style.top = y + 'px';
-    s.style.setProperty('--sm-scale', scale || 4);
-    if (dx != null) s.style.setProperty('--sm-dx', dx + 'px');
-    if (dy != null) s.style.setProperty('--sm-dy', dy + 'px');
-    s.style.setProperty('--sm-rot', (Math.random() * 90 - 45) + 'deg');
-    document.body.appendChild(s);
-    setTimeout(() => s.remove(), 1100);
-  }, delay);
-}
-// 礼花炮：朝指定方向喷射彩色纸屑（登场弹出瞬间）
-// dirX/dirY 为喷射方向向量；spread 为扇形张角（弧度），默认整圈
-function spawnConfetti(x, y, count, dirX, dirY, spread) {
-  const colors = ['#f43f5e','#f5b50a','#6366f1','#10b981','#38bdf8','#a855f7','#fb7185'];
-  const n = count || 30;
-  const hasDir = dirX != null && dirY != null && (dirX || dirY);
-  const base = hasDir ? Math.atan2(dirY, dirX) : -Math.PI / 2;
-  const sp = hasDir ? (spread != null ? spread : 1.0) : Math.PI * 2;
-  for (let i = 0; i < n; i++) {
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    // 有方向：在该方向的扇形内均匀铺开 + 抖动；无方向：整圈
-    const a = hasDir
-      ? base + (i / (n - 1) - .5) * sp + (Math.random() - .5) * .08
-      : (Math.PI * 2 * i) / n + (Math.random() - .5) * .4;
-    const r = 210 + Math.random() * 220;
-    c.style.left = (x - 3) + 'px'; c.style.top = (y - 5) + 'px';
-    c.style.background = colors[i % colors.length];
-    c.style.setProperty('--cf-dx', (Math.cos(a) * r) + 'px');
-    c.style.setProperty('--cf-dy', (Math.sin(a) * r + 58) + 'px');
-    c.style.setProperty('--cf-rot', (Math.random() * 1080 - 540) + 'deg');
-    c.style.animationDuration = (1.15 + Math.random() * .5) + 's';
-    if (i % 3 === 0) { c.style.borderRadius = '50%'; c.style.width = '7px'; c.style.height = '7px'; }
-    document.body.appendChild(c);
-    setTimeout(() => c.remove(), 1750);
-  }
-}
-// 登场路线库（离场改用独立的「退场风格系统」）
-const ENTER_ROUTES = [
-  { arc: -82,  spin: -360, wob: 0  },
-  { arc: 88,   spin: 360,  wob: 0  },
-  { arc: -130, spin: -720, wob: 0  },
-  { arc: -60,  spin: 180,  wob: 50 }
-];
-let lastEnterRoute = -1;
-function pickRoute(arr, prev) {
-  let i = Math.floor(Math.random() * arr.length);
-  if (i === prev) i = (i + 1 + Math.floor(Math.random() * (arr.length - 1))) % arr.length;
-  return i;
-}
-
-/* ===== 粒子工具 ===== */
-function spawnVortex(x, y, dur) {
-  const v = document.createElement('div');
-  v.className = 'vortex';
-  v.style.left = x + 'px'; v.style.top = y + 'px';
-  v.innerHTML = '<i class="v-core"></i>';
-  document.body.appendChild(v);
-  for (let i = 0; i < 11; i++) {
-    const a = (Math.PI * 2 * i) / 11 + Math.random() * .4;
-    const r = 78 + Math.random() * 74;
-    const sp = document.createElement('div');
-    sp.className = 'vortex-spark';
-    sp.style.left = x + 'px'; sp.style.top = y + 'px';
-    sp.style.setProperty('--sp-x', (Math.cos(a) * r) + 'px');
-    sp.style.setProperty('--sp-y', (Math.sin(a) * r) + 'px');
-    sp.style.animationDelay = (.04 + Math.random() * .18) + 's';
-    document.body.appendChild(sp);
-    setTimeout(() => sp.remove(), 1100);
-  }
-  setTimeout(() => v.remove(), dur + 280);
-}
-function spawnSpeck(x, y, dx, dy, color, size, dur, delay) {
-  setTimeout(() => {
-    const p = document.createElement('div');
-    p.className = 'speck';
-    p.style.left = x + 'px'; p.style.top = y + 'px';
-    if (color) p.style.setProperty('--speck-color', color);
-    if (size) { p.style.width = size + 'px'; p.style.height = size + 'px'; }
-    p.style.setProperty('--sp-dx', dx + 'px');
-    p.style.setProperty('--sp-dy', dy + 'px');
-    p.style.animationDuration = (dur || .8) + 's';
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), (dur || .8) * 1000 + 120);
+    const rot = Math.random() * 50 - 25;
+    removeAfterAnimation(s, [
+      { opacity: 0, transform: 'translate3d(0,0,0) scale(.28) rotate(' + rot + 'deg)' },
+      { opacity: .62, offset: .2 },
+      { opacity: 0, transform: 'translate3d(' + (dx || 0) + 'px,' + (dy == null ? -34 : dy) + 'px,0) scale(' + (scale || 2.4) + ') rotate(' + (rot + 24) + 'deg)' }
+    ], { duration: 880, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' });
   }, delay || 0);
 }
-function spawnRipple(x, y, delay) {
+function spawnPortal(x, y, mode, delay) {
   setTimeout(() => {
-    const r = document.createElement('div');
-    r.className = 'ripple';
-    r.style.left = x + 'px'; r.style.top = y + 'px';
-    document.body.appendChild(r);
-    setTimeout(() => r.remove(), 900);
+    const closing = mode === 'exit';
+    const aura = document.createElement('div');
+    aura.className = 'dog-aura';
+    aura.style.left = x + 'px'; aura.style.top = y + 'px';
+    removeAfterAnimation(aura, [
+      { opacity: 0, transform: closing ? 'scale(1.5)' : 'scale(.25)' },
+      { opacity: .82, offset: .28 },
+      { opacity: 0, transform: closing ? 'scale(.18)' : 'scale(1.65)' }
+    ], { duration: 620, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+    for (let i = 0; i < 2; i++) {
+      const ring = document.createElement('div');
+      ring.className = 'dog-ring';
+      ring.style.left = x + 'px'; ring.style.top = y + 'px';
+      removeAfterAnimation(ring, [
+        { opacity: 0, transform: closing ? 'scale(1.55)' : 'scale(.3)' },
+        { opacity: .58 - i * .14, offset: .24 },
+        { opacity: 0, transform: closing ? 'scale(.22)' : 'scale(' + (1.65 + i * .42) + ')' }
+      ], { duration: 650, delay: i * 80, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+    }
   }, delay || 0);
 }
-function spawnGhost(src, x, y, sc, rot, op, delay) {
+function spawnMotes(x, y, mode, delay) {
+  setTimeout(() => {
+    const closing = mode === 'exit';
+    const colors = ['#818cf8', '#a5b4fc', '#c4b5fd', '#94a3b8'];
+    for (let i = 0; i < 7; i++) {
+      const p = document.createElement('div');
+      p.className = 'dog-mote';
+      const a = -Math.PI * .88 + i * Math.PI * .28 + (Math.random() - .5) * .18;
+      const r = 24 + Math.random() * 25;
+      const size = 3 + Math.random() * 3;
+      p.style.left = x + 'px'; p.style.top = y + 'px';
+      p.style.setProperty('--mote-size', size + 'px');
+      p.style.setProperty('--mote-color', colors[i % colors.length]);
+      const ox = Math.cos(a) * r, oy = Math.sin(a) * r;
+      removeAfterAnimation(p, [
+        { opacity: 0, transform: closing ? 'translate3d(' + ox + 'px,' + oy + 'px,0) scale(.5)' : 'translate3d(0,0,0) scale(.35)' },
+        { opacity: .72, offset: .25 },
+        { opacity: 0, transform: closing ? 'translate3d(0,0,0) scale(.15)' : 'translate3d(' + ox + 'px,' + (oy + 9) + 'px,0) scale(.8)' }
+      ], { duration: 560 + Math.random() * 160, delay: i * 18, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+    }
+  }, delay || 0);
+}
+function pulseDogButton(kind) {
+  const btn = document.getElementById('dogBtn');
+  const cls = kind === 'exit' ? 'dog-receive' : 'dog-release';
+  btn.classList.remove('dog-release', 'dog-receive', 'chomp');
+  void btn.offsetWidth;
+  btn.classList.add(cls);
+  setTimeout(() => btn.classList.remove(cls), 760);
+}
+function spawnGhost(src, x, y, sx, sy, rot, delay) {
   setTimeout(() => {
     const g = document.createElement('img');
     g.className = 'ghost-dog';
     g.src = src;
-    g.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + sc + ') rotate(' + rot + 'deg)';
-    g.style.setProperty('--gh-op', op);
+    g.alt = '';
+    g.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + sx + ',' + sy + ') rotate(' + rot + 'deg)';
+    g.style.setProperty('--gh-op', '.1');
     document.body.appendChild(g);
-    setTimeout(() => g.remove(), 620);
+    setTimeout(() => g.remove(), 460);
   }, delay || 0);
 }
 
-/* ===== 退场风格系统：5 种运动语言完全不同的方案，每次随机抽一个 ===== */
-const EXIT_STYLES = [
-  // 1) 漩涡吸走（强化：中心黑洞 + 吸附光点 + 螺旋烟圈）
-  {
-    id: 'vortex', dur: 920,
-    build(C) {
-      const { T, K, po, so, sc, K2, point, fx, fy, tx, ty, spin, s0, s1, dx, dy, tcx, tcy } = C;
-      const frames = [
-        { offset: 0,    transform: K(0, s0, 0), opacity: 1 },
-        { offset: .10,  transform: K2(.10, s0*1.12, s0*.84, -8), easing: 'ease-in' },
-        { offset: .20,  transform: K2(.20, s0*.68, s0*1.4, 12), easing: 'ease-in' },
-        { offset: .38,  transform: K(po(.38), sc(.38), spin*so(.38)), easing: 'ease-in' },
-        { offset: .58,  transform: K(po(.58), sc(.58), spin*so(.58)), easing: 'ease-in' },
-        { offset: .78,  transform: K(po(.78), sc(.78), spin*so(.78)), easing: 'ease-in' },
-        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.1) + ') rotate(' + (spin*1.4) + 'deg)', opacity: 0 }
-      ];
-      const effects = () => {
-        spawnVortex(tcx, tcy, 920);
-        const p1 = point(.18), p2 = point(.36), p3 = point(.56);
-        spawnSmoke(p1[0]+16, p1[1]-8, 110, 1.5, dx*.34+24, dy*.34-18);
-        spawnSmoke(p2[0]+10, p2[1],   300, 2.2, dx*.3, dy*.3);
-        spawnSmoke(p3[0],    p3[1]+8, 470, 1.8, dx*.24, dy*.24);
-      };
-      return { frames, effects };
-    }
-  },
-  // 2) 溜之大吉·滑步潜行（贴地滑行 + 回头张望 + 残影 + 尘埃）
-  {
-    id: 'sneak', dur: 900,
-    build(C) {
-      const { T, fx, fy, tx, ty, s0, s1, dx, dy, src } = C;
-      const slide = o => [fx + dx*o, fy + dy*o + Math.sin(Math.PI*o)*14];
-      const SK = (o, sx, sy, rot, sk) => { const p = slide(o); return T(p[0],p[1]) + ' scale('+sx+','+sy+') rotate('+rot+'deg) skewX('+(sk||0)+'deg)'; };
-      const frames = [
-        { offset: 0,    transform: SK(0, s0, s0, 0, 0) },
-        { offset: .12,  transform: SK(.04, s0*1.12, s0*.76, -6, -4), easing: 'ease-out' },
-        { offset: .24,  transform: SK(.14, s0*.86, s0*1.06, 8, 6), easing: 'ease-in' },
-        { offset: .42,  transform: SK(.42, s0*1.18, s0*.72, -14, -8) },
-        { offset: .60,  transform: SK(.62, s0*.9, s0*1.0, 10, 6) },
-        { offset: .78,  transform: SK(.8, s0*1.14, s0*.74, -10, -6) },
-        { offset: .90,  transform: SK(.92, s1*1.3, s1*.6, 0, 0) },
-        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.15) + ')', opacity: 0 }
-      ];
-      const effects = () => {
-        [.32,.55,.74].forEach(o => {
-          const p = slide(o);
-          spawnGhost(src, p[0], p[1], s0*.9, (o*180)%40-20, .3, o*900-120);
-        });
-        for (let i = 0; i < 11; i++) {
-          const o = .1 + Math.random()*.4, p = slide(o);
-          spawnSpeck(p[0]+100+(Math.random()-.5)*60, p[1]+205, -40+Math.random()*80, -30-Math.random()*50,
-            'rgba(148,163,184,.6)', 6+Math.random()*5, .72, o*900);
-        }
-        const p2 = slide(.3);
-        spawnSmoke(p2[0]+120, p2[1]+130, 260, 2.4, 60, -30);
-      };
-      return { frames, effects };
-    }
-  },
-  // 3) 摆烂融化·瘫成饼（叹气 → 瘫软压扁 → 被吸溜 → 涟漪）
-  {
-    id: 'melt', dur: 900,
-    build(C) {
-      const { T, fx, fy, tx, ty, s0, s1, dx, dy, fcx, fcy, tcx, tcy } = C;
-      const melt = o => [fx + dx*o, fy + dy*o];
-      const MK = (o, sx, sy, rot, sk) => { const p = melt(o); return T(p[0], p[1]+Math.sin(Math.PI*o)*8) + ' scale('+sx+','+sy+') rotate('+rot+'deg) skewY('+(sk||0)+'deg)'; };
-      const frames = [
-        { offset: 0,    transform: MK(0, s0, s0, 0, 0) },
-        { offset: .16,  transform: MK(.02, s0*1.05, s0*.9, 0, 0), easing: 'ease-out' },
-        { offset: .34,  transform: MK(.1, s0*1.55, s0*.26, -3, 6), easing: 'ease-in' },
-        { offset: .5,   transform: MK(.32, s0*1.42, s0*.3, 4, -5) },
-        { offset: .68,  transform: MK(.55, s0*1.1, s0*.5, -3, 4) },
-        { offset: .85,  transform: MK(.78, s1*1.5, s1*.35, 0, 0) },
-        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.2) + ',' + (s1*.05) + ')', opacity: 0 }
-      ];
-      const effects = () => {
-        spawnSmoke(fcx+10, fcy-30, 80, 2.6, 10, -70);
-        for (let i = 0; i < 7; i++) {
-          const o = .3 + Math.random()*.3, p = melt(o);
-          spawnSpeck(p[0]+60+(Math.random()-.5)*140, p[1]+205, (Math.random()-.5)*30, 60+Math.random()*70,
-            'rgba(129,140,248,.72)', 7+Math.random()*5, .82, o*900);
-        }
-        spawnRipple(tcx, tcy, 540);
-      };
-      return { frames, effects };
-    }
-  },
-  // 4) 火箭升空·一溜烟（蹲下蓄力 → 尾焰喷射 → 高速冲刺 → 吞入）
-  {
-    id: 'rocket', dur: 840,
-    build(C) {
-      const { T, K, point, fx, fy, tx, ty, s0, s1, spin, tcx, tcy } = C;
-      const frames = [
-        { offset: 0,    transform: K(0, s0, 0) },
-        { offset: .13,  transform: T(fx, fy+16) + ' scale(' + (s0*.84) + ',' + (s0*1.16) + ')', easing: 'ease-out' },
-        { offset: .24,  transform: T(fx, fy-24) + ' scale(' + (s0*.7) + ',' + (s0*1.44) + ')', easing: 'cubic-bezier(.2,1.7,.4,1)' },
-        { offset: .55,  transform: K(.55, s0*.9, spin*.3), easing: 'linear' },
-        { offset: .8,   transform: K(.82, s1*1.1, spin*.5) },
-        { offset: 1,    transform: T(tx, ty) + ' scale(' + (s1*.12) + ') rotate(' + (spin*.7) + 'deg)', opacity: 0 }
-      ];
-      const effects = () => {
-        for (let i = 0; i < 5; i++) {
-          const o = .2 + i*.14, p = point(o);
-          spawnSmoke(p[0]+115, p[1]+115, o*840, 1.6+Math.random(), -8, 30);
-        }
-        spawnRipple(tcx, tcy, 660);
-      };
-      return { frames, effects };
-    }
-  },
-  // 5) 化烟遁走（原地化烟消散 → 烟团沿轨迹飘向按钮被吞）
-  {
-    id: 'smoke', dur: 900,
-    build(C) {
-      const { T, K, point, s0, s1 } = C;
-      const frames = [
-        { offset: 0,    transform: K(0, s0, 0), opacity: 1 },
-        { offset: .25,  transform: K(.12, s0*1.04, s0*.94, 0), opacity: .75, easing: 'ease-out' },
-        { offset: .5,   transform: K(.38, s0*.9, s0*.9, 0), opacity: .4 },
-        { offset: .72,  transform: K(.65, s0*.7, s0*.7, 0), opacity: .22 },
-        { offset: .9,   transform: K(.85, s1*1.2, s1*1.2, 0), opacity: .1 },
-        { offset: 1,    transform: T(C.tx, C.ty) + ' scale(' + (s1*.3) + ')', opacity: 0 }
-      ];
-      const effects = () => {
-        for (let i = 0; i < 10; i++) {
-          const o = Math.random()*.5, p = point(o);
-          spawnSmoke(p[0]+115, p[1]+110, i*68, 2+Math.random()*1.5, C.dx*.5, C.dy*.5-30);
-        }
-      };
-      return { frames, effects };
-    }
-  }
-];
-let lastExitStyle = -1;
-function pickExitStyle() {
-  let i = Math.floor(Math.random() * EXIT_STYLES.length);
-  if (i === lastExitStyle) i = (i + 1 + Math.floor(Math.random() * (EXIT_STYLES.length - 1))) % EXIT_STYLES.length;
-  lastExitStyle = i;
-  return i;
-}
-
-// 飞行分身：退场走风格系统 / 登场保持弹射翻滚落地；全程 translate3d + GPU 合成
+// 飞行分身：二次贝塞尔弧线 + 细密关键帧，避免直线平移和突兀转向。
 function flyShiba(fromRect, toRect, mode, done) {
   const fly = document.createElement('img');
   fly.className = 'fly-dog';
   fly.src = shibaSrc();
+  fly.alt = '';
   document.body.appendChild(fly);
   window.__dogFlying = true;
+
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isExit = mode === 'exit';
   const NW = 230, NH = fly.offsetHeight || 222;
   const fcx = fromRect.left + fromRect.width / 2, fcy = fromRect.top + fromRect.height / 2;
   const tcx = toRect.left + toRect.width / 2, tcy = toRect.top + toRect.height / 2;
   const fx = fcx - NW / 2, fy = fcy - NH / 2;
   const tx = tcx - NW / 2, ty = tcy - NH / 2;
-  const s0 = fromRect.width / NW, s1 = toRect.width / NW;
+  const s0 = fromRect.width >= 100 ? 1 : fromRect.width / NW;
+  const s1 = toRect.width >= 100 ? 1 : toRect.width / NW;
   const dx = tx - fx, dy = ty - fy;
   const len = Math.hypot(dx, dy) || 1;
-  const orx = -dy / len, ory = dx / len;
-  const T = (x, y) => 'translate3d(' + x + 'px,' + y + 'px,0)';
-  const isExit = mode === 'exit';
+  const dir = dx >= 0 ? 1 : -1;
+  const dur = reduced ? 340 : (isExit ? 960 : 1120);
+  const lift = reduced ? 0 : Math.min(112, Math.max(48, len * .15));
+  const side = reduced ? 0 : Math.min(30, len * .045) * dir;
+  const cx = (fx + tx) / 2 + side;
+  const cy = Math.max(56, Math.min(fy, ty) - lift);
+  const T = (x, y) => 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0)';
+  const point = u => {
+    const v = 1 - u;
+    return [v * v * fx + 2 * v * u * cx + u * u * tx,
+            v * v * fy + 2 * v * u * cy + u * u * ty];
+  };
+  const pose = (x, y, sx, sy, rot) => T(x, y) + ' scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ') rotate(' + rot.toFixed(2) + 'deg)';
+  const frames = [];
+  const add = (offset, transform, opacity) => frames.push({ offset, transform, opacity: opacity == null ? 1 : opacity, easing: 'linear' });
 
-  let frames, effects, dur;
-  if (isExit) {
-    const si = pickExitStyle();
-    const style = EXIT_STYLES[si];
-    fly.dataset.style = style.id;
-    const spin = Math.random() < .5 ? 360 : -360;
-    const arc = -55;
-    const point = o => [fx + dx*o, fy + dy*o + arc*Math.sin(Math.PI*o)];
-    const K = (o, sc, rot) => { const p = point(o); return T(p[0],p[1]) + ' scale('+sc+') rotate('+rot+'deg)'; };
-    const po = o => Math.pow(o, 1.45);
-    const so = o => Math.pow(o, 1.6);
-    const sc = o => s0 + (s1*.18 - s0) * Math.pow(o, 1.2);
-    const K2 = (o, sx, sy, rot) => { const p = point(po(o)); return T(p[0],p[1]) + ' scale('+sx+','+sy+') rotate('+rot+'deg)'; };
-    const C = { T, K, K2, po, so, sc, point, fx, fy, tx, ty, dx, dy, len,
-                s0, s1, spin, fcx, fcy, tcx, tcy, arc, src: fly.src };
-    const built = style.build(C);
-    frames = built.frames; effects = built.effects; dur = style.dur;
+  if (!isExit) {
+    // 出场：狗窝轻压后释放；身体逐渐展开，空中只有很小的倾斜。
+    add(0, pose(fx, fy, s0 * .55, s0 * .55, 0), 0);
+    add(.055, pose(fx, fy + 2, s0 * 1.12, s0 * .78, 0), .9);
+    const steps = reduced ? 10 : 34;
+    for (let i = 0; i <= steps; i++) {
+      const u = i / steps;
+      const p = point(DOG_MOTION.inOut(u));
+      const base = s0 + (s1 - s0) * DOG_MOTION.out(u);
+      const launch = Math.pow(1 - u, 3);
+      const stretch = reduced ? 0 : launch * .16 + Math.sin(Math.PI * u) * .035;
+      const rot = reduced ? 0 : -dir * (launch * 3 + Math.sin(Math.PI * u) * 8);
+      add(.11 + u * .69, pose(p[0], p[1] - launch * 5, base * (1 - stretch), base * (1 + stretch), rot));
+    }
+    // 落地三段式：轻压缩、小幅回弹、稳定。
+    add(.855, pose(tx, ty + 5, s1 * 1.09, s1 * .89, 0));
+    add(.925, pose(tx, ty - 6, s1 * .975, s1 * 1.035, 0));
+    add(.968, pose(tx, ty + 1, s1 * 1.012, s1 * .99, 0));
+    add(1, pose(tx, ty, s1, s1, 0));
   } else {
-    const ri = pickRoute(ENTER_ROUTES, lastEnterRoute);
-    lastEnterRoute = ri;
-    const R = ENTER_ROUTES[ri];
-    const spin = R.spin;
-    const point = o => {
-      const w = (R.wob || 0) * Math.sin(2 * Math.PI * o);
-      return [fx + dx*o + orx*w, fy + dy*o + R.arc*Math.sin(Math.PI*o) + ory*w];
-    };
-    const K = (o, sc, rot) => { const p = point(o); return T(p[0],p[1]) + ' scale('+sc+') rotate('+rot+'deg)'; };
-    frames = [
-      { offset: 0,    transform: T(fx, fy) + ' scale(' + (s0*.7) + ') rotate(' + spin + 'deg)', opacity: .45 },
-      { offset: .12,  transform: T(fx, fy) + ' scale(' + (s0*2.8) + ') rotate(' + (spin*.88) + 'deg)', opacity: 1, easing: 'cubic-bezier(.2,1.6,.35,1)' },
-      { offset: .48,  transform: K(.48, s0 + (s1-s0)*.48, spin*.5), easing: 'linear' },
-      { offset: .78,  transform: K(.78, s1*1.14, spin*.12), easing: 'ease-out' },
-      { offset: .90,  transform: T(tx, ty + 11) + ' scale(' + (s1*1.22) + ',' + (s1*.8) + ') rotate(0deg)' },
-      { offset: .96,  transform: T(tx, ty - 9) + ' scale(' + (s1*.94) + ',' + (s1*1.07) + ') rotate(0deg)' },
-      { offset: 1,    transform: T(tx, ty) + ' scale(' + s1 + ') rotate(0deg)' }
-    ];
-    effects = () => {
-      spawnConfetti(fcx, fcy + 6, 52, dx, dy, .6);
-      spawnSmoke(fcx + 20, fcy - 6, dur * .06, 2.2, 34, -40);
-    };
-    dur = 980;
+    // 回收：先小蹲蓄力，再沿同一套弧线轻盈回到狗窝。
+    add(0, pose(fx, fy, s0, s0, 0));
+    add(.07, pose(fx, fy + 8, s0 * 1.075, s0 * .9, dir * 3));
+    const steps = reduced ? 10 : 34;
+    for (let i = 0; i <= steps; i++) {
+      const u = i / steps;
+      const p = point(DOG_MOTION.inOut(u));
+      const base = s0 + (s1 - s0) * DOG_MOTION.smooth(u);
+      const launch = Math.pow(1 - u, 3);
+      const stretch = reduced ? 0 : launch * .065 + Math.sin(Math.PI * u) * .03;
+      const rot = reduced ? 0 : dir * (Math.sin(Math.PI * u) * 7 - launch * 4);
+      const fade = 1 - DOG_MOTION.smooth(Math.max(0, (u - .84) / .16)) * .35;
+      add(.135 + u * .715, pose(p[0], p[1] - launch * 10, base * (1 - stretch), base * (1 + stretch), rot), fade);
+    }
+    add(.91, pose(tx, ty, s1 * .72, s1 * .9, 0), .62);
+    add(1, pose(tx, ty, s1 * .12, s1 * .12, 0), 0);
   }
 
-  effects();
-  if (!fly.animate) { fly.remove(); window.__dogFlying = false; if (done) done(); return; }
+  const shadow = document.createElement('div');
+  shadow.className = 'fly-dog-shadow';
+  shadow.style.left = (isExit ? fcx : tcx) + 'px';
+  shadow.style.top = ((isExit ? fy : ty) + NH - 7) + 'px';
+  document.body.appendChild(shadow);
+  const shadowFrames = isExit ? [
+    { opacity: .62, transform: 'scale(1)' },
+    { opacity: .3, transform: 'scale(.72)', offset: .16 },
+    { opacity: 0, transform: 'scale(.35)', offset: .4 },
+    { opacity: 0, transform: 'scale(.35)' }
+  ] : [
+    { opacity: 0, transform: 'scale(.25)' },
+    { opacity: 0, transform: 'scale(.35)', offset: .46 },
+    { opacity: .38, transform: 'scale(.72)', offset: .72 },
+    { opacity: .72, transform: 'scale(1.12)', offset: .86 },
+    { opacity: .58, transform: 'scale(1)' }
+  ];
+
+  if (isExit) {
+    setTimeout(() => pulseDogButton('exit'), dur * .76);
+    spawnPortal(tcx, tcy, 'exit', dur * .72);
+  } else {
+    pulseDogButton('enter');
+    spawnPortal(fcx, fcy, 'enter', 0);
+  }
+  if (!reduced) {
+    if (isExit) {
+      spawnSmoke(fcx - 28, fy + NH - 30, 70, 1.7, -24, -34);
+      spawnSmoke(fcx + 26, fy + NH - 28, 135, 1.45, 26, -30);
+      spawnMotes(tcx, tcy, 'exit', dur * .76);
+    } else {
+      spawnSmoke(fcx - 5, fcy + 4, 40, 1.25, -12, -24);
+      spawnMotes(fcx, fcy, 'enter', 40);
+      spawnSmoke(tcx - 42, ty + NH - 25, dur * .79, 1.8, -28, -26);
+      spawnSmoke(tcx + 40, ty + NH - 24, dur * .82, 1.65, 30, -24);
+      spawnMotes(tcx, ty + NH - 24, 'enter', dur * .82);
+      const g1 = point(DOG_MOTION.inOut(.27)), g2 = point(DOG_MOTION.inOut(.43));
+      const b1 = s0 + (s1 - s0) * DOG_MOTION.out(.27), b2 = s0 + (s1 - s0) * DOG_MOTION.out(.43);
+      spawnGhost(fly.src, g1[0], g1[1], b1, b1, -dir * 6, dur * .31);
+      spawnGhost(fly.src, g2[0], g2[1], b2, b2, -dir * 5, dur * .43);
+    }
+  }
+
+  if (!fly.animate) {
+    fly.remove(); shadow.remove(); window.__dogFlying = false;
+    if (done) done();
+    return;
+  }
+  const shadowAnim = shadow.animate(shadowFrames, { duration: dur, fill: 'forwards' });
   const anim = fly.animate(frames, { duration: dur, fill: 'forwards' });
-  anim.onfinish = () => { fly.remove(); window.__dogFlying = false; if (done) done(); };
+  anim.onfinish = () => {
+    fly.remove(); shadow.remove();
+    if (shadowAnim) shadowAnim.cancel();
+    window.__dogFlying = false;
+    if (done) done();
+  };
 }
 function backToEaster() {
+  if (window.__dogFlying) return;
   const easter = document.getElementById('easter');
   const stage = document.getElementById('monsterStage');
   const dogBtn = document.getElementById('dogBtn');
@@ -1586,12 +1482,10 @@ function backToEaster() {
   document.getElementById('tauntBubble').classList.remove('show');
   stage.classList.remove('running', 'pop', 'tease', 'land', 'entering');
 
-  // 按钮吐狗：清空按钮内容（变空白），抖动反馈，记录起飞点
+  // 按钮释放小狗：先清空按钮，释放回弹由飞行动画统一驱动。
   const fromRect = dogBtn.getBoundingClientRect();
   dogBtn.classList.remove('occupied');
   dogBtn.classList.add('vacant');
-  dogBtn.classList.remove('chomp'); void dogBtn.offsetWidth; dogBtn.classList.add('chomp');
-  setTimeout(() => dogBtn.classList.remove('chomp'), 520);
   // 显示彩蛋页（白底柔和渐显），狗本体先藏起来
   easter.classList.add('show');
   stage.style.visibility = 'hidden';
@@ -1604,22 +1498,22 @@ function backToEaster() {
     width: DW, height: DH
   };
   flyShiba(fromRect, toRect, 'enter', () => {
-    // 分身到达：狗本体落位 + 落地回弹
+    // 落地回弹已包含在飞行动画中，本体无缝接管，避免二次弹跳。
     stage.style.left = ((easter.clientWidth - DW) / 2) + 'px';
     stage.style.top = ((easter.clientHeight - DH) / 2 + 28) + 'px';
     stage.style.transition = 'none';
     stage.style.visibility = 'visible';
     void stage.offsetWidth;
     stage.style.transition = '';
-    stage.classList.add('land');
-    setTimeout(() => stage.classList.remove('land'), 720);
   });
 }
 /* ---------- 绑定 ---------- */
 document.getElementById('dogBtn').addEventListener('click', backToEaster);
+document.getElementById('updateCard').addEventListener('click', refreshFromCard);
+document.getElementById('updateCard').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); refreshFromCard(); } });
+window.addEventListener('resize', () => { if (!versionUpdateDetected) return; const c = document.getElementById('updateCard'); const t = cardTarget(); c.style.transform = `translate(${t.x}px,${t.y}px) scale(1)`; });
 document.getElementById('openBtn').addEventListener('click', openCurrent);
 document.getElementById('toggleSideBtn').addEventListener('click', toggleSide);
-document.getElementById('upClose').addEventListener('click', () => document.getElementById('updateToast').classList.remove('show'));
 
 /* ---------- 初始化 ---------- */
 // 公告跑马灯环
