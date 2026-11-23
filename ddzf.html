@@ -141,6 +141,7 @@
             font-family: inherit;
             letter-spacing: -0.01em;
             line-height: 1.3;
+            text-decoration: none;
         }
         .btn:hover {
             background: #e8e8ed;
@@ -548,6 +549,60 @@
         }
         .cat-tab .cat-count { opacity: 0.7; font-size: 0.6875rem; margin-left: 3px; }
 
+        /* ===== EXTENSION DOWNLOAD ===== */
+        details.ext-card > summary { cursor: pointer; list-style: none; }
+        details.ext-card > summary::-webkit-details-marker { display: none; }
+        details.ext-card > summary:hover { background: var(--bg-hover); }
+        details.ext-card:not([open]) > summary { border-bottom-color: transparent; }
+        .ext-chevron {
+            width: 0; height: 0;
+            border-left: 4px solid var(--text-muted);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            transition: transform var(--transition);
+        }
+        details.ext-card[open] .ext-chevron { transform: rotate(90deg); }
+        .ext-card .card-body { padding: 14px 20px 16px; }
+        .ext-guide {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .ext-guide-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .ext-steps {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            line-height: 1.7;
+        }
+        .ext-steps li + li { margin-top: 5px; }
+        .ext-steps code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.6875rem;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+        .ext-steps code.copyable {
+            color: var(--accent);
+            cursor: pointer;
+            border-bottom: 1px dashed var(--accent);
+        }
+        .ext-copy-hint { font-size: 0.6875rem; color: var(--text-muted); margin-left: 4px; }
+        .ext-note {
+            margin-top: 10px;
+            font-size: 0.6875rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .main-layout {
@@ -745,6 +800,28 @@
 
     <!-- ===== LEFT SIDEBAR: ROLES + SCHEMES ===== -->
     <div class="sidebar-left" style="display:flex;flex-direction:column;gap:24px;">
+
+        <!-- 浏览器插件下载 -->
+        <details class="card ext-card">
+            <summary class="card-header">
+                <span class="label">插件</span>
+                <span class="ext-chevron"></span>
+            </summary>
+            <div class="card-body">
+                <a class="btn btn-primary btn-block" style="padding:10px 16px;font-size:0.8125rem;"
+                   href="https://liangtz0518.github.io/gamehub/ddzf.rar"
+                   download="ddzf.rar">⬇ 下载插件</a>
+                <div class="ext-guide">
+                    <div class="ext-guide-title">安装步骤</div>
+                    <ol class="ext-steps">
+                        <li>下载 <code>ddzf.rar</code> 并解压。</li>
+                        <li>复制 <code class="copyable" id="extEdgeUrl" title="点击复制">edge://extensions/</code><span class="ext-copy-hint" id="extCopyHint">点击复制，粘贴到地址栏</span>，打开扩展页并开启「开发者模式」。</li>
+                        <li>点「加载已解压的扩展程序」，选中解压出来的文件夹即可。</li>
+                    </ol>
+                    <div class="ext-note">手动安装不会自动更新，升级需重新下载替换。</div>
+                </div>
+            </div>
+        </details>
 
         <!-- 数据导入 / 导出 -->
         <div style="display:flex;gap:10px;">
@@ -3371,6 +3448,33 @@
     document.getElementById('generateBtn').addEventListener('click', generateAndCopy);
     document.getElementById('saveSchemeBtn').addEventListener('click', saveCurrentScheme);
     document.getElementById('addRoleBtn').addEventListener('click', () => openRoleModal());
+
+    // ===== EXTENSION URL COPY =====
+    const extEdgeUrl = document.getElementById('extEdgeUrl');
+    const extCopyHint = document.getElementById('extCopyHint');
+    let extCopyTimer;
+    if (extEdgeUrl) {
+        extEdgeUrl.addEventListener('click', async () => {
+            const text = 'edge://extensions/';
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (_) {}
+                ta.remove();
+            }
+            if (extCopyHint) {
+                extCopyHint.textContent = '已复制，粘贴到地址栏';
+                clearTimeout(extCopyTimer);
+                extCopyTimer = setTimeout(() => { extCopyHint.textContent = '点击复制，粘贴到地址栏'; }, 3000);
+            }
+        });
+    }
 
     // ===== INIT =====
     renderItemList();
