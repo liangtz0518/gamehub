@@ -1,0 +1,171 @@
+/* 首页（欢迎页）：底色和光晕、品牌字、狐狸面具、尺刀、常用功能卡、页脚链接、
+ * 添加到桌面引导。首页的入场动画在 app/interaction.css，短视口收紧在 app/compact.css。 */
+/* 欢迎页：底色就是工具箱自己的浅粉底，几团主题色光晕 + 一片淡淡的点阵，
+ * 全是 CSS 画的，多大的屏都清楚；颜色全走主题变量，夜晚跟着变。 */
+.welcome {
+  min-height: calc(100% + var(--space-4) + var(--view-pad));
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--view-pad)) calc(-1 * var(--view-pad));
+  padding: clamp(40px, 8vh, 72px) 40px 40px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 80% 50%, color-mix(in srgb, var(--accent) 13%, transparent) 0, transparent 34%),
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent) 9%, transparent) 0, transparent 40%),
+    radial-gradient(circle at 0 100%, color-mix(in srgb, var(--accent-2) 8%, transparent) 0, transparent 42%);
+}
+/* 点阵：越往左越淡，不压文字 */
+.welcome::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(color-mix(in srgb, var(--accent) 24%, transparent) 1px, transparent 1.6px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(to left, black 0, transparent 62%);
+  mask-image: linear-gradient(to left, black 0, transparent 62%);
+}
+/* 首页内容块：左边一列，最多 720px */
+.home-inner { width: min(100%, 720px); display: flex; flex-direction: column; align-items: flex-start; position: relative; z-index: 1; }
+/* 品牌字：双色字标，右上角一枚朱印。颜色走主题变量，夜晚跟着变。 */
+.welcome {
+  /* 首页天空（app/welcome-sky.js 的 canvas）读这些颜色；夜里在 night.css 换一套。
+   * 去掉幻月、樱花枝和刀光后只剩花瓣和尺刀，颜色也跟着减到这两样。 */
+  --sky-petal: #f4a7c3;
+  --sky-blade: #d5336c;
+  --sky-ribbon: #e0457d;
+  --sky-ribbon-2: #f3a5c2;
+  --sky-shine: #ffffff;
+  --sky-metal: #cfc6d6;
+  position: relative;
+  overflow: clip;
+}
+.home-brand { position: relative; display: flex; align-items: flex-start; gap: var(--space-2); }
+.welcome h1 {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", "STZhongsong", "STSong", "SimSun", serif;
+  font-size: clamp(40px, 5.4vw, 64px);
+  font-weight: var(--fw-heavy);
+  line-height: 1.12;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  color: var(--text);
+}
+.home-name-mark { color: var(--accent); }
+
+/* 狐狸面具：用侧角色块版，钉在「箱」字右上角，短绳垂下来 */
+.home-title-tail { position: relative; display: inline-block; }
+
+.home-mask {
+  position: absolute;
+  left: calc(100% - .16em);
+  top: -.12em;
+  z-index: 2;
+  width: .58em;
+  transform: rotate(8deg);
+  transform-origin: 12% 5%;
+  pointer-events: none;
+  filter: drop-shadow(0 .05em .07em color-mix(in srgb, var(--text) 40%, transparent));
+}
+.home-mask img { display: block; width: 100%; height: auto; }
+.home-title-today { margin-right: var(--space-2); color: var(--accent-strong); }
+.home-ask { margin: 0 0 var(--space-3); color: var(--text); font-size: var(--fs-xl); font-weight: var(--fw-bold); line-height: 1.3; }
+/* 分隔线：canvas 画的刀尺 + 两股丝带（app/welcome-sky.js），尺寸固定 260×44，左边往左挪 2px 对齐标题 */
+.home-blade { display: block; width: 260px; max-width: 100%; height: auto; aspect-ratio: 260 / 44; margin: var(--space-6) 0 var(--space-6) -2px; }
+/* 天空 canvas：铺满欢迎页，压在内容下面，不接鼠标（只画飘落的花瓣） */
+.home-sky { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+/* 大屏：内容整块放到正中，上下左右都居中，不再缩在左上角、右边空一大片；
+ * 光晕和点阵也跟着改成围着内容、四周对称（点阵中间淡、四周浓，不压字）。 */
+@media (min-width: 1200px) and (min-height: 720px) {
+  .welcome { justify-content: center; align-items: center; padding: var(--space-10) var(--space-12) var(--space-12); }
+  .welcome {
+    background-image:
+      radial-gradient(ellipse 60% 55% at 50% 45%, color-mix(in srgb, var(--accent) 9%, transparent) 0, transparent 70%),
+      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent) 9%, transparent) 0, transparent 36%),
+      radial-gradient(circle at 0 100%, color-mix(in srgb, var(--accent-2) 8%, transparent) 0, transparent 38%);
+  }
+  .welcome::before {
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, transparent 38%, black 100%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, transparent 38%, black 100%);
+  }
+  .home-inner { width: min(100%, 760px); }
+  .home-tools, .home-meta { max-width: none; }
+}
+/* 三组之间拉开：品牌（胶囊、字标、说明）→ 尺刀 → 任务（小标题、四张卡、两个按钮）→ 页脚 */
+/* 首页常用功能：四个入口排成卡片，图标 + 名字 + 一句做什么；
+ * 上次打开的挂「上次」。颜色走主题变量，夜晚换成深色底也看得清。 */
+.home-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); width: 100%; max-width: 640px; margin: 0 0 var(--space-5); }
+.home-tools:empty { display: none; }
+.home-tool {
+  display: flex; align-items: center; gap: var(--space-3); min-width: 0; padding: var(--space-4);
+  border: 1px solid var(--line-soft); border-radius: var(--r-lg);
+  background: var(--panel);
+  color: var(--text); text-decoration: none;
+  transition: transform var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+}
+.home-tool:hover { transform: translateY(-1px); border-color: var(--accent); background: var(--panel); }
+.home-tool:focus-visible { outline: none; box-shadow: var(--focus); }
+/* 首页「导入分享码」：文件框透明地盖住整张卡，点卡片直接开相册/文件选择。 */
+.home-tool-share { position: relative; cursor: pointer; }
+.home-tool-share input { position: absolute; inset: -1px; opacity: 0; cursor: pointer; }
+.home-tool-share:focus-within { outline: none; box-shadow: var(--focus); }
+.home-tool-share.is-busy { opacity: .68; pointer-events: none; }
+.home-tool.is-primary { border-color: color-mix(in srgb, var(--accent) 28%, var(--line-soft)); background: var(--accent-soft); }
+.home-tool.is-primary .home-tool-icon { width: 40px; height: 40px; background: var(--panel); }
+.home-tool-icon { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--r-md); background: color-mix(in srgb, var(--accent) 13%, transparent); color: var(--accent-strong); }
+.home-tool-icon svg { width: 20px; height: 20px; }
+.home-tool-icon img { width: 28px; height: 28px; border-radius: 50%; }
+.home-tool-text { display: grid; gap: 1px; min-width: 0; flex: 1 1 auto; }
+.home-tool b { font-size: var(--fs-lg); font-weight: var(--fw-bold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-tool small { color: var(--muted); font-size: var(--fs-md); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-tool-tail { display: flex; align-items: center; gap: var(--space-2); flex: none; margin-left: auto; }
+.home-tool-go { width: 16px; height: 16px; flex: none; color: var(--muted); opacity: .42; transition: transform var(--t-fast) var(--ease-out), color var(--t-fast), opacity var(--t-fast); }
+.home-tool:hover .home-tool-go { color: var(--accent-strong); opacity: 1; transform: translateX(2px); }
+.home-tool.is-primary .home-tool-go { color: var(--accent-strong); opacity: .8; }
+.home-tool em { flex: none; padding: 1px var(--space-2); border-radius: 999px; background: var(--accent-fill); color: var(--on-accent-fill); font-size: var(--fs-xs); font-style: normal; font-weight: var(--fw-semibold); }
+/* 更新内容、放到桌面：两枚描边胶囊，和下面的链接区分开 */
+.home-quick { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-8); }
+.home-quick-btn { display: inline-flex; align-items: center; gap: var(--space-1); height: var(--control-h-sm); padding: 0 var(--space-3); border: 1px solid var(--line-soft); border-radius: var(--r-full); background: var(--panel); color: var(--muted); font: inherit; font-size: var(--fs-md); font-weight: var(--fw-semibold); cursor: pointer; transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast); }
+.home-quick-btn:hover { border-color: var(--accent); color: var(--accent-strong); background: var(--accent-soft); }
+.home-quick-btn:focus-visible { outline: none; box-shadow: var(--focus); }
+.home-quick-btn svg { width: 14px; height: 14px; color: var(--accent); }
+/* 页脚：左边一列小标签，右边是链接；不再重复「主页：」和单独一行代码贡献 */
+.home-meta { display: grid; gap: var(--space-2); width: 100%; max-width: 640px; margin: 0; padding-top: var(--space-4); border-top: 1px solid var(--line-soft); }
+.home-meta-row { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: var(--space-3); }
+.home-meta dt { color: var(--muted); font-size: var(--fs-sm); font-weight: var(--fw-semibold); letter-spacing: var(--tracking-normal); }
+.home-meta dd { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--fs-md); }
+/* 链接做成胶囊：悬停时整枚填成主题色 */
+.home-meta a { display: inline-flex; align-items: center; gap: var(--space-2); height: 30px; padding: 0 var(--space-3); border-radius: var(--r-full); background: color-mix(in srgb, var(--panel) 72%, transparent); box-shadow: inset 0 0 0 1px var(--line-soft); color: var(--text); text-decoration: none; transition: color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast) var(--ease-out); }
+.home-meta a:hover { background: var(--accent-fill); box-shadow: none; color: var(--on-accent-fill); }
+.home-meta a:hover svg { color: inherit; }
+.home-meta a:active { transform: scale(.97); }
+.home-meta a:focus-visible { outline: none; box-shadow: var(--focus); }
+.home-meta svg { width: 14px; height: 14px; flex: none; color: var(--accent); transition: color var(--t-fast); }
+.home-meta-sep { display: none; }
+.home-legal { margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+.home-legal a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line-soft); }
+.home-legal a:hover { color: var(--accent-strong); border-bottom-color: currentColor; }
+.home-legal a:focus-visible { outline: none; box-shadow: var(--focus); }
+@media (max-width: 560px) {
+  /* 手机：2×2 竖卡（图标在上、名字在下），说明收起来，给下面的链接留地方 */
+  .home-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .home-tool { position: relative; flex-direction: column; align-items: flex-start; gap: 8px; min-height: 96px; padding: 12px; }
+  .home-tool small { display: none; }
+  .home-tool-tail { position: absolute; top: 8px; right: 8px; margin: 0; }
+  .home-tool-go { display: none; }
+  .home-tool.is-primary .home-tool-icon { width: 36px; height: 36px; }
+  .home-tool b { font-size: var(--fs-md); }
+  .welcome h1 { font-size: clamp(32px, 10vw, 44px); }
+}
+@media (max-width: 760px) {
+  .home-quick-btn { height: 44px; }
+}
+@media (max-width: 900px) {
+  .welcome { padding: 32px 20px 96px; }
+}
+
+#local-save-status { position: fixed; right: 18px; bottom: 8px; z-index: var(--z-toast); max-width: min(90vw, 520px); font-size: var(--fs-xs); color: var(--muted); background: var(--panel); border-radius: var(--r-sm); padding: var(--space-1) var(--space-2); pointer-events: none; }
+#local-save-status:empty { display: none; }
+#local-save-status.is-error { color: var(--bad); border: 1px solid var(--bad); pointer-events: auto; }
+
+/* 首页：添加到桌面引导（1.2） */
+/* 展开的步骤卡占满一行，收起来时就是一个小按钮 */
+

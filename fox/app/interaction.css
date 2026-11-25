@@ -1,0 +1,195 @@
+/* 交互状态和动效：手机通用规则、按下和悬停过渡、键盘焦点、
+ * 换页和首页入场、骨架屏延迟、删除前收起、悬停抬升、空状态、轻提示、按钮转圈。 */
+/* 手机上的几条通用规则 */
+@media (max-width: 760px) {
+  /* iOS 和内嵌网页：点进 16px 以下的输入框会自动放大整页，输入类控件统一 16px。 */
+  input[type="text"], input[type="search"], input[type="number"], input[type="date"], input[type="email"], input[type="password"], input:not([type]), textarea, select { font-size: var(--fs-xl) !important; }
+  /* 独立图标按钮补到 40–44，手指点得准；表格/时间轴里的密集小图标不硬放大。 */
+  .rl-dc-trash { width: 44px; height: 44px; }
+  .rl-filter-x { width: 40px; height: 40px; }
+  /* 顶栏的小圆按钮补到 44px，手指点得准。 */
+  #theme-toggle, #pin-toggle { width: 44px; height: 44px; }
+}
+
+/* 选择控件 / 小按钮统一过渡：按下和悬停都不硬切。 */
+.seg-option, .sv-mode, .tb-mini, .tb-pick, .rl-tool, .bt-pick, .hr-tab,
+.axis-expand-toggle, .axis-config-btn, .axis-add, .gp-item, .gt-dialog-actions button {
+  transition: transform var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
+}
+.seg-option, .sv-mode, .tb-pick, .hr-tab, .bt-pick, .gp-item { cursor: pointer; }
+.seg-option:disabled, .sv-mode:disabled, .tb-mini:disabled, .tb-pick:disabled,
+.rl-tool:disabled, .bt-pick:disabled, .axis-expand-toggle:disabled, .axis-config-btn:disabled, .axis-add:disabled, .gp-item:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* 按下反馈：以前只有悬停，按下去没反应。统一缩一点点，别只换颜色。 */
+.btn:active:not(:disabled),
+.ghost:active:not(:disabled),
+.tab:active:not(:disabled),
+.nav-feature:active,
+.nav-page:active,
+.rs-chip:active,
+.chip:active:not(:disabled),
+.close-btn:active:not(:disabled),
+.seg-option:active:not(:disabled),
+.sv-mode:active:not(:disabled),
+.tb-mini:active:not(:disabled),
+.tb-pick:active:not(:disabled),
+.rl-tool:active:not(:disabled),
+.bt-pick:active:not(:disabled),
+.hr-tab:active:not(:disabled),
+.axis-expand-toggle:active:not(:disabled),
+.axis-config-btn:active:not(:disabled),
+.axis-add:active:not(:disabled),
+.gp-item:active:not(:disabled),
+.gt-dialog-actions button:active:not(:disabled) {
+  transform: scale(.98);
+}
+
+/* 键盘焦点：这几类可点区域原来没有自己的焦点样式，靠浏览器默认太不显眼。 */
+.nav-feature:focus-visible,
+.nav-page:focus-visible,
+.nav-more:focus-visible,
+.rs-chip:focus-visible,
+.tab:focus-visible,
+[role="option"]:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+/* 兜底：没有单独写焦点样式的按钮，用统一的两层焦点环。 */
+button:focus-visible, [role="button"]:focus-visible, [role="radio"]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+/* 品牌是整行按钮，焦点圈画在行里面，免得被侧栏边缘裁掉 */
+.brand:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: -3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  button, [role="button"], [role="radio"], [role="tab"], .btn, .ghost { transition: none; }
+  button:active:not(:disabled), [role="button"]:active:not(:disabled), .btn:active:not(:disabled), .ghost:active:not(:disabled) { transform: none; }
+}
+
+/* ---- 换页：顶栏标题和内容同一拍 ----
+ * 进功能：标题从下往上、内容跟着淡入；回首页：标题从上往下。
+ * 内容只用 opacity：页面里带 transform 会让里面的 position: fixed 弹窗改按这一层定位（弹窗会跑到屏幕外）。
+ * 都用 backwards，播完交还正常样式，不在元素上留 transform。 */
+#crumb .crumb-icon,
+#crumb .crumb-title,
+#crumb .sub { animation: gt-crumb-in var(--t-base) var(--ease-out) backwards; }
+#crumb .sub { animation-delay: var(--t-stagger); }
+#crumb[data-enter="back"] .crumb-icon,
+#crumb[data-enter="back"] .crumb-title,
+#crumb[data-enter="back"] .sub { animation-name: gt-crumb-back; }
+@keyframes gt-crumb-in { from { opacity: 0; transform: translateY(5px); } }
+@keyframes gt-crumb-back { from { opacity: 0; transform: translateY(-5px); } }
+
+@keyframes gt-enter-forward { from { opacity: 0; } }
+/* 页根一般只有一个 wrapper（.rs-page / .axis-page…），只动它的话等于整页一淡；
+ * 第四轮：连它的直接子块一起错开 30ms，进出才有「一块块落位」的节奏。 */
+#view[data-enter="forward"] .gt-feature-root > * { animation: gt-enter-forward var(--t-base) var(--ease-out) backwards; }
+#view[data-enter="forward"] .gt-feature-root > * > * { animation: gt-enter-forward var(--t-slow) var(--ease-out) backwards; }
+#view[data-enter="forward"] .gt-feature-root > * > *:nth-child(2) { animation-delay: var(--t-stagger); }
+#view[data-enter="forward"] .gt-feature-root > * > *:nth-child(3) { animation-delay: calc(var(--t-stagger) * 2); }
+#view[data-enter="forward"] .gt-feature-root > * > *:nth-child(n + 4) { animation-delay: calc(var(--t-stagger) * 3); }
+
+/* 首页（第二轮，收成一次编排，加面具）：胶囊 → 品牌字 → 狐狸面具挂上来 → 横线 → 小标题 → 四张卡 → 小按钮 → 链接。 */
+/* 首页编排的节拍（只在首页用）：大字和面具 420、天空 700；四张卡从 180 起每张晚 50，后面两块接着排。 */
+#view { --home-title: 420ms; --home-sky: 700ms; --home-cards-at: 180ms; --home-card-step: 50ms; }
+#view[data-enter="back"] .welcome h1 { animation: gt-home-rise var(--home-title) var(--ease-out) var(--t-stagger) backwards; }
+#view[data-enter="back"] .home-mask { animation: gt-home-mask var(--home-title) var(--ease-spring) var(--t-enter) backwards; }
+#view[data-enter="back"] .home-blade { animation: gt-home-rise var(--t-enter) var(--ease-out) var(--t-fast) backwards; }
+#view[data-enter="back"] .home-ask { animation: gt-home-rise var(--t-enter) var(--ease-out) calc(var(--t-fast) + var(--t-stagger)) backwards; }
+/* 樱花枝从自己那个角轻轻探进来（只动 opacity 和 translate；左下那枝转了 180°，同一个位移方向正好反过来） */
+#view[data-enter="back"] .home-sky { animation: gt-home-sky var(--home-sky) var(--ease-out) backwards; }
+@keyframes gt-home-sky { from { opacity: 0; } }
+@keyframes gt-home-mask { from { opacity: 0; transform: rotate(-24deg) translateY(-.1em); } }
+#view[data-enter="back"] .home-tool { animation: gt-home-rise var(--t-enter) var(--ease-out) backwards; }
+#view[data-enter="back"] .home-tool:nth-child(1) { animation-delay: var(--home-cards-at); }
+#view[data-enter="back"] .home-tool:nth-child(2) { animation-delay: calc(var(--home-cards-at) + var(--home-card-step)); }
+#view[data-enter="back"] .home-tool:nth-child(3) { animation-delay: calc(var(--home-cards-at) + var(--home-card-step) * 2); }
+#view[data-enter="back"] .home-tool:nth-child(4) { animation-delay: calc(var(--home-cards-at) + var(--home-card-step) * 3); }
+#view[data-enter="back"] .home-quick { animation: gt-home-rise var(--t-enter) var(--ease-out) calc(var(--home-cards-at) + var(--home-card-step) * 4) backwards; }
+#view[data-enter="back"] .home-meta { animation: gt-home-rise var(--t-enter) var(--ease-out) calc(var(--home-cards-at) + var(--home-card-step) * 5) backwards; }
+@keyframes gt-home-rise { from { opacity: 0; transform: translateY(12px); } }
+
+/* 本地加载通常一帧就好了，骨架屏只闪一下更难看：先不显示，150ms 还没好再淡进来 */
+
+@media (prefers-reduced-motion: reduce) {
+  #crumb .crumb-icon,
+  #crumb .crumb-title,
+  #crumb .sub,
+  #view[data-enter="forward"] .gt-feature-root > *,
+  #view[data-enter="forward"] .gt-feature-root > * > *,
+  #view[data-enter="back"] .welcome h1,
+  #view[data-enter="back"] .home-mask,
+  #view[data-enter="back"] .home-blade,
+  #view[data-enter="back"] .home-ask,
+  #view[data-enter="back"] .home-sky,
+  #view[data-enter="back"] .home-tool,
+  #view[data-enter="back"] .home-quick,
+  #view[data-enter="back"] .home-meta { animation: none; }
+}
+
+/* ---- 删除前的收起：先淡出/缩小 160ms，再让数据更新移除 ----
+ * 这里的 forwards 是故意的：收起后要保持隐藏到数据移除，不要闪回原样。 */
+.gt-leaving { pointer-events: none; animation: gt-leave var(--t-fast) var(--ease-out) forwards; }
+.gt-fade-out { pointer-events: none; animation: gt-fade-out var(--t-fast) var(--ease-out) forwards; }
+@keyframes gt-leave { to { opacity: 0; transform: scale(.97); } }
+@keyframes gt-fade-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .gt-leaving, .gt-fade-out { animation: none; opacity: 0; }
+}
+
+/* ---- 悬停抬升：可点的卡片浮起来 2px，告诉用户「这个能点」---- */
+.rs-chip, .rl-cell {
+  transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out), border-color var(--t-fast);
+}
+.rs-chip:hover, .rl-cell:hover { transform: translateY(-2px); box-shadow: var(--shadow-1); }
+.rs-chip:active, .rl-cell:active { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .rs-chip:hover, .rl-cell:hover, .rs-chip:active, .rl-cell:active { transform: none; }
+}
+
+/* ---- 空状态：图标 + 一句为什么空 + 一个下一步 ---- */
+.gt-empty { display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-10) var(--space-5); text-align: center; flex: none; }
+.gt-empty-icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: var(--space-1); border-radius: var(--r-full); background: var(--panel-2); color: var(--accent); }
+.gt-empty-icon svg { width: 24px; height: 24px; }
+.gt-empty-title { margin: 0; color: var(--text); font-size: var(--fs-lg); font-weight: var(--fw-bold); }
+.gt-empty-hint { margin: 0; max-width: 32em; color: var(--muted); font-size: var(--fs-md); line-height: var(--lh-body); }
+.gt-empty-action { margin-top: var(--space-3); }
+
+/* ---- 轻提示 toast：保存、删除、导出这类结果不再弹模态 ---- */
+
+/* ---- 按钮忙的时候：字隐掉，中间转一圈，别让用户以为没点动 ---- */
+.btn.is-loading, .ghost.is-loading { position: relative; color: transparent !important; pointer-events: none; }
+.btn.is-loading::after, .ghost.is-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 14px;
+  height: 14px;
+  margin: auto;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: gt-spin var(--t-spin) linear infinite;
+}
+@keyframes gt-spin { to { transform: rotate(360deg); } }
+/* 不在按钮里的转圈（「正在加载」那一行）：和按钮里的同一个动画；外面写 role="status" 和文字，转圈本身 aria-hidden。 */
+.spinner {
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  vertical-align: -3px;
+  animation: gt-spin var(--t-spin) linear infinite;
+}
+/* 减少动态效果：转慢，不停（停了就看不出还在加载）。 */
+@media (prefers-reduced-motion: reduce) { .btn.is-loading::after, .ghost.is-loading::after, .spinner { animation-duration: var(--t-spin-slow); } }
+
+

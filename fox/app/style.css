@@ -1,0 +1,316 @@
+/* 主题变量和基础样式。
+ * 主题变量（颜色、字号、间距、圆角、动效时长）都在下面的 :root 里定义，夜晚模式的值在 app/night.css 覆盖。
+ * 间距按 8px 网格；颜色、字体、圆角全部走这些变量，页面不写死。
+ * 样式按 index.html 的顺序加载（顺序就是层叠顺序），compact.css 必须最后。 */
+:root {
+  --bg: #fff6f9;
+  --panel: #fffdfd;
+  --panel-2: #fff1f5;
+  --border: #f2d9e2;
+  --text: #352237;
+  --muted: #75616f;
+  --accent: #d5336c;
+  --accent-2: #a95077;
+  --good: #007556;
+  --warn: #8f5a1a;
+  --bad: #b52f4b;
+  --info: #2b6896;
+  --gold: #a06a14;
+  --gold-ink: #8f5c12;
+  --std: #4a6fa5;
+  --std-ink: #3f6092;
+  --radius: 10px;
+  --mono: "Cascadia Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+  --sans: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
+  --base-size: 14px;
+  --line-height: 1.6;
+  --lh-tight: 1.15;
+  --lh-snug: 1.3;
+  --lh-body: 1.6;
+  --lh-dense: 1.45;
+  --lh-number: 1.1;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-heavy: 800;
+  --tracking-display: -.02em;
+  --tracking-tight: -.01em;
+  --tracking-normal: 0;
+  --tracking-label: .02em;
+  --tracking-caps: .08em;
+  --tracking-wide: .12em;
+  --measure: 68ch;
+  --sidebar-w: 250px;
+  --sidebar-w-narrow: 170px; /* 761~1099 宽时展开的侧栏（app/shell.css） */
+  /* 设计稿里的玫瑰色层次：强调文字、浅底、输入框描边 */
+  --accent-strong: color-mix(in srgb, var(--accent) 92%, #000);
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, #fff);
+  /* 实心按钮 / 选中态专用：白天跟 --accent 一致，夜晚换成深玫瑰，白字才够对比。
+   * 新加实心粉按钮只用这两个变量，不要再往 night.css 的名单里加选择器。 */
+  --accent-fill: #d5336c;
+  --on-accent-fill: #fff;
+  --on-bad: #fff;
+  --on-gold: #fff;
+  --on-std: #fff;
+  --btn-shadow: 0 4px 12px color-mix(in srgb, var(--accent-fill) 22%, transparent);
+  --field-bg: #fffefd;
+  /* 输入框、勾选框的边界：3:1，不能再用 --border 那种装饰线 */
+  --control-border: #9d7d8b;
+  --field-edge: var(--control-border);
+  --field-hover: #7f5b6d;
+  --placeholder: var(--muted);
+  --overlay: #38232f66;
+  --good-soft: color-mix(in srgb, var(--good) 12%, var(--panel));
+  --warn-soft: color-mix(in srgb, var(--warn) 12%, var(--panel));
+  --bad-soft: color-mix(in srgb, var(--bad) 12%, var(--panel));
+  --info-soft: color-mix(in srgb, var(--info) 12%, var(--panel));
+  --gold-soft: color-mix(in srgb, var(--gold) 14%, var(--panel));
+  --std-soft: color-mix(in srgb, var(--std) 14%, var(--panel));
+  /* 间距：4px 阶梯；旧的 --s1/--s2/--s3 已删，新代码只用 --space-*。 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --view-pad: var(--space-6);
+  --card-pad: var(--space-4);
+  --card-pad-lg: var(--space-6);
+  --card-pad-sm: var(--space-3);
+  --control-h: 40px;
+  --control-h-sm: 34px;
+  --control-h-xs: 28px;
+  --icon-sm: 16px;
+  --icon-md: 18px;
+  --icon-lg: 20px;
+  --icon-xl: 24px;
+  --focus: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent-strong);
+  /* 层级：从低到高。页面区 .view 不自成一层，页面里的 position: fixed 浮层和挂到 body 下的一样，
+   * 和外壳在同一层里比大小（以前 .view 带 z-index: 1，页面里的弹窗再高也压不过顶栏，遮罩盖不住顶栏和侧栏）。
+   * 页面平常的内容被 .view 的滚动区裁在里面，碰不到顶栏和侧栏，不用写层级。
+   * - 外壳：顶栏、侧栏、手机底部标签栏、专注显示的退出条
+   * - 页面浮层（可拖的面板、贴着按钮弹出的小窗、撤销条）：在 --z-shell 和 --z-modal 之间，页面自己写数（现在用 50～850）
+   * - 外壳自己的浮层：侧栏悬停展开和提示、顶栏搜索结果、手机「更多」面板和它的遮罩；打开时整块抬到这一层
+   * - 弹窗：带遮罩的都用这一档，遮罩盖住整个窗口（包括顶栏、侧栏）；叠在别的弹窗上的再往上加
+   * - toast、保存状态、更新提示：弹窗开着也看得到
+   * - 共享下拉菜单（弹窗里也会开）、浮动滚动条
+   * 对话框是 <dialog> showModal，在浏览器的最顶层，不用写层级。 */
+  --z-shell: 30;
+  --z-shell-pop: 200;
+  --z-modal: 900;
+  --z-toast: 2000;
+  --z-menu: 10000;
+
+  /* 七个属性色：角色页立绘光晕、编队页号位圆点和队伍条共用。白天夜晚同一套。 */
+  --el-physical: #cfd6e6;
+  --el-fire: #ff7a59;
+  --el-ice: #7fd3ff;
+  --el-thunder: #c9a2ff;
+  --el-wind: #7fe0c0;
+  --el-quantum: #9a7bff;
+  --el-imaginary: #ffd86b;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: var(--base-size)/var(--line-height) var(--sans);
+  /* 数据密集的工具：数字统一等宽，数值跳动时不会左右抖 */
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus { outline: none; }
+/* 表单控件也要有看得见的焦点：全局 :focus 去掉了 outline，下面统一补两层环。 */
+.input:focus-visible,
+select:not([multiple]):focus-visible,
+textarea:focus-visible,
+input:not([type]):focus-visible,
+input[type="text"]:focus-visible,
+input[type="search"]:focus-visible,
+input[type="number"]:focus-visible,
+input[type="date"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="password"]:focus-visible,
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible,
+input[type="color"]:focus-visible,
+input[type="range"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+select:not([multiple]) { appearance: none; padding-right: var(--space-8); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%2375616f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; cursor: pointer; }
+.gt-select-menu { position: fixed; z-index: var(--z-menu); overflow-y: auto; padding: 4px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface-float); color: var(--text); box-shadow: var(--shadow-2); font: var(--fs-md)/1.4 var(--sans); transform-origin: var(--gt-select-origin, top left); animation: gt-select-in var(--t-fast) var(--ease-out) backwards; }
+.gt-select-menu.is-closing { animation: gt-select-out var(--t-fast) ease forwards; pointer-events: none; }
+@keyframes gt-select-in { from { opacity: 0; transform: scale(.96); } }
+@keyframes gt-select-out { to { opacity: 0; transform: scale(.98); } }
+.gt-select-pill { position: absolute; top: 0; left: 4px; right: 4px; height: 30px; border-radius: var(--r-sm); background: var(--surface-active); opacity: 0; pointer-events: none; transition: transform var(--t-base) var(--ease-out), height var(--t-fast) ease, opacity var(--t-fast) ease; }
+.gt-select-menu [role="option"] { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 var(--space-2) 0 var(--space-2); border-radius: var(--r-sm); color: var(--text); font-size: var(--fs-md); font-weight: var(--fw-medium); cursor: pointer; }
+.gt-select-menu [role="option"]:hover, .gt-select-menu [role="option"].is-current { background: transparent; color: var(--text); }
+.gt-select-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-select-menu [role="option"][aria-selected="true"]::after { content: "✓"; flex: none; color: var(--accent-strong); font-size: var(--fs-xs); font-weight: 700; line-height: 1; }
+.gt-select-menu [aria-disabled="true"] { opacity: .45; cursor: default; }
+.gt-select-menu [aria-disabled="true"]:hover { color: var(--text); }
+.gt-select-menu.compact { padding: 4px; font-size: var(--fs-md); }
+.gt-select-menu.compact [role="option"] { min-height: 26px; padding: 0 8px; }
+.gt-select-group { padding: var(--space-2) var(--space-2) var(--space-1); color: var(--muted); font-size: var(--fs-sm); }
+@media (max-width: 760px), (pointer: coarse) {
+  .gt-select-menu [role="option"] { min-height: 40px; }
+  .gt-select-menu.compact [role="option"] { min-height: 34px; }
+}
+@media (prefers-reduced-motion: reduce) { .gt-select-menu, .gt-select-menu.is-closing { animation: none; } .gt-select-pill { transition: none; } }
+.gt-dialog { width: min(420px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--border); border-radius: var(--r-lg); color: var(--text); background: var(--panel); box-shadow: var(--shadow-3); font: 14px/1.6 var(--sans); }
+/* 弹窗别再瞬间出现：面板轻轻弹出来，遮罩淡入 */
+.gt-dialog[open] { animation: gt-dialog-in var(--t-base) var(--ease-spring); }
+.gt-dialog[open]::backdrop { animation: gt-fade-in var(--t-fast) ease-out; }
+@keyframes gt-dialog-in { from { opacity: 0; transform: translateY(6px) scale(.96); } }
+/* gt-fade-in（遮罩淡入）定义在 app/shell.css，和手机「更多」面板共用一份 */
+@media (prefers-reduced-motion: reduce) { .gt-dialog[open], .gt-dialog[open]::backdrop { animation: none; } }
+.gt-dialog::backdrop { background: var(--overlay); }
+.gt-dialog p { margin: 0 0 20px; white-space: pre-wrap; }
+.gt-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.gt-dialog-actions button { padding: var(--space-2) var(--space-4); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--panel); color: var(--text); cursor: pointer; font: inherit; }
+.gt-dialog-actions .gt-dialog-primary { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent-fill); font-weight: 700; }
+.gt-dialog-actions button:disabled { opacity: .5; cursor: not-allowed; }
+/* 导入存档选方式：两个选项，下面的清单跟着选项变 */
+.gt-dialog:has(.gt-import-choice) { width: min(480px, calc(100vw - 32px)); }
+.gt-dialog:has(.gt-import-choice) h2 { margin: 0 0 var(--space-1); font-size: var(--fs-2xl); }
+.gt-dialog:has(.gt-import-choice) > p { margin-bottom: var(--space-4); color: var(--muted); }
+.gt-import-choice { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); }
+.gt-import-modes { display: grid; gap: var(--space-2); }
+.gt-import-mode { display: flex; align-items: flex-start; gap: var(--space-3); min-height: 44px; padding: var(--space-3) var(--space-4); border: 1px solid var(--border); border-radius: var(--r-md); cursor: pointer; transition: border-color var(--t-fast) ease, background-color var(--t-fast) ease; }
+.gt-import-mode:hover { background: var(--surface-hover); }
+.gt-import-mode:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.gt-import-mode:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gt-import-mode input { margin-top: var(--space-1); }
+.gt-import-mode span { display: grid; gap: 2px; }
+.gt-import-mode small { color: var(--muted); font-size: var(--fs-md); }
+.gt-import-summary { max-height: min(40vh, 320px); overflow: auto; padding: var(--space-3) var(--space-4); border-radius: var(--r-md); background: var(--panel-2); font-size: var(--fs-md); }
+.gt-import-summary ul { margin: 0; padding-left: var(--space-5); }
+.gt-import-summary li + li { margin-top: var(--space-1); }
+.gt-dialog .gt-import-summary p { margin: var(--space-2) 0 0; }
+.gt-import-summary.is-warn p { color: var(--warn); font-weight: 600; }
+.gt-import-summary.is-error { border-left: 3px solid var(--bad); background: var(--bad-soft); }
+.gt-dialog .gt-import-summary.is-error p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .gt-import-mode { transition: none; } }
+/* 管理存档：每份一行，正在用的那行高亮；底下虚线框新建 */
+.gt-dialog:has(.gt-slots) { width: min(480px, calc(100vw - 32px)); }
+.gt-dialog:has(.gt-slots) h2 { margin: 0 0 var(--space-1); font-size: var(--fs-2xl); }
+.gt-dialog:has(.gt-slots) > p { margin-bottom: var(--space-4); color: var(--muted); }
+.gt-slots { display: grid; gap: var(--space-3); margin-bottom: var(--space-6); }
+.gt-slot-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.gt-slot { display: flex; align-items: center; gap: var(--space-3); min-height: 48px; padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); border: 1px solid var(--border); border-radius: var(--r-md); }
+.gt-slot.is-current { border-color: var(--accent); background: var(--accent-soft); }
+.gt-slot-main { display: flex; flex: 1; align-items: center; gap: var(--space-2); min-width: 0; }
+.gt-slot-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-slot-main input { flex: 1; min-width: 0; height: var(--control-h-sm); padding: 0 var(--space-2); border: 1px solid var(--field-edge); border-radius: var(--r-sm); background: var(--field-bg); color: var(--text); font: inherit; }
+.gt-slot-tag { flex: none; padding: 0 var(--space-2); border-radius: var(--r-full); background: var(--accent-fill); color: var(--on-accent-fill); font-size: var(--fs-xs); font-weight: 700; line-height: 20px; }
+.gt-slot-actions { display: flex; flex: none; gap: var(--space-1); }
+.gt-slot-action { min-height: 32px; padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--panel); color: var(--text); cursor: pointer; font: inherit; font-size: var(--fs-md); }
+.gt-slot-action:hover { background: var(--surface-hover); }
+.gt-slot-action.is-primary { border-color: var(--accent); color: var(--accent-strong); font-weight: 700; }
+.gt-slot-action.is-danger { color: color-mix(in srgb, var(--bad) 75%, var(--text)); }
+.gt-dialog .gt-slot-error { margin: 0; color: color-mix(in srgb, var(--bad) 75%, var(--text)); font-size: var(--fs-md); }
+.gt-dialog .gt-slot-error:empty { display: none; }
+.gt-slot-footer button { width: 100%; min-height: 40px; border: 1px dashed var(--border); border-radius: var(--r-md); background: none; color: var(--accent-strong); cursor: pointer; font: inherit; font-weight: 600; }
+.gt-slot-footer button:hover:not(:disabled) { background: var(--surface-hover); }
+.gt-slot-footer button:disabled { color: var(--muted); cursor: not-allowed; }
+@media (max-width: 760px) {
+  .gt-slot { flex-wrap: wrap; }
+  .gt-slot-action { min-height: 40px; }
+  .gt-slot-main input { font-size: var(--fs-xl); }
+}
+input[type="range"] { appearance: none; height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 22%, white); cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border: 2px solid var(--panel); border-radius: 50%; background: var(--accent); box-shadow: 0 1px 4px color-mix(in srgb, var(--text) 20%, transparent); }
+input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border: 2px solid var(--panel); border-radius: 50%; background: var(--accent); }
+input[type="checkbox"], input[type="radio"] { appearance: none; width: 16px; height: 16px; flex: none; margin: 0; border: 1px solid var(--field-edge); background: var(--field-bg); vertical-align: middle; cursor: pointer; }
+input[type="checkbox"] { border-radius: var(--r-sm); }
+input[type="radio"] { border-radius: 50%; }
+input[type="checkbox"]:checked { background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8 3 3 7-7' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/13px no-repeat; border-color: var(--accent); }
+input[type="radio"]:checked { border: 5px solid var(--accent); }
+input[type="checkbox"]:disabled, input[type="radio"]:disabled { opacity: .45; cursor: default; }
+input[type="color"] { padding: var(--space-1); border: 1px solid var(--field-edge); border-radius: var(--r-sm); background: var(--field-bg); cursor: pointer; }
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: 0; border-radius: var(--r-sm); }
+/* 全站滚动条：原生滚动条全部藏起来，在滚的区域由 app/scrollbars.js 浮一条滑块。
+   不要在页面里再给某个区域写 scrollbar-width / ::-webkit-scrollbar，否则那里又会占宽度、样子也不统一。 */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.gt-scrollthumb { position: fixed; z-index: calc(var(--z-menu) + 50); width: 8px; height: 8px; border-radius: 999px; opacity: 0; pointer-events: none; cursor: default; transition: opacity var(--t-slow) ease; }
+.gt-scrollthumb::before { content: ""; position: absolute; border-radius: inherit; background: color-mix(in srgb, var(--accent) 62%, transparent); transition: inset var(--t-fast) ease, background-color var(--t-fast) ease; }
+.gt-scrollthumb.is-y::before { inset: 0 2px 0 var(--space-1); }
+.gt-scrollthumb.is-x::before { inset: var(--space-1) 0 2px 0; }
+.gt-scrollthumb.is-on { opacity: 1; pointer-events: auto; transition-duration: calc(var(--t-fast) / 2); }
+.gt-scrollthumb:hover::before, .gt-scrollthumb.is-drag::before { inset: 0; background: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .gt-scrollthumb, .gt-scrollthumb::before { transition: none; } }
+
+#app { display: flex; height: 100vh; background-color: var(--bg); background-image: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent) 4%, transparent) 0, transparent 42%); }
+
+/* 字号档位：普通界面只用这几档，以后整体调大小只改这里。
+ * 游戏同款面板（.cpanel-*）另有一套更小的字，是照游戏界面还原的，不走这些变量。 */
+:root {
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-base: 14px;
+  --fs-lg: 15px;
+  --fs-xl: 16px;
+  --fs-2xl: 18px;
+  --fs-3xl: 20px;
+  --fs-4xl: 24px;
+  --fs-5xl: 32px;
+  /* 页面宽度和间距：所有页面同一个基准宽，换页时左右留白不变；
+   * 画布页要更宽靠页内栅格分配，不整页拉宽，免得留白忽宽忽窄。 */
+  --w-page: 1400px;
+  --gap-section: var(--space-6);
+  --gap-card: var(--space-4);
+  --gap-card-dense: var(--space-3);
+  --gap-section-lg: var(--space-8);
+  --gap-inline: var(--space-2);
+  --gap-inline-sm: var(--space-1);
+  /* 圆角、阴影、动效时长：全站只用这几档 */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-full: 999px;
+  --shadow-2: 0 12px 30px #70405c24;
+  --shadow-3: 0 20px 60px #55344533;
+  /* 悬停抬升用的一层很淡的阴影 */
+  --shadow-1: 0 2px 10px #5534451f;
+  /* 侧栏悬停展开时浮在内容上：一层贴边的玫瑰色短影 + 一层很淡的远影，不用一大片灰影 */
+  --sidebar-float-shadow: 1px 0 0 #e7c3d1, 6px 0 14px -6px #c2457a2e, 22px 0 44px -18px #5534452e;
+  /* 收起 / 弹出用：先冲过头一点再回来 */
+  --ease-out: cubic-bezier(.2, .9, .3, 1);
+  --ease-spring: cubic-bezier(.34, 1.45, .64, 1);
+  /* 离场用：越走越快，尾巴不拖 */
+  --ease-in: cubic-bezier(.4, 0, 1, 1);
+  /* 语义色：交界线、悬停底、选中底、浮层底，浅色夜晚各定义一次，
+   * 组件里不再逐条写死，也不用在 night.css 里一个个覆盖。 */
+  --line-soft: #f1e1e7;
+  --surface-hover: #fbe9f0;
+  --surface-active: #f9dfe9;
+  --surface-float: #fffafd;
+  --t-fast: 140ms;
+  --t-base: 200ms;
+  --t-slow: 260ms;
+  --t-enter: 320ms;
+  /* 不属于上面四档的演出参数：一组东西依次出现时每个晚多少、转圈一圈、
+   * 减少动态效果时的慢转圈、骨架屏闪一次。 */
+  --t-stagger: 30ms;
+  --t-spin: .8s;
+  --t-spin-slow: 2s;
+  --t-shimmer: 1.4s;
+}
