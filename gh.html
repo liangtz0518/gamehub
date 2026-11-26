@@ -620,6 +620,47 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
   .announce { max-width: 150px; }
   .clock, .warm-mini-num { display: none; }
 }
+
+/* ---------- 主题切换：Dog / fox ---------- */
+.gh-theme-switch { position: relative; }
+.gh-ts-btn {
+  width: 29px; height: 29px;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+  color: #4f46e5;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.gh-ts-btn:hover { border-color: #818cf8; background: #eef2ff; box-shadow: 0 3px 10px rgba(79,70,229,.12); }
+.gh-ts-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,.22); }
+.gh-ts-btn svg { width: 17px; height: 17px; flex: none; }
+.gh-ts-menu {
+  position: absolute; top: calc(100% + 9px); right: 0; z-index: 120;
+  width: 186px; padding: 7px;
+  border: 1px solid #e3e8f0; border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(30,41,59,.16), 0 2px 6px rgba(30,41,59,.06);
+  opacity: 0; transform: translateY(-6px) scale(.98); pointer-events: none;
+  transition: opacity .16s ease, transform .18s cubic-bezier(.34,1.3,.64,1);
+}
+.gh-theme-switch.open .gh-ts-menu { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.gh-ts-title { padding: 5px 9px 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .8px; color: #94a3b8; }
+.gh-ts-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 9px; border-radius: 8px;
+  color: var(--text); text-decoration: none;
+  font-size: 12px; font-weight: 650;
+  transition: background .15s ease, color .15s ease;
+}
+.gh-ts-item:hover { background: var(--accent-soft); color: var(--accent); }
+.gh-ts-item.is-current { background: #eef2ff; color: #4f46e5; }
+.gh-ts-item svg { width: 17px; height: 17px; flex: none; }
+.gh-ts-name { flex: 1; }
+.gh-ts-check { font-size: 11px; font-weight: 800; opacity: 0; }
+.gh-ts-item.is-current .gh-ts-check { opacity: 1; }
 </style>
 </head>
 <body>
@@ -665,6 +706,23 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
       <button class="top-btn icon-only" id="toggleSideBtn" title="收起侧栏">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
       </button>
+
+      <div class="gh-theme-switch" id="ghThemeSwitch">
+        <button class="gh-ts-btn" id="ghThemeSwitchBtn" type="button" title="切换主题网站" aria-label="切换主题" aria-haspopup="true" aria-expanded="false" aria-controls="ghThemeSwitchMenu">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="7" cy="9" rx="2" ry="2.6"></ellipse><ellipse cx="12" cy="6.6" rx="2" ry="2.8"></ellipse><ellipse cx="17" cy="9" rx="2" ry="2.6"></ellipse><ellipse cx="20" cy="13.5" rx="1.5" ry="2"></ellipse><path d="M12 11.5c3.1 0 6.4 2.6 6.4 5.2 0 1.8-1.4 3-3.2 3-1 0-1.8-.5-3.2-.5s-2.2.5-3.2.5c-1.8 0-3.2-1.2-3.2-3 0-2.6 3.3-5.2 6.4-5.2Z"></path></svg>
+        </button>
+        <div class="gh-ts-menu" id="ghThemeSwitchMenu" role="menu" aria-label="选择主题">
+          <div class="gh-ts-title">选择主题</div>
+          <a class="gh-ts-item is-current" role="menuitem" href="https://liangtz0518.github.io/gamehub/gh.html" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="7" cy="9" rx="2" ry="2.6"/><ellipse cx="12" cy="6.6" rx="2" ry="2.8"/><ellipse cx="17" cy="9" rx="2" ry="2.6"/><ellipse cx="20" cy="13.5" rx="1.5" ry="2"/><path d="M12 11.5c3.1 0 6.4 2.6 6.4 5.2 0 1.8-1.4 3-3.2 3-1 0-1.8-.5-3.2-.5s-2.2.5-3.2.5c-1.8 0-3.2-1.2-3.2-3 0-2.6 3.3-5.2 6.4-5.2Z"/></svg>
+            <span class="gh-ts-name">Dog</span><span class="gh-ts-check">✓</span>
+          </a>
+          <a class="gh-ts-item" role="menuitem" href="https://liangtz0518.github.io/gamehub/fox/gh.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.5 8.6 8.2A8.4 8.4 0 0 1 12 7.4c1.2 0 2.4.3 3.4.8L20 4.5l-.7 6.1a8 8 0 1 1-14.6 0Z" fill="currentColor" fill-opacity=".12"/><path d="M9 13h.01M15 13h.01" stroke-width="2.2"/><path d="m10.8 16.2 1.2 1 1.2-1"/></svg>
+            <span class="gh-ts-name">fox</span><span class="gh-ts-check">✓</span>
+          </a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -706,7 +764,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 // ===== 公告区文字：在这里修改你想要的文案（多条用 | 分隔）=====
 const ANNOUNCEMENT_TEXT = '记得写周报，记得写周报，记得写周报，要加道具GS内部群喊一声';
 
-const HUB_VERSION = '1';
+const HUB_VERSION = '2';
 const VERSION_CHECK_URL = 'https://liangtz0518.github.io/gamehub/version.json';
 const VERSION_CHECK_INTERVAL = 10000;
 
@@ -1537,6 +1595,29 @@ if (allItems.length > 0) {
 }
 setInterval(checkVersion, VERSION_CHECK_INTERVAL);
 setTimeout(checkVersion, 5000);
+</script>
+<script>
+(function () {
+  var wrap = document.getElementById('ghThemeSwitch');
+  var btn = document.getElementById('ghThemeSwitchBtn');
+  if (!wrap || !btn) return;
+  function closeMenu() {
+    wrap.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+  btn.addEventListener('click', function (event) {
+    event.stopPropagation();
+    var open = !wrap.classList.contains('open');
+    wrap.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', function (event) {
+    if (!wrap.contains(event.target)) closeMenu();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeMenu();
+  });
+})();
 </script>
 </body>
 </html>
