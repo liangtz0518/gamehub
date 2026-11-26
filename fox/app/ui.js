@@ -7,7 +7,7 @@
   const app = $("#app");
 
   /* ---------- 导航数据：链接聚合站（分类 = 侧栏分组，功能 = 网站链接） ---------- */
-  const HUB_VERSION = "1";
+  const HUB_VERSION = "2";
   function buildFrameUrl(url) {
     const sep = url.includes("?") ? "&" : "?";
     return url + sep + "hub_v=" + HUB_VERSION;
