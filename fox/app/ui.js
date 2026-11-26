@@ -784,16 +784,16 @@
   $("#home-button")?.addEventListener("click", openHome);
   $("#home-sheet-button")?.addEventListener("click", openHome);
   /* ---------- 问题反馈（占位，后续再决定内容） ---------- */
-  $("#feedback-button")?.addEventListener("click", () => showDialog("问题反馈", '<p style="margin:0;color:var(--muted);line-height:1.7">这里先留作占位，后续再决定放什么内容。</p>'));
+  $("#feedback-button")?.addEventListener("click", () => showDialog("问题反馈", '<p style="margin:0;color:var(--muted);line-height:1.7">本来想放个微信的，嫌麻烦就不放了，有什么问题直接喊</p>'));
   /* ---------- 首页占位按钮（节点会随页面切换重建，用事件委托） ---------- */
-  const placeholderTip = (title) => showDialog(title, '<p style="margin:0;color:var(--muted);line-height:1.7">这里先留作占位，后续再决定放什么内容。</p>');
+  const placeholderTip = (title) => showDialog(title, '<p style="margin:0;color:var(--muted);line-height:1.7">你小子这么闲？</p>');
   document.addEventListener("click", (e) => {
     const guideBtn = e.target.closest(".home-quick-btn[data-guide]");
-    if (guideBtn) { e.preventDefault(); placeholderTip("使用引导"); return; }
+    if (guideBtn) { e.preventDefault(); placeholderTip("别乱点"); return; }
     const newsBtn = e.target.closest(".home-quick-btn[data-whats-new]");
-    if (newsBtn) { e.preventDefault(); placeholderTip("更新内容"); return; }
+    if (newsBtn) { e.preventDefault(); placeholderTip("别乱点"); return; }
     const legalLink = e.target.closest(".home-legal a");
-    if (legalLink) { e.preventDefault(); placeholderTip("版权与免责声明"); }
+    if (legalLink) { e.preventDefault(); placeholderTip("别乱点"); }
   });
 
   /* ---------- 更新横幅：立即更新刷新加载新版本，稍后仅关闭本次提示 ---------- */
