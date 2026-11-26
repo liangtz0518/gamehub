@@ -7,19 +7,16 @@
   const app = $("#app");
 
   /* ---------- 导航数据：链接聚合站（分类 = 侧栏分组，功能 = 网站链接） ---------- */
-  const VERSION_ACK_KEY = "gamehub-seen-version";
-  let hubVersion = "";
-  try { hubVersion = localStorage.getItem(VERSION_ACK_KEY) || ""; } catch (e) {}
+  const HUB_VERSION = "1";
   function buildFrameUrl(url) {
     const sep = url.includes("?") ? "&" : "?";
-    return url + sep + "hub_v=" + encodeURIComponent(hubVersion);
+    return url + sep + "hub_v=" + HUB_VERSION;
   }
 
-  /* ---------- 版本检测：只以 version.json 为准，用户确认过的版本记在 localStorage ---------- */
+  /* ---------- 版本检测：远程版本号与本地不一致时提示刷新 ---------- */
   const VERSION_CHECK_URL = "https://liangtz0518.github.io/gamehub/version.json";
   const VERSION_CHECK_INTERVAL = 10000;
   let versionUpdateDetected = false;
-  let detectedVersion = "";
 
   async function checkVersion() {
     if (versionUpdateDetected) return;
@@ -28,15 +25,8 @@
       if (!resp.ok) return;
       const data = await resp.json();
       const remoteVersion = String(data.version || "");
-      if (!remoteVersion) return;
-
-      hubVersion = remoteVersion;
-      let seen = "";
-      try { seen = localStorage.getItem(VERSION_ACK_KEY) || ""; } catch (e) {}
-
-      if (seen !== remoteVersion) {
+      if (remoteVersion && remoteVersion !== HUB_VERSION) {
         versionUpdateDetected = true;
-        detectedVersion = remoteVersion;
         const banner = $("#update-banner");
         if (banner) banner.hidden = false;
       }
@@ -806,13 +796,8 @@
     if (legalLink) { e.preventDefault(); placeholderTip("别乱点"); }
   });
 
-  /* ---------- 更新横幅：立即更新记住当前远程版本，之后同版本不再提示 ---------- */
-  $("#update-now")?.addEventListener("click", () => {
-    if (detectedVersion) {
-      try { localStorage.setItem(VERSION_ACK_KEY, detectedVersion); } catch (e) {}
-    }
-    location.reload();
-  });
+  /* ---------- 更新横幅：立即更新刷新加载新版本，稍后仅关闭本次提示 ---------- */
+  $("#update-now")?.addEventListener("click", () => location.reload());
   $("#update-later")?.addEventListener("click", () => {
     const banner = $("#update-banner");
     if (banner) banner.hidden = true;
