@@ -16,7 +16,7 @@
   }
 
   /* ---------- 版本检测：只以 version.json 为准，用户确认过的版本记在 localStorage ---------- */
-  const VERSION_CHECK_URL = "https://liangtz0518.github.io/gamehub/version.json";
+  const VERSION_CHECK_URL = "https://liangtz0518.github.io/gamehub/GameHub/version.json";
   const VERSION_CHECK_INTERVAL = 10000;
   let versionUpdateDetected = false;
   let detectedVersion = "";
@@ -47,26 +47,26 @@
       {
         id: "xyss", name: "逍遥蜀山", version: "", color: "#10b981", collapsed: true,
         features: [
-          { id: "xyss-mail", name: "蜀山邮件", url: "https://liangtz0518.github.io/gamehub/xyss.html", description: "逍遥蜀山邮件工具" },
-          { id: "xyss-score", name: "蜀山算分", url: "https://liangtz0518.github.io/gamehub/xyss1.html", description: "逍遥蜀山算分工具" },
+          { id: "xyss-mail", name: "蜀山邮件", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/xyss.html", description: "逍遥蜀山邮件工具" },
+          { id: "xyss-score", name: "蜀山算分", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/xyss1.html", description: "逍遥蜀山算分工具" },
         ],
       },
       {
         id: "ddzf", name: "大道争锋", version: "", color: "#f5b50a", collapsed: false,
         features: [
-          { id: "ddzf-mail", name: "大道邮件", url: "https://liangtz0518.github.io/gamehub/ddzf.html", description: "大道争锋邮件工具" },
+          { id: "ddzf-mail", name: "大道邮件", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/ddzf.html", description: "大道争锋邮件工具" },
         ],
       },
       {
         id: "fmj", name: "伏魔诀", version: "", color: "#6366f1", collapsed: true,
         features: [
-          { id: "fmj-mail", name: "伏魔邮件", url: "https://liangtz0518.github.io/gamehub/fmj.html", description: "伏魔诀邮件工具" },
+          { id: "fmj-mail", name: "伏魔邮件", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/fmj.html", description: "伏魔诀邮件工具" },
         ],
       },
       {
         id: "sgqg", name: "上古情歌", version: "", color: "#f43f5e", collapsed: true,
         features: [
-          { id: "sgqg-mail", name: "上古邮件", url: "https://liangtz0518.github.io/gamehub/sgqg.html", description: "上古情歌邮件工具" },
+          { id: "sgqg-mail", name: "上古邮件", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/sgqg.html", description: "上古情歌邮件工具" },
         ],
       },
       {
@@ -83,7 +83,7 @@
       {
         id: "vip", name: "VIP", version: "", color: "#a855f7", collapsed: false,
         features: [
-          { id: "vip-plan", name: "方案生成", url: "https://liangtz0518.github.io/gamehub/fasc.htm", description: "VIP 方案生成" },
+          { id: "vip-plan", name: "方案生成", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/fasc.htm", description: "VIP 方案生成" },
           { id: "vip-code", name: "礼包码", url: "https://www.kdocs.cn/l/co9KayfzTswb", description: "礼包码" },
           { id: "vip-transfer", name: "转游方案", url: "https://www.kdocs.cn/l/chj77gtoWp3C", description: "转游方案" },
           { id: "vip-service", name: "客服工具表", url: "https://www.kdocs.cn/l/cpMDT20C5kEu", description: "客服工具表" },
@@ -92,9 +92,9 @@
       {
         id: "ops", name: "运营", version: "", color: "#0ea5e9", collapsed: false,
         features: [
-          { id: "ops-shushan", name: "蜀山跨服", url: "https://liangtz0518.github.io/gamehub/hf.html", description: "蜀山跨服" },
-          { id: "ops-dadao", name: "大道跨服", url: "https://liangtz0518.github.io/gamehub/hf-ddzf.html", description: "大道跨服" },
-          { id: "ops-chat", name: "聊天速查", url: "https://liangtz0518.github.io/gamehub/GSLT.html", description: "聊天速查" },
+          { id: "ops-shushan", name: "蜀山跨服", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/hf.html", description: "蜀山跨服" },
+          { id: "ops-dadao", name: "大道跨服", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/hf-ddzf.html", description: "大道跨服" },
+          { id: "ops-chat", name: "聊天速查", url: "https://liangtz0518.github.io/gamehub/GameHub/ylurl/GSLT.html", description: "聊天速查" },
         ],
       },
     ],

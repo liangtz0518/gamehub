@@ -215,8 +215,8 @@ iframe[hidden] { display: none; }
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.6-3.2 1.8 1.8 0 0 1 1.5-2.8H18a3 3 0 0 0 3-3A9 9 0 0 0 12 3Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="15" cy="8" r="1"/></svg>
     </button>
     <div class="menu" id="themeMenu">
-      <a href="https://liangtz0518.github.io/gamehub/gh.html">Dog</a>
-      <a href="https://liangtz0518.github.io/gamehub/fox/gh.html">Fox</a>
+      <a href="https://liangtz0518.github.io/gamehub/GameHub/doggh.html">Dog</a>
+      <a href="https://liangtz0518.github.io/gamehub/GameHub/fox/foxgh.html">Fox</a>
       <span class="cur" aria-current="page">Lite</span>
     </div>
   </main>
@@ -228,17 +228,17 @@ iframe[hidden] { display: none; }
 
   const GROUPS = [
     ["逍遥蜀山", [
-      ["蜀山邮件", "https://liangtz0518.github.io/gamehub/xyss.html"],
-      ["蜀山算分", "https://liangtz0518.github.io/gamehub/xyss1.html"]
+      ["蜀山邮件", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/xyss.html"],
+      ["蜀山算分", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/xyss1.html"]
     ]],
     ["大道争锋", [
-      ["大道邮件", "https://liangtz0518.github.io/gamehub/ddzf.html"]
+      ["大道邮件", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/ddzf.html"]
     ]],
     ["伏魔诀", [
-      ["伏魔邮件", "https://liangtz0518.github.io/gamehub/fmj.html"]
+      ["伏魔邮件", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/fmj.html"]
     ]],
     ["上古情歌", [
-      ["上古邮件", "https://liangtz0518.github.io/gamehub/sgqg.html"]
+      ["上古邮件", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/sgqg.html"]
     ]],
     ["其他", [
       ["GS工具表", "https://www.kdocs.cn/l/coLhd7ebUx09"],
@@ -249,15 +249,15 @@ iframe[hidden] { display: none; }
       ["GS方案参考", "https://www.kdocs.cn/l/cm5oqo4BX4cv"]
     ]],
     ["VIP", [
-      ["方案生成", "https://liangtz0518.github.io/gamehub/fasc.htm"],
+      ["方案生成", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/fasc.htm"],
       ["礼包码", "https://www.kdocs.cn/l/co9KayfzTswb"],
       ["转游方案", "https://www.kdocs.cn/l/chj77gtoWp3C"],
       ["客服工具表", "https://www.kdocs.cn/l/cpMDT20C5kEu"]
     ]],
     ["运营", [
-      ["蜀山跨服", "https://liangtz0518.github.io/gamehub/hf.html"],
-      ["大道跨服", "https://liangtz0518.github.io/gamehub/hf-ddzf.html"],
-      ["聊天速查", "https://liangtz0518.github.io/gamehub/GSLT.html"]
+      ["蜀山跨服", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/hf.html"],
+      ["大道跨服", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/hf-ddzf.html"],
+      ["聊天速查", "https://liangtz0518.github.io/gamehub/GameHub/ylurl/GSLT.html"]
     ]]
   ];
 
@@ -353,7 +353,7 @@ iframe[hidden] { display: none; }
     }
   });
 
-  const VERSION_URL = "https://liangtz0518.github.io/gamehub/version.json";
+  const VERSION_URL = "https://liangtz0518.github.io/gamehub/GameHub/version.json";
   const ACK_KEY = "gamehub-seen-version";
   const updateModal = document.getElementById("updateModal");
   fetch(VERSION_URL + "?t=" + Date.now(), { cache: "no-store" })
