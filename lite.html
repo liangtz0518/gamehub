@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameHub Lite</title>
+<style>
+:root {
+  --bg: #fff;
+  --side: #f7f7f8;
+  --line: #e8e8eb;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --hover: #f0f0f2;
+  --active: #e9e9ee;
+  --accent: #2f6fed;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { display: flex; height: 100vh; }
+aside {
+  flex: none;
+  width: 248px;
+  overflow: auto;
+  background: var(--side);
+  border-right: 1px solid var(--line);
+}
+.brand {
+  padding: 18px 16px 15px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -.015em;
+}
+nav { display: flex; flex-direction: column; gap: 16px; padding: 16px 10px 28px; }
+.cat {
+  display: flex;
+  align-items: center;
+  padding: 0 12px 6px;
+  color: #8a8a8f;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  cursor: default;
+  user-select: none;
+}
+.cat::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--dot, #c7c7cc);
+  flex: none;
+}
+.item {
+  display: block;
+  width: calc(100% - 12px);
+  margin: 1px 0 1px 12px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.item:hover { background: var(--hover); }
+.item.on { background: var(--active); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
+main { position: relative; flex: 1; min-width: 0; }
+iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+iframe[hidden] { display: none; }
+.theme {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .94);
+  color: var(--muted);
+  cursor: pointer;
+}
+.theme:hover { color: var(--text); border-color: #d2d2d6; }
+.update {
+  position: absolute;
+  top: 12px;
+  right: 48px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #cbd8ff;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .94);
+  color: var(--accent);
+  cursor: pointer;
+}
+.update[hidden] { display: none; }
+.update::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px #fff;
+}
+.update:hover { border-color: var(--accent); background: #f5f8ff; }
+.menu {
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  z-index: 3;
+  display: none;
+  width: 120px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+}
+.menu.open { display: block; }
+.menu a {
+  display: block;
+  padding: 7px 9px;
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 12px;
+  text-decoration: none;
+}
+.menu a:hover { background: var(--hover); }
+.menu .cur {
+  display: block;
+  padding: 7px 9px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.menu .cur::after { content: "✓"; float: right; color: var(--accent); }
+@media (max-width: 640px) {
+  aside { width: 200px; }
+  .brand { padding-left: 14px; }
+  nav { padding-left: 8px; padding-right: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">GameHub Lite</div>
+    <nav id="nav"></nav>
+  </aside>
+  <main>
+    <iframe id="frame" title="网站内容" hidden></iframe>
+    <button class="update" id="updateBtn" type="button" title="更新" aria-label="更新" hidden>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>
+    </button>
+    <button class="theme" id="themeBtn" type="button" title="切换主题" aria-label="切换主题" aria-haspopup="true" aria-expanded="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="2"/><path d="M9 20h9a2 2 0 0 0 2-2V9"/></svg>
+    </button>
+    <div class="menu" id="themeMenu">
+      <a href="https://liangtz0518.github.io/gamehub/gh.html">Dog</a>
+      <a href="https://liangtz0518.github.io/gamehub/fox/gh.html">fox</a>
+      <span class="cur" aria-current="page">Lite</span>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const GROUPS = [
+    ["逍遥蜀山", [
+      ["蜀山邮件", "https://liangtz0518.github.io/gamehub/xyss.html"],
+      ["蜀山算分", "https://liangtz0518.github.io/gamehub/xyss1.html"]
+    ]],
+    ["大道争锋", [
+      ["大道邮件", "https://liangtz0518.github.io/gamehub/ddzf.html"]
+    ]],
+    ["伏魔诀", [
+      ["伏魔邮件", "https://liangtz0518.github.io/gamehub/fmj.html"]
+    ]],
+    ["上古情歌", [
+      ["上古邮件", "https://liangtz0518.github.io/gamehub/sgqg.html"]
+    ]],
+    ["其他", [
+      ["GS工具表", "https://www.kdocs.cn/l/coLhd7ebUx09"],
+      ["GS登记表", "https://www.kdocs.cn/l/cey47f36Zyvx"],
+      ["GS周报", "https://www.kdocs.cn/l/csaM7qfQtaa9"],
+      ["GS部门培训教程", "https://www.kdocs.cn/l/cvX5dg1QecZ1"],
+      ["逍遥蜀山攻略", "https://www.kdocs.cn/l/cuSD0UKMPjph?from=docs&startTime=1782893050692&createDirect=true&newFile=true"],
+      ["GS方案参考", "https://www.kdocs.cn/l/cm5oqo4BX4cv"]
+    ]],
+    ["VIP", [
+      ["方案生成", "https://liangtz0518.github.io/gamehub/fasc.htm"],
+      ["礼包码", "https://www.kdocs.cn/l/co9KayfzTswb"],
+      ["转游方案", "https://www.kdocs.cn/l/chj77gtoWp3C"],
+      ["客服工具表", "https://www.kdocs.cn/l/cpMDT20C5kEu"]
+    ]],
+    ["运营", [
+      ["蜀山跨服", "https://liangtz0518.github.io/gamehub/hf.html"],
+      ["大道跨服", "https://liangtz0518.github.io/gamehub/hf-ddzf.html"],
+      ["聊天速查", "https://liangtz0518.github.io/gamehub/GSLT.html"]
+    ]]
+  ];
+
+  const COLORS = ["#10b981", "#f5b50a", "#6366f1", "#f43f5e", "#64748b", "#a855f7", "#0ea5e9"];
+
+  const nav = document.getElementById("nav");
+  const frame = document.getElementById("frame");
+  const buttons = [];
+
+  GROUPS.forEach(function (group, gi) {
+    const label = document.createElement("div");
+    label.className = "cat";
+    label.textContent = group[0];
+    label.style.setProperty("--dot", COLORS[gi]);
+    nav.appendChild(label);
+
+    group[1].forEach(function (site, ii) {
+      const button = document.createElement("button");
+      button.className = "item";
+      button.type = "button";
+      button.textContent = site[0];
+      button.addEventListener("click", function () { open(gi, ii); });
+      nav.appendChild(button);
+      buttons.push(button);
+    });
+  });
+
+  function open(gi, ii) {
+    const group = GROUPS[gi];
+    if (!group || !group[1][ii]) return;
+    const key = gi + "-" + ii;
+    buttons.forEach(function (button) {
+      button.classList.toggle("on", button.dataset.key === key);
+    });
+    frame.src = group[1][ii][1];
+    frame.hidden = false;
+    if (location.hash.slice(1) !== key) location.hash = key;
+  }
+
+  buttons.forEach(function (button, i) {
+    let n = 0;
+    for (let gi = 0; gi < GROUPS.length; gi++) {
+      const count = GROUPS[gi][1].length;
+      if (i < n + count) {
+        button.dataset.key = gi + "-" + (i - n);
+        break;
+      }
+      n += count;
+    }
+  });
+
+  const initial = /^(\d+)-(\d+)$/.exec(location.hash.slice(1));
+  if (initial && GROUPS[+initial[1]] && GROUPS[+initial[1]][1][+initial[2]]) {
+    open(+initial[1], +initial[2]);
+  }
+
+  const themeBtn = document.getElementById("themeBtn");
+  const themeMenu = document.getElementById("themeMenu");
+  themeBtn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    const open = !themeMenu.classList.contains("open");
+    themeMenu.classList.toggle("open", open);
+    themeBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  document.addEventListener("click", function (event) {
+    if (!themeMenu.contains(event.target) && event.target !== themeBtn) {
+      themeMenu.classList.remove("open");
+      themeBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      themeMenu.classList.remove("open");
+      themeBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  const VERSION_URL = "https://liangtz0518.github.io/gamehub/version.json";
+  const ACK_KEY = "gamehub-seen-version";
+  const updateBtn = document.getElementById("updateBtn");
+  fetch(VERSION_URL + "?t=" + Date.now(), { cache: "no-store" })
+    .then(function (resp) { return resp.ok ? resp.json() : null; })
+    .then(function (data) {
+      const version = String((data && data.version) || "");
+      if (!version) return;
+      let seen = "";
+      try { seen = localStorage.getItem(ACK_KEY) || ""; } catch (e) {}
+      if (seen === version) return;
+      updateBtn.hidden = false;
+      updateBtn.addEventListener("click", function () {
+        try { localStorage.setItem(ACK_KEY, version); } catch (e) {}
+        location.reload();
+      });
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>
