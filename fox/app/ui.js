@@ -37,26 +37,26 @@
       {
         id: "xyss", name: "逍遥蜀山", version: "", color: "#10b981", collapsed: true,
         features: [
-          { id: "xyss-mail", name: "邮件", url: "https://liangtz0518.github.io/gamehub/xyss.html", description: "逍遥蜀山邮件工具" },
-          { id: "xyss-score", name: "算分", url: "https://liangtz0518.github.io/gamehub/xyss1.html", description: "逍遥蜀山算分工具" },
+          { id: "xyss-mail", name: "蜀山邮件", url: "https://liangtz0518.github.io/gamehub/xyss.html", description: "逍遥蜀山邮件工具" },
+          { id: "xyss-score", name: "蜀山算分", url: "https://liangtz0518.github.io/gamehub/xyss1.html", description: "逍遥蜀山算分工具" },
         ],
       },
       {
         id: "ddzf", name: "大道争锋", version: "", color: "#f5b50a", collapsed: false,
         features: [
-          { id: "ddzf-mail", name: "邮件", url: "https://liangtz0518.github.io/gamehub/ddzf.html", description: "大道争锋邮件工具" },
+          { id: "ddzf-mail", name: "大道邮件", url: "https://liangtz0518.github.io/gamehub/ddzf.html", description: "大道争锋邮件工具" },
         ],
       },
       {
         id: "fmj", name: "伏魔诀", version: "", color: "#6366f1", collapsed: true,
         features: [
-          { id: "fmj-mail", name: "邮件", url: "https://liangtz0518.github.io/gamehub/fmj.html", description: "伏魔诀邮件工具" },
+          { id: "fmj-mail", name: "伏魔邮件", url: "https://liangtz0518.github.io/gamehub/fmj.html", description: "伏魔诀邮件工具" },
         ],
       },
       {
         id: "sgqg", name: "上古情歌", version: "", color: "#f43f5e", collapsed: true,
         features: [
-          { id: "sgqg-mail", name: "邮件", url: "https://liangtz0518.github.io/gamehub/sgqg.html", description: "上古情歌邮件工具" },
+          { id: "sgqg-mail", name: "上古邮件", url: "https://liangtz0518.github.io/gamehub/sgqg.html", description: "上古情歌邮件工具" },
         ],
       },
       {
@@ -720,7 +720,7 @@
     setEnterDirection("back");
     view.innerHTML = welcomeMarkup;
     renderHomeTools();
-    document.title = "链接聚合站";
+    document.title = "GameHub";
     setNavActive();
     mountSky();
     view.scrollTop = 0;
@@ -740,7 +740,7 @@
     view.innerHTML = `<div class="gt-feature-root hub-stage">
       <iframe class="hub-frame" src="${escapeHtml(currentUrl)}" title="${escapeHtml(feature.name)}" allow="clipboard-read; clipboard-write" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>`;
-    document.title = `${feature.name} · 链接聚合站`;
+    document.title = `${feature.name} · GameHub`;
     if (openWindowBtn) { openWindowBtn.disabled = false; openWindowBtn.title = `在新窗口打开：${feature.name}`; }
     // 打开网站时自动展开所属分类，让选中项可见。
     const moduleBox = nav.querySelector(`[data-module-id="${moduleId}"]`);
