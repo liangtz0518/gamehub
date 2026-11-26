@@ -719,7 +719,11 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
           </a>
           <a class="gh-ts-item" role="menuitem" href="https://liangtz0518.github.io/gamehub/fox/gh.html">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.5 8.6 8.2A8.4 8.4 0 0 1 12 7.4c1.2 0 2.4.3 3.4.8L20 4.5l-.7 6.1a8 8 0 1 1-14.6 0Z" fill="currentColor" fill-opacity=".12"/><path d="M9 13h.01M15 13h.01" stroke-width="2.2"/><path d="m10.8 16.2 1.2 1 1.2-1"/></svg>
-            <span class="gh-ts-name">fox</span><span class="gh-ts-check">✓</span>
+            <span class="gh-ts-name">Fox</span><span class="gh-ts-check">✓</span>
+          </a>
+          <a class="gh-ts-item" role="menuitem" href="https://liangtz0518.github.io/gamehub/lite.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="2"/><path d="M9 20h9a2 2 0 0 0 2-2V9"/></svg>
+            <span class="gh-ts-name">Lite</span><span class="gh-ts-check">✓</span>
           </a>
         </div>
       </div>
@@ -764,9 +768,7 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 // ===== 公告区文字：在这里修改你想要的文案（多条用 | 分隔）=====
 const ANNOUNCEMENT_TEXT = '记得写周报，记得写周报，记得写周报，要加道具GS内部群喊一声';
 
-const VERSION_ACK_KEY = 'gamehub-seen-version';
-let hubVersion = '';
-try { hubVersion = localStorage.getItem(VERSION_ACK_KEY) || ''; } catch (e) {}
+const HUB_VERSION = '2';
 const VERSION_CHECK_URL = 'https://liangtz0518.github.io/gamehub/version.json';
 const VERSION_CHECK_INTERVAL = 10000;
 
@@ -845,7 +847,7 @@ function buildIndex() {
 }
 function buildFrameUrl(item) {
   const sep = item.url.includes('?') ? '&' : '?';
-  return item.url + sep + 'hub_v=' + encodeURIComponent(hubVersion);
+  return item.url + sep + 'hub_v=' + HUB_VERSION;
 }
 
 /* ---------- 侧栏渲染 ---------- */
@@ -1125,22 +1127,13 @@ async function checkVersion() {
     if (!resp.ok) return;
     const data = await resp.json();
     const remoteVersion = String(data.version || '');
-    if (!remoteVersion) return;
-
-    hubVersion = remoteVersion;
-    let seen = '';
-    try { seen = localStorage.getItem(VERSION_ACK_KEY) || ''; } catch (e) {}
-
-    if (seen !== remoteVersion) {
+    if (remoteVersion && remoteVersion !== HUB_VERSION) {
       versionUpdateDetected = true;
       showUpdateCard();
     }
   } catch (e) {}
 }
-function doRefresh() {
-  try { localStorage.setItem(VERSION_ACK_KEY, hubVersion); } catch (e) {}
-  location.reload();
-}
+function doRefresh() { location.reload(); }
 
 /* ---------- 时钟 ---------- */
 function tickClock() {
