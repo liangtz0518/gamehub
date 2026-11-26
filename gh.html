@@ -764,7 +764,9 @@ body.side-collapsed .sidebar { width: 0; border-right-width: 0; }
 // ===== 公告区文字：在这里修改你想要的文案（多条用 | 分隔）=====
 const ANNOUNCEMENT_TEXT = '记得写周报，记得写周报，记得写周报，要加道具GS内部群喊一声';
 
-const HUB_VERSION = '2';
+const VERSION_ACK_KEY = 'gamehub-seen-version';
+let hubVersion = '';
+try { hubVersion = localStorage.getItem(VERSION_ACK_KEY) || ''; } catch (e) {}
 const VERSION_CHECK_URL = 'https://liangtz0518.github.io/gamehub/version.json';
 const VERSION_CHECK_INTERVAL = 10000;
 
@@ -843,7 +845,7 @@ function buildIndex() {
 }
 function buildFrameUrl(item) {
   const sep = item.url.includes('?') ? '&' : '?';
-  return item.url + sep + 'hub_v=' + HUB_VERSION;
+  return item.url + sep + 'hub_v=' + encodeURIComponent(hubVersion);
 }
 
 /* ---------- 侧栏渲染 ---------- */
@@ -1123,13 +1125,22 @@ async function checkVersion() {
     if (!resp.ok) return;
     const data = await resp.json();
     const remoteVersion = String(data.version || '');
-    if (remoteVersion && remoteVersion !== HUB_VERSION) {
+    if (!remoteVersion) return;
+
+    hubVersion = remoteVersion;
+    let seen = '';
+    try { seen = localStorage.getItem(VERSION_ACK_KEY) || ''; } catch (e) {}
+
+    if (seen !== remoteVersion) {
       versionUpdateDetected = true;
       showUpdateCard();
     }
   } catch (e) {}
 }
-function doRefresh() { location.reload(); }
+function doRefresh() {
+  try { localStorage.setItem(VERSION_ACK_KEY, hubVersion); } catch (e) {}
+  location.reload();
+}
 
 /* ---------- 时钟 ---------- */
 function tickClock() {
